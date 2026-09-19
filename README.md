@@ -19,8 +19,8 @@ farmers* · Government of Maharashtra, Maharashtra State Innovation Society · T
 
 ## Status
 
-Built phase by phase, each gate proven and committed (PROMPT PART XV). **Current: P10 — the
-morning briefing.** Done so far:
+Built phase by phase, each gate proven and committed (PROMPT PART XV). **Current: P11 — selling, in
+three languages.** Done so far:
 - the foundation, and the shared domain engine;
 - the schema with row-level security, and authentication;
 - the nine adapters;
@@ -36,12 +36,17 @@ morning briefing.** Done so far:
 - the morning briefing: the district benchmark first and largest (sparkline, MSP floor, seven-day
   movement, seasonal position), the RAKSHA answer with its forecast shown as a band, the
   farmer's own lot, and "Why this signal?" — a ledger of the nine layers with measured weights.
+- selling by voice or text in Marathi, Hindi or English: the farmer's words are parsed on the
+  phone, shown back in a "here's what we understood" card that asks, with a single tap, about
+  anything unclear (above all: ₹2,500 per quintal, per kilo, or for the whole lot?), and saved
+  as a listing that goes through the outbox, offline or not. Offline, the mic records, and the
+  recording is written down when the network returns.
 
 A farmer can choose a language, sign in, verify a PM-KISAN record and see their district's prices
-and a sell/wait decision computed on the phone, with the reasons laid out. That keeps working
-with the API killed or the network gone. Selling (voice and text parsing), the camera and the
-buyer shortlist come next (P11–P13). The shortlist half of Gate A is proven when the shortlist
-exists (P13).
+and a sell/wait decision computed on the phone, with the reasons laid out, then list a crop by
+speaking or typing. All of it keeps working with the API killed or the network gone. The camera
+and the buyer shortlist come next (P12–P13). The shortlist half of Gate A is proven when the
+shortlist exists (P13).
 
 `REQUIREMENTS.csv` is the source of truth for what is real. Run `pnpm requirements` to see it.
 

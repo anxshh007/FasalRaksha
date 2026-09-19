@@ -15,10 +15,11 @@ import { LotControl } from '../briefing/LotControl';
 import { RakshaCard } from '../briefing/RakshaCard';
 import { Glyph } from '../design/Glyph';
 import { clock, headlineKey, rupees, t, type Locale } from '../i18n/strings';
+import { SpeakButton } from '../sell/SpeakButton';
 import type { CropBriefing } from '../offline/compute';
 import type { Device } from '../state/useDevice';
 
-const cropName = (locale: Locale, item: CropBriefing) => (locale === 'mr' ? item.names.mr : item.names.en);
+const cropName = (locale: Locale, item: CropBriefing) => (locale === 'en' ? item.names.en : locale === 'hi' ? (item.names.hi ?? item.names.mr) : item.names.mr);
 
 function OtherCrop({ locale, item, onChoose }: { locale: Locale; item: CropBriefing; onChoose: () => void }) {
   const verdict = item.evaluation.suppressed ? 'suppressed' : item.evaluation.verdict;
@@ -109,7 +110,7 @@ export function Home({ device }: { device: Device }) {
   const evidenceRef = useRef<HTMLDivElement>(null);
   const [evidenceOpen, setEvidenceOpen] = useState(false);
   if (briefing === null) return null;
-  const district = briefing.districtNames === null ? briefing.district : locale === 'mr' ? briefing.districtNames.mr : briefing.districtNames.en;
+  const district = briefing.districtNames === null ? briefing.district : briefing.districtNames[locale];
 
   if (briefing.crops.length === 0) {
     return (
@@ -134,6 +135,17 @@ export function Home({ device }: { device: Device }) {
       <div className="brief">
         <article className="brief__main" data-testid={`crop-${lead.crop}`} aria-label={cropName(locale, lead)}>
           <BenchmarkStrip locale={locale} cropName={cropName(locale, lead)} districtName={district} benchmark={lead.benchmark} bundle={lead.bundle} />
+          <div>
+            <SpeakButton
+              locale={locale}
+              text={t(locale, 'speak.summary', {
+                crop: cropName(locale, lead),
+                district,
+                price: rupees(locale, lead.benchmark.modal.amount),
+                answer: lead.evaluation.suppressed ? t(locale, 'home.stale') : t(locale, headlineKey(lead.evaluation.headline)),
+              })}
+            />
+          </div>
           <div data-testid={`verdict-${lead.crop}`} data-verdict={verdict}>
             <RakshaCard locale={locale} evaluation={lead.evaluation} today={lead.benchmark.modal.amount} onWhy={why} />
           </div>
@@ -144,7 +156,7 @@ export function Home({ device }: { device: Device }) {
             price={lead.benchmark.modal.amount}
             storage={lead.storage}
             location={briefing.location}
-            marketName={briefing.locationNames === null ? null : locale === 'mr' ? briefing.locationNames.mr : briefing.locationNames.en}
+            marketName={briefing.locationNames === null ? null : locale === 'en' ? briefing.locationNames.en : briefing.locationNames.mr}
           />
         </article>
         <div className="brief__side" ref={evidenceRef}>

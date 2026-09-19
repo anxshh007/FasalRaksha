@@ -172,6 +172,20 @@ worth committing.
 | Range bar and sparkline are hand-drawn SVG (1px strokes, `vector-effect: non-scaling-stroke`) with HTML labels | No chart library (§9.9-2); labels never stretch with a responsive band. |
 | Lot size is remembered on the phone and recomputes RK-7/GR-7 with **no request** (asserted in the P10 gate) | Constitution §4: farmer inputs are joined to market data only on the device. |
 
+### Decisions taken in P11
+
+| Decision | Reason |
+|---|---|
+| Three complete interfaces (mr, hi, en); the string table's type requires all three | §10.1 and Gate H: a missing translation fails the build, not a demo. Bengali and Punjabi stay in the shared locale list, offered once their tables exist. |
+| The parse runs on every keystroke, on the phone | The shared parser is instant and deterministic; the confirm card updates as the farmer types or as speech arrives. |
+| The confirm card's questions *are* the structured form | With no text at all (offline, no recogniser) the card asks crop and quantity directly; a listing never waits on voice. |
+| An unmarked price blocks "List for sale" until one tap answers it; a price over 4× or under ¼ of today's rate once normalised is flagged | Gate I / P1-03: the per-kilo-meant-per-quintal mistake produces confident wrong answers, not errors. |
+| Offline, the mic records (MediaRecorder) and the server transcribes on reconnection; a transcript fills an empty listing note through the outbox | §10.2: "we do not pretend" recognition works offline; the recording enriches the record, it never gates it. |
+| Listings travel through `POST /api/outbox`; an update that overtakes its own create gets 409 `LISTING_NOT_YET_RECEIVED`, which the phone retries | The shared drain order sends creates first, but a failed create must not turn a later edit into a lost one. |
+| DATE columns are selected as text | node-pg turns a DATE into local midnight, which is the previous day in UTC (IST is +05:30). |
+| Hash routes (`#/sell`, `#/deals`) | Back button and reload work, and one service-worker shell serves every place. |
+| Known limit: native date inputs follow the browser's own locale, not the app's | Recorded rather than replaced with a custom picker; the stored value is always ISO. |
+
 ## 4 · Environment (measured 2026-09-19)
 
 Windows 11 · Node 24.19 · pnpm 10.34.5 · Python 3.12.6 (`.venv`, pinned `ml/requirements.txt`) ·

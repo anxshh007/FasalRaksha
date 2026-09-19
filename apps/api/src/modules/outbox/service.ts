@@ -7,7 +7,7 @@
  * response and changes nothing. The same key sent with different content is refused, because
  * that is a client bug or a replay attack, not a retry.
  *
- * Kinds whose features arrive in later phases (listings P11, photos P12) are answered with 501,
+ * Photographs (P12) are answered with 501 until the image pipeline lands,
  * which the phone treats as "keep it and try later". They are never silently accepted.
  */
 import { createHash } from 'node:crypto';
@@ -17,6 +17,7 @@ import type { PoolClient } from 'pg';
 
 import { withActor, type Actor, type Database } from '../../db/actor.js';
 import { DomainError } from '../../http/errors.js';
+import { applyListing } from '../listings/service.js';
 
 export interface OutboxResponse {
   status: number;
@@ -69,6 +70,8 @@ export async function deliverOutboxEntry(db: Database, actor: Actor, entry: Outb
       case 'listing.create':
       case 'listing.update':
       case 'listing.renew':
+        result = await applyListing(client, actor, entry);
+        break;
       case 'photo.upload':
         notYet(entry);
     }

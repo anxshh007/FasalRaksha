@@ -129,10 +129,10 @@ describe('SEC-09 · FR-10 · what the outbox refuses, and what it keeps for late
   });
 
   it('answers 501 for a kind whose feature is not built yet, so the phone keeps it', async () => {
-    const key = `renew-${randomUUID()}`;
+    const key = `photo-${randomUUID()}`;
     const response = await app.inject({
       method: 'POST', url: '/api/outbox', headers: { ...bearer(world.farmerA, 'farmer'), 'idempotency-key': key },
-      payload: { kind: 'listing.renew', idempotencyKey: key, createdAt: '2026-09-18T06:30:00.000Z', attempts: 0, listingClientId: 'client-listing-1', availableUntil: '2026-09-30' },
+      payload: { kind: 'photo.upload', idempotencyKey: key, createdAt: '2026-09-18T06:30:00.000Z', attempts: 0, listingClientId: 'client-listing-1', contentHash: 'a'.repeat(64), blobKey: 'blob-1', byteLength: 250_000 },
     });
     expect(response.statusCode).toBe(501);
     expect(await count('SELECT count(*) AS n FROM app.idempotency_keys WHERE key = $1', [key])).toBe(0); // nothing recorded: a later retry will be applied

@@ -16,12 +16,14 @@ import Fastify, { type FastifyReply, type FastifyRequest } from 'fastify';
 import { z } from 'zod';
 
 import type { MessagingAdapter } from '../adapters/messaging/index.js';
+import type { SpeechAdapter } from '../adapters/speech/speech.js';
 import type { BuyerRegistryAdapter, FarmerRegistryAdapter } from '../adapters/registry/types.js';
 import type { Config } from '../config.js';
 import type { Actor, Database } from '../db/actor.js';
 import type { Logger } from '../log/logger.js';
 import { refreshSession, requestOtp, revokeSession, verifyOtp, type AuthDeps, type SessionTokens } from '../modules/auth/service.js';
 import { cropBundle, currentManifest, sharedBundle, type ServedDocument } from '../modules/bundles/store.js';
+import { listMine } from '../modules/listings/service.js';
 import { getMe } from '../modules/me/service.js';
 import { parseOutboxEntry } from '../modules/outbox/schema.js';
 import { deliverOutboxEntry } from '../modules/outbox/service.js';
@@ -43,6 +45,7 @@ export interface AppDependencies {
   messaging?: MessagingAdapter;
   farmerRegistry?: FarmerRegistryAdapter;
   buyerRegistry?: BuyerRegistryAdapter;
+  speech?: SpeechAdapter;
   now?: () => Date;
 }
 
@@ -222,6 +225,21 @@ export function buildApp(deps: AppDependencies) {
 
   // The drain endpoint for a phone's offline outbox: one entry per request, idempotent under
   // its key. Deal transitions cannot be queued (compile-time) and are refused here too (SEC-09).
+  app.get('/api/listings/mine', async (request) => ({ listings: await listMine(requireDb(), requireActor(request)) }));
+
+  // Offline, a farmer's spoken listing is recorded on the phone; on reconnection it is transcribed
+  // here to enrich the record (PROMPT §10.2). Raw audio in, text out; nothing is stored.
+  app.addContentTypeParser(/^audio\//, { parseAs: 'buffer', bodyLimit: 5 * 1024 * 1024 }, (_request, body, done) => done(null, body));
+  app.post('/api/speech/transcribe', { config: { rateLimit: { max: 20, timeWindow: '10 minutes' } } }, async (request) => {
+    requireActor(request);
+    if (deps.speech === undefined) throw new DomainError(503, 'SPEECH_UNAVAILABLE', 'Voice is not available on this server. Your recording stays on your phone.');
+    const { locale } = z.object({ locale: z.enum(['mr', 'hi', 'en', 'bn', 'pa']) }).parse(request.query);
+    const audio = request.body;
+    if (!(audio instanceof Buffer) || audio.byteLength === 0) throw new DomainError(422, 'NO_AUDIO', 'The recording was empty.');
+    const mimeType = String(request.headers['content-type'] ?? '');
+    return deps.speech.transcribe({ audio: new Uint8Array(audio), mimeType, locale });
+  });
+
   app.post('/api/outbox', { config: { rateLimit: { max: 120, timeWindow: '1 minute' } } }, async (request, reply) => {
     const actor = requireActor(request);
     const entry = parseOutboxEntry(request.body);

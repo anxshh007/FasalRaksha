@@ -35,6 +35,7 @@ async function main(): Promise<void> {
     messaging: adapters.messaging,
     farmerRegistry: adapters.farmerRegistry,
     buyerRegistry: adapters.buyerRegistry,
+    speech: adapters.speech,
   });
   const shutdown = async (signal: string): Promise<void> => {
     logger.info({ signal }, 'shutting down');

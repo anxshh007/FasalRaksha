@@ -4,13 +4,15 @@
  * recompute the briefing from the device store. The briefing never waits on the network. It is
  * computed from what the phone holds, and the network only ever refreshes what the phone holds.
  */
-import type { OutboxEntry } from '@fasal/shared';
+import type { ListingDraft, OutboxEntry } from '@fasal/shared';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { Locale } from '../i18n/strings';
 import { computeHome, DEFAULT_CONTEXT, type DecisionContext, type HomeBriefing } from '../offline/compute';
 import { request } from '../offline/http';
+import { store, type LocalListing, type QueueState } from '../offline/db';
 import { drain, enqueue, queueSummary, type QueueSummary } from '../offline/outbox';
+import { attachRecording, saveRecording, transcribePending } from '../offline/recordings';
 import { effectiveType, probe, type Reachability } from '../offline/reach';
 import { adoptSession, refreshProfile, restoreSession, signOut as endSession, type SessionState } from '../offline/session';
 import { syncDistrict } from '../offline/sync';
@@ -36,11 +38,28 @@ export interface Device {
   /** The crop the briefing leads with. */
   selectedCrop: string | null;
   selectCrop: (crop: string) => void;
+  /** The farmer's listings on this phone, with where each is on its way to the server. */
+  listings: ListingState[];
+  createListing: (draft: ListingDraft, said: string, recordingId: string | null) => Promise<void>;
+  keepRecording: (blob: Blob) => Promise<string | null>;
   /** After an OTP sign-in or a verification, adopt the new state. */
   adopt: (accessToken: string) => Promise<void>;
   reloadProfile: () => Promise<void>;
   queueAction: (entry: OutboxEntry) => Promise<void>;
   signOut: () => Promise<void>;
+}
+
+export interface ListingState {
+  listing: LocalListing;
+  state: 'saved-here' | 'waiting' | 'sent' | 'rejected';
+  error: string | null;
+}
+
+function listingState(outboxState: QueueState | undefined): ListingState['state'] {
+  if (outboxState === undefined) return 'saved-here';
+  if (outboxState === 'sent') return 'sent';
+  if (outboxState === 'rejected') return 'rejected';
+  return 'waiting';
 }
 
 export function useDevice(initial: Preferences): Device {
@@ -51,6 +70,7 @@ export function useDevice(initial: Preferences): Device {
   const [reach, setReach] = useState<Reachability | null>(null);
   const [briefing, setBriefing] = useState<HomeBriefing | null>(null);
   const [queue, setQueue] = useState<QueueSummary | null>(null);
+  const [listings, setListings] = useState<ListingState[]>([]);
   const [context, setContext] = useState<DecisionContext>({ ...DEFAULT_CONTEXT, quantityQtl: initial.quantityQtl ?? DEFAULT_CONTEXT.quantityQtl });
   const [selectedCrop, setSelectedCrop] = useState<string | null>(initial.selectedCrop ?? null);
   const contextRef = useRef(context);
@@ -58,6 +78,7 @@ export function useDevice(initial: Preferences): Device {
   const sessionRef = useRef<SessionState | null>(null);
   sessionRef.current = session;
   const busy = useRef(false);
+  const again = useRef(false);
 
   const recompute = useCallback(async (state: SessionState | null) => {
     if (state === null || state.status === 'signed-out') {
@@ -67,11 +88,21 @@ export function useDevice(initial: Preferences): Device {
     }
     setBriefing(await computeHome(state.profile, contextRef.current));
     setQueue(await queueSummary(state.profile.userId));
+    const mine = await store().listings.where('userId').equals(state.profile.userId).reverse().sortBy('createdAt');
+    const entries = await store().outbox.bulkGet(mine.map((l) => `listing-${l.clientId}`));
+    setListings(mine.map((listing, i) => ({ listing, state: listingState(entries[i]?.state), error: entries[i]?.lastError ?? null })));
   }, []);
 
-  /** One pass of the loop. Safe to call at any time; overlapping calls are skipped. */
-  const tick = useCallback(async () => {
-    if (busy.current) return;
+  /**
+   * One pass of the loop. Safe to call at any time. A call that arrives mid-pass (the network
+   * coming back while a slow probe is still timing out) is not dropped: it runs as soon as the
+   * current pass ends, so a returning network is acted on at once rather than on the next timer.
+   */
+  const tick = useCallback(async (): Promise<void> => {
+    if (busy.current) {
+      again.current = true;
+      return;
+    }
     busy.current = true;
     try {
       const measured = await probe();
@@ -86,11 +117,16 @@ export function useDevice(initial: Preferences): Device {
         if (state.status === 'signed-in' && state.profile.district !== null) {
           await syncDistrict(state.profile.district);
           await drain(state.profile.userId, { effectiveType: effectiveType() });
+          await transcribePending(state.profile.userId);
         }
       }
       await recompute(state);
     } finally {
       busy.current = false;
+      if (again.current) {
+        again.current = false;
+        void tick();
+      }
     }
   }, [recompute]);
 
@@ -194,6 +230,29 @@ export function useDevice(initial: Preferences): Device {
     [tick],
   );
 
+  const createListing = useCallback(
+    async (draft: ListingDraft, said: string, recordingId: string | null) => {
+      const state = sessionRef.current;
+      if (state === null || state.status === 'signed-out') return;
+      const now = Date.now();
+      await store().listings.put({ clientId: draft.clientId, userId: state.profile.userId, draft, said, createdAt: now });
+      if (recordingId !== null) await attachRecording(recordingId, draft.clientId);
+      await enqueue({ kind: 'listing.create', idempotencyKey: `listing-${draft.clientId}`, createdAt: new Date(now).toISOString(), attempts: 0, listing: draft }, state.profile.userId, now);
+      await recompute(state);
+      void tick();
+    },
+    [recompute, tick],
+  );
+
+  const keepRecording = useCallback(
+    async (blob: Blob) => {
+      const state = sessionRef.current;
+      if (state === null || state.status === 'signed-out') return null;
+      return (await saveRecording(state.profile.userId, blob, locale)).id;
+    },
+    [locale],
+  );
+
   const signOut = useCallback(async () => {
     await endSession();
     const next: SessionState = { status: 'signed-out', reason: 'no-session' };
@@ -202,7 +261,7 @@ export function useDevice(initial: Preferences): Device {
     await recompute(next);
   }, [recompute]);
 
-  return { locale, setLocale, theme, setTheme, themeOffer, dismissThemeOffer, session, reach, briefing, queue, context, setQuantity, selectedCrop, selectCrop, adopt, reloadProfile, queueAction, signOut };
+  return { locale, setLocale, theme, setTheme, themeOffer, dismissThemeOffer, session, reach, briefing, queue, listings, createListing, keepRecording, context, setQuantity, selectedCrop, selectCrop, adopt, reloadProfile, queueAction, signOut };
 }
 
 /** Thin wrappers over the identity endpoints for the sign-in screens. */

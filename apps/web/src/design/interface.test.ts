@@ -34,11 +34,11 @@ const code = (text: string) => text.replace(/\/\*[\s\S]*?\*\//g, '').replace(/(^
 
 // The farmer-facing copy, both languages.
 const strings = read(join(WEB, 'src/i18n/strings.ts'));
-const copy = [...strings.matchAll(/(mr|en): (['"])((?:\\.|(?!\2).)*)\2/g)].map((m) => ({ lang: m[1], text: m[3] ?? '' }));
+const copy = [...strings.matchAll(/(mr|hi|en): (['"])((?:\\.|(?!\2).)*)\2/g)].map((m) => ({ lang: m[1], text: m[3] ?? '' }));
 
 describe('P1-07 · no security signalling, no emoji', () => {
   it('finds the copy it scans (guards against a vacuous pass)', () => {
-    expect(copy.length).toBeGreaterThan(100);
+    expect(copy.length).toBeGreaterThan(600); // every string, in Marathi, Hindi and English
   });
 
   it('no padlock, shield, "runs locally", "secure" or "verified" badge text anywhere in the interface', () => {
@@ -55,7 +55,7 @@ describe('P1-07 · no security signalling, no emoji', () => {
 
 describe('Constitution §8 · no model terminology on a farmer screen', () => {
   it('none of model, algorithm, AI, ML, inference, prediction, confidence interval, quantile, score', () => {
-    const banned = /\b(model|algorithm|AI|ML|inference|predict(ion|ed)?|confidence interval|quantile|score)\b|मॉडेल|अल्गोरिदम|एआय/i;
+    const banned = /\b(model|algorithm|AI|ML|inference|predict(ion|ed)?|confidence interval|quantile|score)\b|मॉडेल|मॉडल|अल्गोरिदम|एल्गोरिदम|एआय|एआई/i;
     expect(copy.filter((c) => banned.test(c.text)).map((c) => `${c.lang}: ${c.text}`)).toEqual([]);
   });
 });

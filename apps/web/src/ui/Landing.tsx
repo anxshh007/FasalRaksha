@@ -11,6 +11,7 @@ import { SignIn } from './SignIn';
 
 const LANGUAGES: { id: Locale; name: string }[] = [
   { id: 'mr', name: 'मराठी' },
+  { id: 'hi', name: 'हिन्दी' },
   { id: 'en', name: 'English' },
 ];
 

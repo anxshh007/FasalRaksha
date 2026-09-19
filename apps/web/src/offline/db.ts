@@ -9,7 +9,7 @@
  * page cannot lift a long-lived credential from storage) and the refresh token (an httpOnly
  * cookie the page cannot read at all).
  */
-import type { CropBundle, OutboxEntry } from '@fasal/shared';
+import type { CropBundle, ListingDraft, OutboxEntry } from '@fasal/shared';
 import Dexie, { type Table } from 'dexie';
 
 export interface StoredBundle {
@@ -90,6 +90,30 @@ export interface SyncEvent {
   detail: string;
 }
 
+/** A listing as the farmer composed it on this phone; its journey to the server is its outbox entry. */
+export interface LocalListing {
+  clientId: string;
+  userId: string;
+  draft: ListingDraft;
+  /** What the farmer said or typed, kept so a transcript can enrich it later. */
+  said: string;
+  createdAt: number;
+}
+
+/** Audio a farmer recorded with no network, written down on reconnection (§10.2). */
+export interface Recording {
+  id: string;
+  userId: string;
+  /** The listing it belongs to, once one was created from the same screen. */
+  listingClientId: string | null;
+  blob: Blob;
+  mimeType: string;
+  locale: string;
+  createdAt: number;
+  status: 'saved' | 'transcribed' | 'unrecognised';
+  transcript: string | null;
+}
+
 export interface Setting {
   key: string;
   value: unknown;
@@ -103,6 +127,8 @@ export class DeviceStore extends Dexie {
   outbox!: Table<QueuedEntry, string>;
   events!: Table<SyncEvent, number>;
   settings!: Table<Setting, string>;
+  listings!: Table<LocalListing, string>;
+  recordings!: Table<Recording, string>;
 
   constructor(name = 'fasal-raksha') {
     super(name);
@@ -114,6 +140,11 @@ export class DeviceStore extends Dexie {
       outbox: 'id, userId, state, nextAttemptAt',
       events: '++id, at, kind',
       settings: 'key',
+    });
+    // v2 (P11): listings composed on the phone, and recordings awaiting transcription.
+    this.version(2).stores({
+      listings: 'clientId, userId, createdAt',
+      recordings: 'id, userId, status, listingClientId',
     });
   }
 }

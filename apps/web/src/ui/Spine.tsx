@@ -4,14 +4,17 @@
  * 44px target; the two choices (language, theme) are buttons, the rest are readings.
  */
 import { Glyph } from '../design/Glyph';
-import { shortDay, t } from '../i18n/strings';
+import { LOCALES, shortDay, t, type Locale } from '../i18n/strings';
 import type { Device } from '../state/useDevice';
 
+
+const SHORT: Record<Locale, string> = { mr: 'मरा', hi: 'हिं', en: 'EN' };
+const nextLocale = (locale: Locale): Locale => LOCALES[(LOCALES.indexOf(locale) + 1) % LOCALES.length] ?? 'mr';
 
 export function Spine({ device }: { device: Device }) {
   const { locale, theme, reach, briefing, session } = device;
   const signedIn = session !== null && session.status !== 'signed-out';
-  const districtName = briefing?.districtNames ? (locale === 'mr' ? briefing.districtNames.mr : briefing.districtNames.en) : signedIn ? session.profile.district : null;
+  const districtName = briefing?.districtNames ? briefing.districtNames[locale] : signedIn ? session.profile.district : null;
   const asOf = briefing?.crops.map((c) => c.benchmark.asOf).sort().at(-1) ?? null;
   const state = reach === null ? 'checking' : reach.reachable ? 'live' : 'field';
 
@@ -26,9 +29,9 @@ export function Spine({ device }: { device: Device }) {
           <span>{districtName}</span>
         </span>
       )}
-      <button type="button" className="spine__item" onClick={() => device.setLocale(locale === 'mr' ? 'en' : 'mr')} aria-label={t(locale, 'spine.language')} data-testid="spine-language">
+      <button type="button" className="spine__item" onClick={() => device.setLocale(nextLocale(locale))} aria-label={t(locale, 'spine.language')} data-testid="spine-language">
         <Glyph name="language" />
-        <span lang={locale === 'mr' ? 'en' : 'mr'}>{locale === 'mr' ? 'EN' : 'मरा'}</span>
+        <span>{SHORT[locale]}</span>
       </button>
       <button
         type="button"

@@ -1036,6 +1036,177 @@ button.spine__item:hover {
   margin: 0;
 }
 
+/* ── sell: speak or type, the confirm card, the review (P11) ───────────────────────────── */
+
+.sell__title {
+  font-size: var(--size-h2);
+}
+.sell textarea {
+  display: block;
+  width: 100%;
+  min-height: 96px;
+  padding: var(--space-3);
+  font: inherit;
+  font-size: var(--size-lead);
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--text-faint);
+  border-radius: var(--radius-input);
+  resize: vertical;
+}
+
+/* The parse-confirm card: Phase 1's understanding card, a tinted, deliberately separate surface. */
+.confirm {
+  padding: var(--space-5);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  background: var(--accent-tint);
+}
+.confirm__title {
+  font-size: var(--size-lead);
+  margin: 0 0 var(--space-4);
+}
+.confirm__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+  margin: 0;
+}
+@media (min-width: 700px) {
+  .confirm__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1100px) {
+  .confirm__grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+.confirm__grid dt {
+  margin-bottom: var(--space-1);
+}
+.confirm__grid dd {
+  margin: 0;
+}
+.confirm__value {
+  font-size: var(--size-lead);
+  font-weight: 600;
+}
+.confirm__question {
+  display: block;
+  font-weight: 700;
+  margin-bottom: var(--space-2);
+}
+.confirm__number {
+  width: 7em;
+  min-height: var(--touch);
+  padding: 0 var(--space-2);
+  border: 1px solid var(--text-faint);
+  border-radius: var(--radius-input);
+  background: var(--surface);
+  color: var(--text);
+  font-size: var(--size-lead);
+}
+.confirm select,
+.review__dates input {
+  min-height: var(--touch);
+  padding: 0 var(--space-2);
+  border: 1px solid var(--text-faint);
+  border-radius: var(--radius-input);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+.choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.choice {
+  min-height: var(--touch);
+  padding: 0 var(--space-4);
+  border: 1px solid var(--text-faint);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font-size: var(--size-body);
+  cursor: pointer;
+}
+.choice[aria-pressed='true'] {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.confirm__benchmark {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-4) 0 0;
+  font-size: var(--size-small);
+}
+.confirm .notice {
+  margin-top: var(--space-3);
+}
+
+.review__dates {
+  align-items: flex-end;
+}
+.review__dates .field {
+  flex: 1;
+  min-width: 140px;
+}
+.check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--touch);
+  margin-bottom: var(--space-3);
+}
+.check input {
+  width: 24px;
+  height: 24px;
+  accent-color: var(--accent);
+}
+
+/* My listings: each with its journey to the server. */
+.listing-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: var(--hairline);
+}
+.listing-item {
+  padding: var(--space-4) 0;
+  border-bottom: var(--hairline);
+}
+.listing-item__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  font-size: var(--size-lead);
+}
+.listing-item__state {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--size-small);
+  color: var(--text-muted);
+}
+.listing-item__state--sent {
+  color: var(--accent);
+}
+.listing-item__state--rejected {
+  color: var(--refuse);
+}
+.listing-item__facts {
+  margin: var(--space-2) 0 var(--space-1);
+}
+.listing-item__dates {
+  margin: 0;
+  font-size: var(--size-small);
+}
+
 .stack {
   display: grid;
   gap: var(--space-4);

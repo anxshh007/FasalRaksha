@@ -39,6 +39,8 @@ export interface RequestOptions {
   auth?: boolean;
   /** Return the raw text instead of parsed JSON (bundles: the bytes are what is verified). */
   raw?: boolean;
+  /** Send bytes as they are (a recording), with the Blob's own content type. */
+  blob?: Blob;
 }
 
 export async function request<T>(path: string, options: RequestOptions = {}): Promise<HttpResult<T>> {
@@ -46,13 +48,14 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
   const timer = setTimeout(() => controller.abort(), options.timeoutMs ?? DEFAULT_TIMEOUT_MS);
   const headers: Record<string, string> = { accept: 'application/json', ...options.headers };
   if (options.body !== undefined) headers['content-type'] = 'application/json';
+  if (options.blob !== undefined) headers['content-type'] = options.blob.type || 'application/octet-stream';
   if ((options.auth ?? true) && accessToken !== null) headers['authorization'] = `Bearer ${accessToken}`;
   let response: Response;
   try {
     response = await fetch(path, {
       method: options.method ?? 'GET',
       headers,
-      body: options.body === undefined ? null : JSON.stringify(options.body),
+      body: options.blob ?? (options.body === undefined ? null : JSON.stringify(options.body)),
       credentials: 'same-origin',
       cache: 'no-store',
       signal: controller.signal,

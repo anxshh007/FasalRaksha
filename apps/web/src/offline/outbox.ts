@@ -21,6 +21,9 @@ import { request, type HttpResult } from './http.js';
 
 export type Sender = (entry: OutboxEntry) => Promise<HttpResult<Record<string, unknown>>>;
 
+/** Refusals that mean "not yet", not "no": an update that overtook its own listing, for one. */
+const RETRY_LATER = new Set(['LISTING_NOT_YET_RECEIVED']);
+
 export const sendToServer: Sender = (entry) =>
   request<Record<string, unknown>>('/api/outbox', { method: 'POST', body: entry, headers: { 'idempotency-key': entry.idempotencyKey } });
 
@@ -67,7 +70,7 @@ export async function drain(userId: string, options: { now?: number; effectiveTy
       result.sent++;
       continue;
     }
-    if (answer.kind === 'rejected') {
+    if (answer.kind === 'rejected' && !RETRY_LATER.has(answer.code)) {
       if (answer.status === 401) {
         await db.outbox.update(queued.id, { state: 'queued', updatedAt: now });
         result.stoppedBecause = 'signed-out';
@@ -80,7 +83,7 @@ export async function drain(userId: string, options: { now?: number; effectiveTy
     await db.outbox.update(queued.id, {
       state: 'retrying',
       entry: attempt,
-      lastError: answer.message || `server error ${answer.status}`,
+      lastError: answer.message || `server answered ${answer.status}`,
       nextAttemptAt: now + nextBackoffMs(attempt.attempts, attempt.idempotencyKey),
       updatedAt: now,
     });

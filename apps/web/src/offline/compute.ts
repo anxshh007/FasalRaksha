@@ -16,7 +16,7 @@ import {
   TOLERABLE_LOSS_FRACTION_DEFAULT,
   type Benchmark,
   type CropBundle,
-  type CropProfile,
+  type CropDictionary,
   type DistrictRegistry,
   type FarmerLocation,
   type ISODate,
@@ -64,6 +64,9 @@ export interface HomeBriefing {
   computedAt: number;
   release: string | null;
   dataSource: string | null;
+  /** The crop dictionary and district registry, for the parser (null before the first sync). */
+  dictionary: CropDictionary | null;
+  registry: DistrictRegistry | null;
 }
 
 /** Today's date in India (IST, UTC+05:30, no daylight saving), from a clock reading. */
@@ -80,7 +83,8 @@ export async function computeHome(profile: StoredProfile, context: DecisionConte
     db.shared.get('districts'),
     db.manifest.get('current'),
   ]);
-  const dictionary = (cropsDoc?.document['dictionary'] as { crops?: CropProfile[] } | undefined)?.crops ?? [];
+  const dictionaryDoc = (cropsDoc?.document['dictionary'] as CropDictionary | undefined) ?? null;
+  const dictionary = dictionaryDoc?.crops ?? [];
   const registry = districtsDoc?.document['registry'] as DistrictRegistry | undefined;
   const district = registry === undefined ? null : findDistrict(registry, profile.district);
   const location = district === null ? null : locateFarmer(profile.village, district);
@@ -106,5 +110,5 @@ export async function computeHome(profile: StoredProfile, context: DecisionConte
     .sort((a, b) => Number(a.benchmark.adviceSuppressed) - Number(b.benchmark.adviceSuppressed) || a.crop.localeCompare(b.crop));
 
   const market = location?.marketId === null || location === null ? null : (district?.markets.find((m) => m.id === location.marketId) ?? null);
-  return { district: profile.district, districtNames: district?.names ?? null, locationNames: market?.names ?? null, location, crops, computedAt: now, release: manifest?.version ?? null, dataSource: manifest?.dataSource ?? null };
+  return { district: profile.district, districtNames: district?.names ?? null, locationNames: market?.names ?? null, location, crops, computedAt: now, release: manifest?.version ?? null, dataSource: manifest?.dataSource ?? null, dictionary: dictionaryDoc, registry: registry ?? null };
 }
