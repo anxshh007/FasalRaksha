@@ -1,0 +1,30 @@
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+.vite/
+
+# Secrets never enter the repository. .env.example is the only committed env file.
+.env
+.env.*
+!.env.example
+
+# Local PostgreSQL cluster managed by infra/db/local-postgres.mjs
+.pgdata/
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Generated at runtime / by tests
+data/raw/*
+!data/raw/.gitkeep
+data/uploads/
+playwright-report/
+test-results/
+
+*.log
+.DS_Store
+Thumbs.db

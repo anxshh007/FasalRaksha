@@ -1,0 +1,13 @@
+packages:
+  - packages/*
+  - apps/*
+
+# pnpm 10 blocks dependency lifecycle scripts unless they are named here. Every entry is a
+# deliberate decision to let that package run code at install time.
+onlyBuiltDependencies:
+  - esbuild
+  # Rehydrates the symlinks listed in native/pg-symlinks.json (empty on Windows); no network, no compile.
+  - "@embedded-postgres/windows-x64"
+  - "@embedded-postgres/linux-x64"
+  - "@embedded-postgres/darwin-arm64"
+  - "@embedded-postgres/darwin-x64"

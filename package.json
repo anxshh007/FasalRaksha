@@ -1,0 +1,31 @@
+{
+  "name": "fasal-raksha",
+  "version": "3.0.0",
+  "private": true,
+  "description": "Fasal Raksha — offline-first price intelligence and a verified-buyer marketplace for the field gate. SIH 2026 · PS 26132 · Government of Maharashtra.",
+  "type": "module",
+  "packageManager": "pnpm@10.34.5",
+  "engines": {
+    "node": ">=20.11"
+  },
+  "scripts": {
+    "build": "pnpm -r run build",
+    "typecheck": "pnpm -r run typecheck",
+    "test": "pnpm -r run test",
+    "test:db": "pnpm --filter @fasal/api run test:db",
+    "db:start": "pnpm --filter @fasal/api run db:local",
+    "db:bootstrap": "pnpm --filter @fasal/api run bootstrap",
+    "db:migrate": "pnpm --filter @fasal/api run migrate",
+    "dev:api": "pnpm --filter @fasal/api run dev",
+    "dev:web": "pnpm --filter @fasal/web run dev",
+    "ml:test": "node tools/py.mjs -m pytest ml -q",
+    "requirements": "node tools/requirements/audit.mjs",
+    "audit:deps": "pnpm audit --audit-level high",
+    "verify": "node tools/verify.mjs"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "~6.0.3",
+    "vitest": "^5.0.1"
+  }
+}

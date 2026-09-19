@@ -1,0 +1,17 @@
+# Normalise text to LF in the repository and the working tree. Bundle integrity hashes and
+# golden vectors are computed over bytes, so a CRLF conversion on a Windows checkout would
+# make an honest bundle fail its own integrity check.
+* text=auto eol=lf
+
+# Generated, hashed artefacts: never let git rewrite a byte.
+data/bundles/** -text
+data/golden/** -text
+*.onnx binary
+*.png binary
+*.jpg binary
+*.webp binary
+*.woff2 binary
+*.docx binary
+
+# Reference material is kept byte-identical to the team's originals.
+reference/** -text

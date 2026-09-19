@@ -1,0 +1,29 @@
+# PostgreSQL for Fasal Raksha on any machine with Docker (PROMPT §3.2).
+#
+#   docker compose -f infra/docker-compose.yml --env-file .env up -d
+#   DATABASE_SUPERUSER_URL=postgres://postgres:<POSTGRES_PASSWORD>@127.0.0.1:5432/postgres pnpm db:bootstrap
+#
+# `pnpm db:bootstrap` creates the fasal_owner / fasal_app roles with fresh passwords, applies
+# the migrations and writes DATABASE_URL / DATABASE_OWNER_URL into .env. Machines without
+# Docker use `pnpm db:start` instead — the same PostgreSQL major, run from the embedded-postgres
+# binaries (CUTS.md C-01). Both paths run identical migrations.
+services:
+  postgres:
+    image: postgres:18
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_INITDB_ARGS: --encoding=UTF8
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      # postgres:18 keeps its data under /var/lib/postgresql/<major>/docker; mount the parent.
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pgdata:

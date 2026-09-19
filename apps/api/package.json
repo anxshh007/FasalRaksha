@@ -1,0 +1,39 @@
+{
+  "name": "@fasal/api",
+  "version": "3.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Fasal Raksha API — Fastify, PostgreSQL with row-level security, zod at every boundary.",
+  "exports": {
+    ".": {
+      "types": "./dist/http/app.d.ts",
+      "default": "./dist/http/app.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "typecheck": "tsc -b && tsc -p tsconfig.test.json",
+    "dev": "tsx watch --conditions=source src/server.ts",
+    "start": "node dist/server.js",
+    "migrate": "tsx --conditions=source scripts/migrate.ts",
+    "db:local": "tsx --conditions=source scripts/local-db.ts",
+    "test": "vitest run --project unit",
+    "test:db": "vitest run --project db",
+    "bootstrap": "tsx --conditions=source scripts/bootstrap.ts"
+  },
+  "dependencies": {
+    "@fasal/shared": "workspace:*",
+    "fastify": "^5.12.5",
+    "pg": "^8.23.0",
+    "pino": "^10.3.1",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/pg": "^8.23.1",
+    "embedded-postgres": "18.4.0-beta.17",
+    "tsx": "^4.23.13",
+    "typescript": "~6.0.3",
+    "vitest": "^5.0.1"
+  }
+}

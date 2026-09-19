@@ -1,0 +1,1576 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Fasal Raksha — AI-powered farmer & buyer marketplace</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%BE%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
+
+:root {
+  --bg: #07110c;
+  --bg-soft: #0b1710;
+  --card: #0e1b13;
+  --border: rgba(255,255,255,0.09);
+  --text: #f4f7f3;
+  --muted: #91a097;
+  --green: #b9e879;
+  --green-dark: #162515;
+  --white-soft: rgba(255,255,255,0.055);
+  --blue: #7ec4ff;
+  --blue-soft: rgba(126,196,255,0.1);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  min-height: 100vh;
+}
+button, input, textarea, select { font-family: inherit; }
+button { cursor: pointer; }
+a { text-decoration: none; color: inherit; }
+::selection { background: rgba(185,232,121,0.35); }
+.hidden { display: none !important; }
+
+/* ============ SHARED / NAV ============ */
+.navbar {
+  width: 100%; height: 76px; padding: 0 6%;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  background: rgba(7,17,12,0.86);
+  backdrop-filter: blur(18px);
+  position: sticky; top: 0; z-index: 40;
+}
+.brand { display: flex; align-items: center; gap: 11px; cursor: pointer; border: none; background: none; color: inherit; }
+.brand-icon {
+  width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+  border-radius: 12px; background: rgba(185,232,121,0.1);
+  border: 1px solid rgba(185,232,121,0.15); font-size: 20px; flex-shrink: 0;
+}
+.brand-name { font-family: "Manrope", sans-serif; font-size: 16px; font-weight: 800; text-align: left; }
+.brand-subtitle { margin-top: 2px; font-size: 8px; letter-spacing: 1.4px; color: var(--muted); text-align: left; }
+.nav-links { display: flex; gap: 8px; align-items: center; }
+.nav-pill {
+  border: 1px solid var(--border); background: transparent; color: var(--muted);
+  padding: 9px 15px; border-radius: 9px; font-size: 12px; font-weight: 600; transition: 0.2s;
+}
+.nav-pill:hover { color: var(--text); background: var(--white-soft); }
+.nav-pill.active { color: var(--green); border-color: rgba(185,232,121,0.3); background: rgba(185,232,121,0.08); }
+.nav-cta {
+  border: 1px solid rgba(185,232,121,0.25); background: rgba(185,232,121,0.08); color: var(--green);
+  padding: 10px 17px; border-radius: 9px; font-size: 12px; font-weight: 700;
+}
+.nav-cta:hover { background: rgba(185,232,121,0.15); }
+
+/* ============ HOME ============ */
+.home-page {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 75% 15%, rgba(92,153,70,0.14), transparent 28%),
+    radial-gradient(circle at 10% 50%, rgba(52,108,59,0.1), transparent 30%),
+    var(--bg);
+}
+.hero-section {
+  max-width: 1250px; min-height: 640px; margin: auto; padding: 80px 6%;
+  display: grid; grid-template-columns: 1fr 0.9fr; align-items: center; gap: 80px;
+}
+.hero-left { position: relative; z-index: 2; }
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 7px; color: var(--green);
+  font-size: 10px; letter-spacing: 1.7px; font-weight: 800; margin-bottom: 22px;
+}
+.eyebrow span { font-size: 13px; }
+.hero-left h1 {
+  font-family: "Manrope", sans-serif; font-size: clamp(40px, 6vw, 72px);
+  line-height: 1.03; letter-spacing: -3px; font-weight: 800;
+}
+.hero-left h1 span { color: var(--green); }
+.hero-text { max-width: 570px; margin-top: 25px; color: var(--muted); line-height: 1.75; font-size: 16px; }
+.hero-actions { display: flex; gap: 12px; margin-top: 34px; flex-wrap: wrap; }
+.primary-button {
+  border: none; background: var(--green); color: #0b1309; padding: 14px 19px; border-radius: 10px;
+  font-size: 13px; font-weight: 800; display: inline-flex; align-items: center; gap: 12px; transition: 0.2s;
+}
+.primary-button:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(185,232,121,0.12); }
+.primary-button span { font-size: 17px; }
+.primary-button.blue { background: var(--blue); }
+.primary-button.blue:hover { box-shadow: 0 12px 30px rgba(126,196,255,0.15); }
+.secondary-button {
+  padding: 14px 19px; border: 1px solid var(--border); border-radius: 10px; color: #c1cbc5; font-size: 13px; transition: 0.2s;
+}
+.secondary-button:hover { background: var(--white-soft); }
+.trust-row { display: flex; gap: 24px; margin-top: 38px; flex-wrap: wrap; }
+.trust-item { color: #718078; font-size: 11px; display: flex; align-items: center; gap: 6px; }
+
+.hero-visual { min-height: 430px; position: relative; display: flex; align-items: center; justify-content: center; }
+.glow { position: absolute; width: 330px; height: 330px; border-radius: 50%; background: rgba(112,180,77,0.12); filter: blur(70px); }
+.farmer-visual-card {
+  width: min(390px, 100%); padding: 24px; position: relative; z-index: 2; border-radius: 22px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: linear-gradient(145deg, rgba(24,42,28,0.95), rgba(11,24,16,0.96));
+  box-shadow: 0 35px 90px rgba(0,0,0,0.45);
+}
+.visual-header { display: flex; justify-content: space-between; align-items: center; color: #78877e; font-size: 9px; font-weight: 800; letter-spacing: 1.2px; }
+.visual-header > div { display: flex; align-items: center; gap: 7px; }
+.live-dot { width: 6px; height: 6px; border-radius: 50%; background: #91e36b; }
+.visual-header > span { color: var(--green); padding: 5px 8px; background: rgba(185,232,121,0.08); border-radius: 6px; }
+.visual-crop { display: flex; align-items: center; gap: 15px; margin-top: 35px; }
+.crop-circle { width: 64px; height: 64px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 30px; background: rgba(185,232,121,0.1); border: 1px solid rgba(185,232,121,0.15); }
+.visual-crop small { display: block; color: #65736b; font-size: 10px; }
+.visual-crop h3 { font-family: "Manrope"; font-size: 21px; margin: 3px 0; }
+.visual-crop p { color: #738078; font-size: 11px; }
+.visual-divider { height: 1px; background: var(--border); margin: 25px 0; }
+.match-title { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.match-title span { color: #6f7d74; font-size: 9px; letter-spacing: 1.2px; font-weight: 800; }
+.match-title strong { color: var(--green); font-size: 21px; }
+.preview-buyer { display: flex; align-items: center; gap: 11px; padding: 12px; background: rgba(255,255,255,0.035); border: 1px solid rgba(255,255,255,0.06); border-radius: 11px; }
+.buyer-mini-icon { width: 38px; height: 38px; display: flex; justify-content: center; align-items: center; border-radius: 10px; background: rgba(255,255,255,0.07); }
+.preview-buyer strong { display: block; font-size: 11px; }
+.preview-buyer small { display: block; color: #68756d; font-size: 9px; margin-top: 3px; }
+.price-mini { margin-left: auto; color: var(--green); font-size: 12px; font-weight: 800; }
+.preview-details { display: flex; gap: 10px; margin-top: 12px; }
+.preview-details span { flex: 1; padding: 9px; text-align: center; border-radius: 8px; background: rgba(255,255,255,0.025); color: #738078; font-size: 9px; }
+.ai-bubble { margin-top: 18px; padding: 10px 12px; border-radius: 9px; color: #8ea28f; background: rgba(185,232,121,0.05); font-size: 10px; text-align: center; }
+.floating-stat { position: absolute; z-index: 4; padding: 13px 16px; border-radius: 11px; background: rgba(14,28,19,0.94); border: 1px solid var(--border); box-shadow: 0 15px 40px rgba(0,0,0,0.3); }
+.floating-stat strong { display: block; color: var(--green); font-family: "Manrope"; font-size: 18px; }
+.floating-stat span { display: block; color: #66736c; font-size: 8px; margin-top: 2px; }
+.stat-one { top: 10%; left: -4%; }
+.stat-two { right: -4%; bottom: 12%; }
+
+.section { max-width: 1150px; margin: auto; padding: 100px 6%; }
+.section-heading { max-width: 650px; margin-bottom: 55px; }
+.section-heading h2 { font-family: "Manrope"; font-size: clamp(30px, 4vw, 46px); line-height: 1.08; letter-spacing: -2px; margin-bottom: 17px; }
+.section-heading h2 span { color: var(--green); }
+.section-heading > p { color: var(--muted); line-height: 1.7; font-size: 14px; }
+
+.steps { display: flex; align-items: stretch; gap: 18px; flex-wrap: wrap; }
+.step-card { flex: 1; min-width: 220px; padding: 25px; border-radius: 16px; border: 1px solid var(--border); background: rgba(255,255,255,0.025); position: relative; }
+.step-number { color: #526059; font-size: 10px; font-weight: 800; letter-spacing: 1px; }
+.step-icon { font-size: 27px; margin: 35px 0 18px; }
+.step-card h3 { font-family: "Manrope"; font-size: 17px; margin-bottom: 9px; }
+.step-card p { color: var(--muted); font-size: 12px; line-height: 1.6; }
+
+.features-section { border-top: 1px solid var(--border); }
+.feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.feature-card { padding: 28px; border-radius: 17px; border: 1px solid var(--border); background: rgba(255,255,255,0.025); }
+.feature-card.large { grid-row: span 2; }
+.feature-card.wide { display: flex; gap: 20px; align-items: flex-start; }
+.feature-icon { width: 43px; height: 43px; display: flex; justify-content: center; align-items: center; border-radius: 11px; background: rgba(185,232,121,0.08); font-size: 20px; margin-bottom: 22px; }
+.feature-card h3 { font-family: "Manrope"; font-size: 17px; margin-bottom: 10px; }
+.feature-card p { color: var(--muted); font-size: 12px; line-height: 1.65; }
+.language-pills { display: flex; gap: 7px; margin-top: 28px; flex-wrap: wrap; }
+.language-pills span { padding: 8px 11px; border-radius: 8px; background: rgba(255,255,255,0.05); color: #9ca8a1; font-size: 10px; }
+
+/* ROLE PICKER */
+.role-section { border-top: 1px solid var(--border); }
+.role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.role-card {
+  padding: 34px; border-radius: 20px; border: 1px solid var(--border); background: rgba(255,255,255,0.025);
+  text-align: left; transition: 0.2s; display: flex; flex-direction: column; gap: 14px; color: inherit;
+}
+.role-card:hover { transform: translateY(-3px); border-color: rgba(185,232,121,0.25); background: rgba(255,255,255,0.04); }
+.role-card .role-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 26px; background: rgba(185,232,121,0.1); }
+.role-card.buyer .role-icon { background: var(--blue-soft); }
+.role-card h3 { font-family: "Manrope"; font-size: 20px; }
+.role-card p { color: var(--muted); font-size: 13px; line-height: 1.6; }
+.role-card .role-go { margin-top: auto; color: var(--green); font-size: 12px; font-weight: 800; }
+.role-card.buyer .role-go { color: var(--blue); }
+
+.final-cta { padding: 100px 20px; text-align: center; border-top: 1px solid var(--border); background: radial-gradient(circle at center, rgba(92,153,70,0.12), transparent 50%); }
+.cta-leaf { font-size: 30px; }
+.final-cta h2 { font-family: "Manrope"; font-size: clamp(32px, 5vw, 52px); line-height: 1.05; letter-spacing: -2px; margin: 18px 0; }
+.final-cta p { color: var(--muted); margin-bottom: 27px; }
+.final-cta-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+footer { max-width: 1150px; margin: auto; padding: 35px 6% 50px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 30px; flex-wrap: wrap; }
+.footer-brand { display: flex; align-items: center; gap: 10px; }
+.footer-brand strong { display: block; font-size: 13px; }
+.footer-brand span { display: block; color: #65716a; font-size: 9px; margin-top: 2px; }
+footer > p.footer-note { color: #647069; font-size: 10px; margin-left: auto; max-width: 340px; line-height: 1.6; }
+.footer-copy { color: #4e5953; font-size: 9px; }
+.footer-links { display: flex; gap: 14px; }
+.footer-links button { background: none; border: none; color: #7d8b83; font-size: 10px; text-decoration: underline; }
+.footer-links button:hover { color: var(--green); }
+
+/* ============ DASHBOARD SHARED ============ */
+.dashboard-page { min-height: 100vh; background: radial-gradient(circle at 50% 0, rgba(93,156,69,0.13), transparent 34%), var(--bg); }
+.dashboard-page.buyer-theme { background: radial-gradient(circle at 50% 0, rgba(69,120,156,0.16), transparent 34%), var(--bg); }
+.dashboard-main { max-width: 960px; margin: auto; padding: 55px 20px 110px; }
+.dashboard-intro { text-align: center; margin-bottom: 42px; }
+.tagline { color: #68766e; font-size: 10px; letter-spacing: 1.8px; font-weight: 800; margin-bottom: 10px; }
+.dashboard-intro h1 { font-family: "Manrope"; font-size: clamp(34px, 6vw, 54px); letter-spacing: -2px; line-height: 1.06; }
+.dashboard-intro h1 span { color: var(--green); }
+.buyer-theme .dashboard-intro h1 span { color: var(--blue); }
+.dashboard-intro p { color: var(--muted); margin-top: 17px; font-size: 14px; max-width: 520px; margin-left: auto; margin-right: auto; }
+
+.panel { padding: 28px; border: 1px solid var(--border); border-radius: 20px; background: rgba(255,255,255,0.035); box-shadow: 0 30px 80px rgba(0,0,0,0.25); margin-bottom: 26px; }
+.panel-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 22px; gap: 12px; flex-wrap: wrap; }
+.panel-top h2 { font-family: "Manrope"; font-size: 19px; }
+.panel-top p { color: #68766e; font-size: 11px; margin-top: 5px; }
+.badge-soft { padding: 7px 10px; border-radius: 20px; background: rgba(185,232,121,0.05); color: #74836f; font-size: 9px; white-space: nowrap; }
+.buyer-theme .badge-soft { background: rgba(126,196,255,0.07); color: #7fa1b7; }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-size: 11px; font-weight: 700; margin-bottom: 8px; color: #b6c0ba; }
+.form-group .hint { display: block; color: #5e6c64; font-size: 9px; margin-top: 6px; font-weight: 400; }
+.form-group input, .form-group select, .form-group textarea {
+  width: 100%; border: 1px solid var(--border); border-radius: 10px; outline: none; color: white;
+  background: rgba(0,0,0,0.2); transition: 0.2s; height: 47px; padding: 0 13px; font-size: 12.5px;
+}
+.form-group textarea { min-height: 120px; padding: 13px; resize: vertical; height: auto; line-height: 1.6; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: rgba(185,232,121,0.35); box-shadow: 0 0 0 3px rgba(185,232,121,0.06); }
+.buyer-theme .form-group input:focus, .buyer-theme .form-group select:focus, .buyer-theme .form-group textarea:focus { border-color: rgba(126,196,255,0.4); box-shadow: 0 0 0 3px rgba(126,196,255,0.07); }
+.form-group select option { background: #101b14; }
+
+.action-button {
+  width: 100%; border: none; border-radius: 10px; background: var(--green); color: #091009; padding: 14px;
+  font-size: 12.5px; font-weight: 800; display: flex; justify-content: center; align-items: center; gap: 10px; transition: 0.2s;
+}
+.action-button:hover { transform: translateY(-2px); box-shadow: 0 12px 35px rgba(185,232,121,0.12); }
+.action-button:disabled { opacity: 0.6; cursor: wait; transform: none; }
+.action-button.secondary { background: transparent; border: 1px solid var(--border); color: #cfd8d2; }
+.action-button.secondary:hover { background: var(--white-soft); box-shadow: none; }
+.action-button.blue { background: var(--blue); color: #051019; }
+.action-button.blue:hover { box-shadow: 0 12px 35px rgba(126,196,255,0.18); }
+.action-button.danger { background: transparent; border: 1px solid rgba(255,120,120,0.25); color: #ff9a9a; }
+.action-button.danger:hover { background: rgba(255,90,90,0.08); }
+.button-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.button-row .action-button { width: auto; flex: 1; min-width: 140px; }
+
+.spinner { width: 14px; height: 14px; border: 2px solid rgba(0,0,0,0.25); border-top-color: #091009; border-radius: 50%; animation: spin 0.7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.error-message { margin-top: 14px; padding: 12px 14px; border-radius: 10px; background: rgba(255,90,90,0.08); border: 1px solid rgba(255,120,120,0.2); color: #ffb3b3; font-size: 12px; }
+.info-message { margin-top: 14px; padding: 12px 14px; border-radius: 10px; background: rgba(185,232,121,0.06); border: 1px solid rgba(185,232,121,0.15); color: #b7c9ae; font-size: 12px; }
+.buyer-theme .info-message { background: rgba(126,196,255,0.07); border-color: rgba(126,196,255,0.2); color: #b8d3e5; }
+
+.understanding-card { margin-top: 22px; padding: 22px; border-radius: 16px; border: 1px solid rgba(185,232,121,0.14); background: rgba(185,232,121,0.035); }
+.understanding-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
+.understanding-top h3 { font-family: "Manrope"; font-size: 16px; }
+.ai-ready { display: flex; align-items: center; gap: 6px; color: #9bb88d; font-size: 9px; }
+.ai-ready span.dot { width: 6px; height: 6px; border-radius: 50%; background: #8ce066; display: inline-block; }
+.understanding-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.understanding-grid > div { padding: 13px; border-radius: 10px; background: rgba(255,255,255,0.035); }
+.understanding-grid small { display: block; color: #69766f; font-size: 9px; margin-bottom: 6px; }
+.understanding-grid strong { font-size: 12.5px; }
+.understanding-note { margin-top: 14px; color: #6f8074; font-size: 10.5px; line-height: 1.6; }
+
+.matches-section { margin-top: 12px; }
+.matches-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
+.matches-header h2 { font-family: "Manrope"; font-size: 24px; margin-bottom: 5px; }
+.matches-header p { color: #68766e; font-size: 11px; }
+.match-total { padding: 8px 12px; border: 1px solid var(--border); border-radius: 20px; color: #7c8981; font-size: 9px; white-space: nowrap; }
+
+.listing-card { position: relative; padding: 21px; margin-bottom: 13px; border-radius: 16px; border: 1px solid var(--border); background: rgba(255,255,255,0.025); transition: 0.25s; }
+.listing-card:hover { transform: translateY(-2px); border-color: rgba(185,232,121,0.2); background: rgba(255,255,255,0.035); }
+.buyer-theme .listing-card:hover { border-color: rgba(126,196,255,0.25); }
+.listing-card.best { border-color: rgba(185,232,121,0.18); background: linear-gradient(135deg, rgba(185,232,121,0.055), rgba(255,255,255,0.025)); }
+.buyer-theme .listing-card.best { border-color: rgba(126,196,255,0.22); background: linear-gradient(135deg, rgba(126,196,255,0.06), rgba(255,255,255,0.025)); }
+.best-badge { position: absolute; top: -9px; left: 20px; padding: 4px 9px; border-radius: 5px; background: var(--green); color: #0a1108; font-size: 8px; font-weight: 800; letter-spacing: 0.6px; }
+.buyer-theme .best-badge { background: var(--blue); color: #051019; }
+.listing-main { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.listing-identity { display: flex; align-items: center; gap: 12px; }
+.listing-avatar { width: 46px; height: 46px; display: flex; justify-content: center; align-items: center; border-radius: 12px; background: rgba(255,255,255,0.06); font-size: 20px; flex-shrink: 0; }
+.listing-identity h3 { font-family: "Manrope"; font-size: 14px; }
+.listing-identity p { color: #65726b; font-size: 10px; margin-top: 4px; }
+.match-score { text-align: right; }
+.match-score strong { display: block; color: var(--green); font-family: "Manrope"; font-size: 22px; }
+.buyer-theme .match-score strong { color: var(--blue); }
+.match-score span { color: #617068; font-size: 8px; }
+.listing-info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; margin: 18px 0; }
+.listing-info-grid > div { padding: 11px; border-radius: 9px; background: rgba(255,255,255,0.03); }
+.listing-info-grid span { display: block; color: #647169; font-size: 9px; margin-bottom: 5px; }
+.listing-info-grid strong { font-size: 11px; }
+.listing-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.contact-button { flex: 1; min-width: 130px; padding: 10px; border-radius: 9px; border: 1px solid rgba(185,232,121,0.15); background: rgba(185,232,121,0.06); color: #a8c98d; font-size: 10.5px; font-weight: 800; transition: 0.2s; }
+.contact-button:hover { background: rgba(185,232,121,0.1); border-color: rgba(185,232,121,0.25); }
+.buyer-theme .contact-button { border-color: rgba(126,196,255,0.2); background: rgba(126,196,255,0.07); color: #a9cfe5; }
+.buyer-theme .contact-button:hover { background: rgba(126,196,255,0.12); border-color: rgba(126,196,255,0.3); }
+.remove-button { padding: 10px 12px; border-radius: 9px; border: 1px solid rgba(255,120,120,0.18); background: transparent; color: #d38f8f; font-size: 10.5px; }
+.remove-button:hover { background: rgba(255,90,90,0.08); }
+.empty-state { text-align: center; padding: 50px 20px; color: #66756c; }
+.empty-state .icon { font-size: 30px; margin-bottom: 12px; }
+.empty-state p { font-size: 12.5px; max-width: 340px; margin: 6px auto 0; line-height: 1.6; }
+
+.mini-listing { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border); background: rgba(255,255,255,0.025); margin-bottom: 8px; gap: 10px; flex-wrap: wrap; }
+.mini-listing .l-name { font-size: 12px; font-weight: 700; }
+.mini-listing .l-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+.advanced-toggle { margin-top: 8px; font-size: 10.5px; color: #7c8981; background: none; border: none; text-decoration: underline; padding: 0; }
+.advanced-toggle:hover { color: var(--green); }
+.advanced-box { margin-top: 12px; padding: 14px; border-radius: 10px; border: 1px dashed var(--border); background: rgba(0,0,0,0.15); }
+.advanced-box p { font-size: 10.5px; color: #7d8b83; line-height: 1.6; margin-bottom: 10px; }
+
+/* Toast */
+#toast-wrap { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); z-index: 200; display: flex; flex-direction: column; gap: 8px; align-items: center; }
+.toast { padding: 11px 18px; border-radius: 10px; background: #101b14; border: 1px solid rgba(185,232,121,0.25); color: var(--text); font-size: 12px; box-shadow: 0 15px 40px rgba(0,0,0,0.4); animation: toast-in 0.25s ease; }
+@keyframes toast-in { from { opacity: 0; transform: translateY(8px);} to { opacity: 1; transform: translateY(0);} }
+
+/* Modal */
+.modal-overlay { position: fixed; inset: 0; background: rgba(3,8,5,0.72); backdrop-filter: blur(4px); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.modal-box { width: min(440px, 100%); background: #0d1912; border: 1px solid var(--border); border-radius: 20px; padding: 26px; box-shadow: 0 40px 100px rgba(0,0,0,0.55); }
+.modal-box h3 { font-family: "Manrope"; font-size: 18px; margin-bottom: 6px; }
+.modal-box .modal-sub { color: var(--muted); font-size: 12px; margin-bottom: 18px; }
+.modal-close { position: absolute; }
+.modal-top { display: flex; justify-content: space-between; align-items: flex-start; }
+.icon-btn { background: none; border: none; color: #7d8b83; font-size: 16px; padding: 4px; }
+.icon-btn:hover { color: var(--text); }
+.contact-line { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; border-radius: 10px; background: rgba(255,255,255,0.04); margin-bottom: 10px; font-size: 12.5px; }
+.contact-line button { font-size: 10px; color: var(--green); background: none; border: 1px solid rgba(185,232,121,0.25); padding: 6px 10px; border-radius: 7px; }
+
+/* Role modal grid inside modal */
+.role-modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 6px; }
+.role-modal-grid button { padding: 20px 12px; border-radius: 14px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); color: var(--text); text-align: center; transition: 0.2s; }
+.role-modal-grid button:hover { border-color: rgba(185,232,121,0.3); background: rgba(185,232,121,0.05); }
+.role-modal-grid .r-icon { font-size: 26px; display: block; margin-bottom: 10px; }
+.role-modal-grid .r-label { font-weight: 800; font-size: 13px; display: block; }
+.role-modal-grid .r-sub { font-size: 10px; color: var(--muted); display: block; margin-top: 4px; }
+
+/* About modal */
+.about-list { font-size: 12px; color: #c3cdc6; line-height: 1.8; margin-top: 6px; }
+.about-list li { margin-bottom: 8px; }
+
+/* ============ AUTH / FARMER VERIFICATION ============ */
+.auth-tabs { display: flex; gap: 6px; margin-bottom: 22px; padding: 4px; border-radius: 12px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); }
+.auth-tab { flex: 1; padding: 10px; background: none; border: none; border-radius: 9px; color: #7c8981; font-size: 12px; font-weight: 700; transition: 0.2s; }
+.auth-tab.active { color: #0b1309; background: var(--green); }
+.verify-note { display: flex; gap: 10px; align-items: flex-start; margin: -4px 0 18px; padding: 12px 14px; border-radius: 10px; background: rgba(126,196,255,0.06); border: 1px solid rgba(126,196,255,0.15); color: #a9c3d3; font-size: 10.5px; line-height: 1.6; }
+.verified-card { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; }
+.verified-identity { display: flex; align-items: center; gap: 13px; }
+.verified-identity .v-badge { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; background: rgba(185,232,121,0.1); border: 1px solid rgba(185,232,121,0.18); flex-shrink: 0; }
+.verified-identity .v-name { font-weight: 800; font-size: 13px; }
+.verified-identity .v-sub { font-size: 10.5px; color: #68766e; margin-top: 3px; }
+.demo-disclaimer { text-align: center; font-size: 10.5px; color: #6f7d76; line-height: 1.7; margin-top: 16px; }
+.demo-disclaimer button { background: none; border: none; color: #8ea28f; text-decoration: underline; font-size: 10.5px; padding: 0; }
+
+/* Mic / voice input */
+.mic-button {
+  display: inline-flex; align-items: center; gap: 6px; border: 1px solid rgba(185,232,121,0.25);
+  background: rgba(185,232,121,0.06); color: #a8c98d; font-size: 10px; font-weight: 800;
+  padding: 7px 11px; border-radius: 20px; transition: 0.2s; flex-shrink: 0; white-space: nowrap;
+}
+.mic-button:hover { background: rgba(185,232,121,0.12); }
+.mic-button .mic-dot { width: 6px; height: 6px; border-radius: 50%; background: #8ce066; display: inline-block; }
+.mic-button.listening { background: rgba(255,90,90,0.12); border-color: rgba(255,120,120,0.35); color: #ff9a9a; animation: mic-pulse 1.3s ease-in-out infinite; }
+.mic-button.listening .mic-dot { background: #ff6b6b; }
+@keyframes mic-pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(255,90,90,0.35); } 50% { box-shadow: 0 0 0 7px rgba(255,90,90,0); } }
+.field-label-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+.field-label-row label { margin-bottom: 0; }
+.voice-hint { font-size: 9.5px; color: #5e6c64; margin-top: 6px; }
+
+/* ============ RESPONSIVE ============ */
+@media (max-width: 900px) {
+  .hero-section { grid-template-columns: 1fr; gap: 50px; }
+  .hero-left { text-align: center; }
+  .hero-text { margin-left: auto; margin-right: auto; }
+  .hero-actions, .trust-row { justify-content: center; }
+  .hero-visual { max-width: 500px; width: 100%; margin: auto; }
+  .steps { flex-direction: column; }
+  .role-grid { grid-template-columns: 1fr; }
+  .understanding-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 700px) {
+  .nav-links .nav-pill span.long { display: none; }
+  .navbar { padding: 0 16px; }
+  .hero-section { padding: 50px 20px; }
+  .hero-actions { flex-direction: column; }
+  .primary-button, .secondary-button { justify-content: center; width: 100%; }
+  .trust-row { flex-wrap: wrap; gap: 12px; }
+  .section { padding: 60px 20px; }
+  .feature-grid { grid-template-columns: 1fr; }
+  .feature-card.large { grid-row: auto; }
+  .feature-card.wide { display: block; }
+  footer { flex-direction: column; align-items: flex-start; }
+  footer > p.footer-note { margin-left: 0; max-width: none; }
+  .form-row { grid-template-columns: 1fr; }
+  .listing-info-grid { grid-template-columns: 1fr; }
+  .understanding-grid { grid-template-columns: 1fr; }
+  .panel { padding: 20px; }
+}
+@media (max-width: 430px) {
+  .brand-subtitle { display: none; }
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="modal-root"></div>
+<div id="toast-wrap"></div>
+
+<script>
+(function(){
+"use strict";
+
+/* =========================================================
+   DATA LAYER — replaces the FastAPI + SQLite backend.
+   Everything lives in localStorage on this device.
+========================================================= */
+var DB_KEY = "fasalraksha_db_v2";
+var SETTINGS_KEY = "fasalraksha_settings_v1";
+
+function defaultDB(){
+  return {
+    buyers: [
+      { id: 1, name: "Sharma Agro Traders", crop: "Wheat", price: 2700, quantity: 500, location: "Kolkata", contact: "sharma.agro@example.com", phone: "+91 98300 11223" },
+      { id: 2, name: "Green Harvest Pvt. Ltd.", crop: "Wheat", price: 2600, quantity: 300, location: "Kolkata", contact: "contact@greenharvest.example.com", phone: "+91 98301 44556" },
+      { id: 3, name: "Eastern Grain Market", crop: "Wheat", price: 2550, quantity: 200, location: "Kolkata", contact: "sales@easterngrain.example.com", phone: "+91 98302 77889" }
+    ],
+    listings: [
+      { id: 1, farmerName: "Ramesh Kumar", crop: "Wheat", quantity: 400, price: 2500, location: "Kolkata", contact: "+91 98765 43210", note: "Freshly harvested, ready for pickup this week.", createdAt: Date.now() - 86400000 * 2 },
+      { id: 2, farmerName: "Anita Devi", crop: "Rice", quantity: 250, price: 3100, location: "Howrah", contact: "+91 91234 56780", note: "Basmati paddy, can arrange transport.", createdAt: Date.now() - 86400000 }
+    ],
+    nextBuyerId: 4,
+    nextListingId: 3,
+    myBuyerProfileId: null,
+    farmers: [],
+    nextFarmerId: 1
+  };
+}
+
+function loadDB(){
+  try {
+    var raw = localStorage.getItem(DB_KEY);
+    if (!raw) { var seeded = defaultDB(); saveDB(seeded); return seeded; }
+    var parsed = JSON.parse(raw);
+    if (!parsed.buyers || !parsed.listings) return defaultDB();
+    if (!parsed.farmers) parsed.farmers = [];
+    if (!parsed.nextFarmerId) parsed.nextFarmerId = 1;
+    return parsed;
+  } catch (e) { return defaultDB(); }
+}
+function saveDB(db){ localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+
+function loadSettings(){
+  try { return JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {}; }
+  catch(e){ return {}; }
+}
+function saveSettings(s){ localStorage.setItem(SETTINGS_KEY, JSON.stringify(s)); }
+
+/* ---------------------------------------------------------
+   SESSION (which farmer, if any, is currently signed in)
+--------------------------------------------------------- */
+var SESSION_KEY = "fasalraksha_session_v1";
+function loadSession(){
+  try { return JSON.parse(localStorage.getItem(SESSION_KEY)) || null; }
+  catch(e){ return null; }
+}
+function saveSession(s){ localStorage.setItem(SESSION_KEY, JSON.stringify(s)); }
+function clearSession(){ localStorage.removeItem(SESSION_KEY); }
+
+var db = loadDB();
+var settings = loadSettings();
+var session = loadSession();
+
+/* ---------------------------------------------------------
+   MOCK GOVERNMENT FARMER REGISTRY
+   ---------------------------------------------------------
+   DEMO DATA ONLY. This stands in for a real government farmer
+   database (e.g. a PM-KISAN / state Agristack beneficiary
+   lookup) so the sign-up flow below has something real to
+   verify against inside a single offline HTML file.
+
+   IMPORTANT — in a production deployment this whole lookup
+   must move server-side: a browser should never hold a
+   government API key or call a government verification
+   endpoint directly. The real flow would be:
+     1. Farmer submits their Farmer ID from this page.
+     2. Your backend calls the government registry/eKYC API
+        (with proper auth, over HTTPS, with the farmer's
+        consent) and gets back a verified name/state/district.
+     3. Your backend returns only a verified/not-verified
+        result (plus the minimum needed profile fields) to
+        this page — never the raw government dataset.
+--------------------------------------------------------- */
+var GOV_FARMER_REGISTRY = [
+  { farmerId: "PMK-WB-2201-04871", name: "Ramesh Kumar", state: "West Bengal", district: "Howrah" },
+  { farmerId: "PMK-WB-2201-05532", name: "Anita Devi", state: "West Bengal", district: "Howrah" },
+  { farmerId: "PMK-UP-1904-11290", name: "Suresh Yadav", state: "Uttar Pradesh", district: "Lucknow" },
+  { farmerId: "PMK-PB-1102-08823", name: "Gurpreet Singh", state: "Punjab", district: "Amritsar" },
+  { farmerId: "PMK-BR-2005-03345", name: "Meena Kumari", state: "Bihar", district: "Patna" },
+  { farmerId: "PMK-MH-1607-09981", name: "Vijay Patil", state: "Maharashtra", district: "Pune" }
+];
+
+function verifyFarmerIdWithGovDB(farmerId, callback){
+  // Simulated network round-trip to a government verification service.
+  setTimeout(function(){
+    var clean = (farmerId || "").toString().trim().toUpperCase();
+    var match = GOV_FARMER_REGISTRY.find(function(r){ return r.farmerId.toUpperCase() === clean; });
+    callback(match || null);
+  }, 1100);
+}
+
+function getLoggedInFarmer(){
+  if (!session || !session.farmerId) return null;
+  return db.farmers.find(function(f){ return f.id === session.farmerId; }) || null;
+}
+
+/* =========================================================
+   CROP / LOCATION DICTIONARIES for the local "AI" parser
+========================================================= */
+var CROPS = [
+  { key: "wheat", label: "Wheat", icon: "🌾", syn: ["wheat","gehu","gehun","gehoon","gom","kanak"] },
+  { key: "rice", label: "Rice", icon: "🌾", syn: ["rice","chawal","chaal","dhan","paddy","chal"] },
+  { key: "maize", label: "Maize", icon: "🌽", syn: ["maize","corn","makka","makai","bhutta"] },
+  { key: "potato", label: "Potato", icon: "🥔", syn: ["potato","potatoes","aloo","alu"] },
+  { key: "onion", label: "Onion", icon: "🧅", syn: ["onion","onions","pyaz","piyaj","peyaj"] },
+  { key: "tomato", label: "Tomato", icon: "🍅", syn: ["tomato","tomatoes","tamatar"] },
+  { key: "sugarcane", label: "Sugarcane", icon: "🎋", syn: ["sugarcane","ganna","akh","aakh"] },
+  { key: "cotton", label: "Cotton", icon: "☁️", syn: ["cotton","kapas","tula"] },
+  { key: "mustard", label: "Mustard", icon: "🌼", syn: ["mustard","sarson","sorisha"] },
+  { key: "soybean", label: "Soybean", icon: "🫘", syn: ["soybean","soya","soyabean"] },
+  { key: "groundnut", label: "Groundnut", icon: "🥜", syn: ["groundnut","peanut","peanuts","moongfali","badam"] },
+  { key: "gram", label: "Gram (Chana)", icon: "🫛", syn: ["gram","chana","chola"] },
+  { key: "pulses", label: "Pulses (Dal)", icon: "🍲", syn: ["pulses","dal","daal","dhal"] },
+  { key: "jute", label: "Jute", icon: "🌿", syn: ["jute","paat"] },
+  { key: "tea", label: "Tea", icon: "🍃", syn: ["tea","chai"] }
+];
+var CITIES = ["Kolkata","Delhi","Mumbai","Pune","Bengaluru","Bangalore","Chennai","Hyderabad","Lucknow","Patna",
+  "Bhopal","Nagpur","Amritsar","Ludhiana","Jaipur","Ahmedabad","Surat","Kanpur","Indore","Guwahati",
+  "Bhubaneswar","Ranchi","Siliguri","Howrah","Durgapur","Asansol"];
+
+function findCropInText(lower){
+  for (var i=0;i<CROPS.length;i++){
+    var c = CROPS[i];
+    for (var j=0;j<c.syn.length;j++){
+      var re = new RegExp("\\b"+c.syn[j]+"\\b","i");
+      if (re.test(lower)) return c;
+    }
+  }
+  return null;
+}
+function findCityInText(lower){
+  for (var i=0;i<CITIES.length;i++){
+    if (lower.indexOf(CITIES[i].toLowerCase()) !== -1) return CITIES[i];
+  }
+  return null;
+}
+function normCrop(v){ return (v||"").toString().trim().toLowerCase(); }
+
+/* Local rule-based "AI understanding" — runs entirely offline in the browser. */
+function parseCropMessage(text, fallbackLocation){
+  var lower = " " + text.toLowerCase() + " ";
+  var crop = findCropInText(lower);
+
+  var qty = null;
+  var qm = lower.match(/(\d+(?:[.,]\d+)?)\s*(kg|kilo|kilogram|kilograms|quintal|quintals|qtl|ton|tonne|tonnes)/i);
+  if (qm){
+    var n = parseFloat(qm[1].replace(",",""));
+    var unit = qm[2].toLowerCase();
+    if (unit.indexOf("quintal") !== -1 || unit === "qtl") n = n * 100;
+    else if (unit.indexOf("ton") !== -1) n = n * 1000;
+    qty = Math.round(n);
+  }
+
+  var price = null;
+  var pm = lower.match(/(?:₹|rs\.?|inr)\s?(\d[\d,]*(?:\.\d+)?)/i);
+  if (!pm) pm = lower.match(/(\d[\d,]*(?:\.\d+)?)\s?(?:rupees?|rupaye|rupaya|taka)/i);
+  if (pm) price = Math.round(parseFloat(pm[1].replace(/,/g,"")));
+
+  var location = findCityInText(lower) || fallbackLocation || null;
+
+  var urgent = /(urgent|jaldi|turant|asap|emergency|today|abhi)/i.test(lower);
+
+  return { crop: crop, quantity: qty, price: price, location: location, urgent: urgent, raw: text };
+}
+
+/* =========================================================
+   MATCHING ENGINE — computed, not hardcoded like the
+   original prototype's fixed 94% / 89% / 84%.
+========================================================= */
+function matchScore(sell, buy){
+  var score = 0;
+  var sc = normCrop(sell.crop), bc = normCrop(buy.crop);
+  if (sc && bc){
+    if (sc === bc) score += 45;
+    else if (sc.indexOf(bc) !== -1 || bc.indexOf(sc) !== -1) score += 25;
+    else score += 5;
+  } else score += 15;
+
+  if (sell.location && buy.location){
+    if (sell.location.trim().toLowerCase() === buy.location.trim().toLowerCase()) score += 20;
+    else score += 8;
+  } else score += 10;
+
+  if (buy.price && sell.price){
+    var ratio = buy.price / sell.price;
+    score += Math.max(0, Math.min(20, ratio * 20));
+  } else score += 10;
+
+  if (buy.quantity && sell.quantity){
+    var qratio = sell.quantity / buy.quantity;
+    score += Math.max(0, Math.min(15, qratio * 15));
+  } else score += 8;
+
+  return Math.max(55, Math.min(98, Math.round(score)));
+}
+
+/* =========================================================
+   SMALL HELPERS
+========================================================= */
+function esc(s){
+  return (s === null || s === undefined) ? "" : String(s).replace(/[&<>"']/g, function(c){
+    return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c];
+  });
+}
+/* Safe to drop into: onclick="...write('HERE')..." — a single-quoted JS
+   string literal that itself sits inside an HTML attribute.
+   Order matters: JS-escape (backslash, then quote) FIRST, then HTML-escape
+   the result for the attribute. Escaping in the other order (as the old
+   code did via esc(x).replace(/'/g,"\\'")) is a no-op: esc() already turns
+   ' into the entity &#39;, so the later regex finds no raw ' left to touch.
+   The browser then HTML-decodes &#39; back into a bare ' when it parses the
+   attribute, which reintroduces an unescaped quote into the middle of the
+   JS string and throws "missing ) after argument list" the moment the
+   button is clicked — e.g. any contact value containing an apostrophe. */
+function escJsAttr(s){
+  s = (s === null || s === undefined) ? "" : String(s);
+  s = s.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+  return s.replace(/[&<>"]/g, function(c){
+    return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c];
+  });
+}
+function inr(n){
+  if (n === null || n === undefined || isNaN(n)) return "—";
+  return "₹" + Number(n).toLocaleString("en-IN");
+}
+function kg(n){
+  if (n === null || n === undefined || isNaN(n)) return "—";
+  return Number(n).toLocaleString("en-IN") + " kg";
+}
+function byId(id){ return document.getElementById(id); }
+function val(id){ var el = byId(id); return el ? el.value.trim() : ""; }
+function numVal(id){ var v = val(id); if (v === "") return null; var n = Number(v); return isNaN(n) ? null : n; }
+
+function toast(msg){
+  var wrap = byId("toast-wrap");
+  var t = document.createElement("div");
+  t.className = "toast";
+  t.textContent = msg;
+  wrap.appendChild(t);
+  setTimeout(function(){ t.style.opacity = "0"; t.style.transition = "opacity .3s"; }, 2200);
+  setTimeout(function(){ if (t.parentNode) wrap.removeChild(t); }, 2600);
+}
+
+/* =========================================================
+   APP STATE + ROUTER
+========================================================= */
+var state = {
+  view: "home",           // home | farmer | buyer
+  lastResult: null,       // last local-AI parse result (farmer view)
+  lastMatches: null,      // last computed buyer matches for farmer message
+  showAdvanced: false      // show optional Groq key box
+};
+
+function go(view){
+  if (view === "farmer" && !getLoggedInFarmer()){
+    state.authMode = "signup";
+    state.authError = null;
+    state.authVerified = null;
+    view = "auth";
+    toast("Verify your Farmer ID to open the farmer dashboard");
+  }
+  state.view = view;
+  window.scrollTo(0,0);
+  render();
+}
+
+/* =========================================================
+   MODALS
+========================================================= */
+function closeModal(){ byId("modal-root").innerHTML = ""; }
+
+function openRoleModal(){
+  byId("modal-root").innerHTML =
+    '<div class="modal-overlay" onclick="if(event.target===this) window.__fr.closeModal()">' +
+      '<div class="modal-box">' +
+        '<div class="modal-top">' +
+          '<div><h3>Get started</h3><p class="modal-sub">Are you here to sell a crop, or to buy one?</p></div>' +
+          '<button class="icon-btn" onclick="window.__fr.closeModal()">✕</button>' +
+        '</div>' +
+        '<div class="role-modal-grid">' +
+          '<button onclick="window.__fr.closeModal(); window.__fr.go(\'farmer\')">' +
+            '<span class="r-icon">👨‍🌾</span><span class="r-label">I\'m a Farmer</span><span class="r-sub">Sell your crop, find buyers</span>' +
+          '</button>' +
+          '<button onclick="window.__fr.closeModal(); window.__fr.go(\'buyer\')">' +
+            '<span class="r-icon">🏪</span><span class="r-label">I\'m a Buyer</span><span class="r-sub">Post demand, find crops</span>' +
+          '</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+}
+
+function openContactModal(name, sub, contact, phone){
+  var lines = "";
+  if (contact) lines += '<div class="contact-line"><span>✉️ ' + esc(contact) + '</span><button onclick="navigator.clipboard&&navigator.clipboard.writeText(\'' + escJsAttr(contact) + '\');window.__fr.toast(\'Copied\')">Copy</button></div>';
+  if (phone) lines += '<div class="contact-line"><span>📞 ' + esc(phone) + '</span><button onclick="navigator.clipboard&&navigator.clipboard.writeText(\'' + escJsAttr(phone) + '\');window.__fr.toast(\'Copied\')">Copy</button></div>';
+  if (!lines) lines = '<div class="contact-line"><span>No contact details on file yet.</span></div>';
+  byId("modal-root").innerHTML =
+    '<div class="modal-overlay" onclick="if(event.target===this) window.__fr.closeModal()">' +
+      '<div class="modal-box">' +
+        '<div class="modal-top">' +
+          '<div><h3>' + esc(name) + '</h3><p class="modal-sub">' + esc(sub) + '</p></div>' +
+          '<button class="icon-btn" onclick="window.__fr.closeModal()">✕</button>' +
+        '</div>' +
+        lines +
+        '<p style="margin-top:12px;font-size:10.5px;color:#6f7d76;line-height:1.6;">This is demo contact info stored locally on your device. Reach out directly using the details above.</p>' +
+      '</div>' +
+    '</div>';
+}
+
+function openAboutModal(){
+  byId("modal-root").innerHTML =
+    '<div class="modal-overlay" onclick="if(event.target===this) window.__fr.closeModal()">' +
+      '<div class="modal-box" style="width:min(560px,100%)">' +
+        '<div class="modal-top">' +
+          '<div><h3>About this build</h3><p class="modal-sub">This is a single-file, standalone conversion of the original Fasal Raksha project.</p></div>' +
+          '<button class="icon-btn" onclick="window.__fr.closeModal()">✕</button>' +
+        '</div>' +
+        '<ul class="about-list">' +
+          '<li><strong>One file, no server.</strong> The original React frontend + FastAPI backend + SQLite database + Groq AI call have been rebuilt as plain HTML/CSS/JS that runs entirely in this browser tab.</li>' +
+          '<li><strong>Data storage.</strong> Buyers and crop listings are saved to your browser\'s <code>localStorage</code> instead of a SQLite database. Nothing is sent to a server. Data stays only on this device/browser.</li>' +
+          '<li><strong>AI understanding.</strong> The original called Groq\'s LLM API server-side. This build parses your message locally with a small crop/quantity/price/location extractor, so it works offline with no API key. If you have your own Groq API key you can optionally enable live AI parsing in the Farmer dashboard\'s advanced panel.</li>' +
+          '<li><strong>Buyer side added.</strong> The original only had a farmer flow — buyers had to be inserted directly into the database. This build adds a full buyer dashboard: post a buying profile, browse farmer listings, and get computed matches.</li>' +
+          '<li><strong>Matching, computed not fixed.</strong> Match percentages are now calculated from crop, price, quantity and location fit, instead of the original\'s hardcoded 94% / 89% / 84% by list position.</li>' +
+        '</ul>' +
+      '</div>' +
+    '</div>';
+}
+
+/* =========================================================
+   RENDER: HOME
+========================================================= */
+function renderHome(){
+  return '' +
+  '<div class="home-page">' +
+    navBar("home") +
+    '<section class="hero-section">' +
+      '<div class="hero-left">' +
+        '<div class="eyebrow"><span>✦</span>AI-POWERED AGRICULTURE</div>' +
+        '<h1>Better crops.<br><span>Better buyers.</span><br>Better outcomes.</h1>' +
+        '<p class="hero-text">Fasal Raksha helps farmers discover the right buyers for their crops, and helps buyers find the right farmers — using language understanding plus price, quantity and location-based matching.</p>' +
+        '<div class="hero-actions">' +
+          '<button class="primary-button" onclick="window.__fr.openRoleModal()">👨‍🌾 Find Buyers<span>→</span></button>' +
+          '<button class="primary-button blue" onclick="window.__fr.go(\'buyer\')">🏪 Find Crops<span>→</span></button>' +
+        '</div>' +
+        '<div class="trust-row">' +
+          '<div class="trust-item"><span>🤖</span>AI Matching</div>' +
+          '<div class="trust-item"><span>🌐</span>Multi-language</div>' +
+          '<div class="trust-item"><span>📍</span>Location-aware</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="hero-visual">' +
+        '<div class="glow"></div>' +
+        '<div class="farmer-visual-card">' +
+          '<div class="visual-header"><div><span class="live-dot"></span>LIVE MATCHING</div><span>AI</span></div>' +
+          '<div class="visual-crop"><div class="crop-circle">🌾</div><div><small>Your crop</small><h3>Wheat</h3><p>100 kg • Kolkata</p></div></div>' +
+          '<div class="visual-divider"></div>' +
+          '<div class="match-preview">' +
+            '<div class="match-title"><span>BEST MATCH</span><strong>' + matchScore({crop:"Wheat",price:2700,quantity:500,location:"Kolkata"},{crop:"Wheat",price:2500,quantity:100,location:"Kolkata"}) + '%</strong></div>' +
+            '<div class="preview-buyer"><div class="buyer-mini-icon">🏪</div><div><strong>Sharma Agro Traders</strong><small>Kolkata</small></div><div class="price-mini">₹2700</div></div>' +
+            '<div class="preview-details"><span>💰 Better price</span><span>📦 500 kg demand</span></div>' +
+          '</div>' +
+          '<div class="ai-bubble">🤖 3 buyers currently listed for Wheat</div>' +
+        '</div>' +
+        '<div class="floating-stat stat-one"><strong>' + db.buyers.length + '</strong><span>Active buyers</span></div>' +
+        '<div class="floating-stat stat-two"><strong>' + db.listings.length + '</strong><span>Crop listings</span></div>' +
+      '</div>' +
+    '</section>' +
+
+    '<section class="section" id="how">' +
+      '<div class="section-heading">' +
+        '<div class="eyebrow">HOW IT WORKS</div>' +
+        '<h2>From your words to<span> the right match.</span></h2>' +
+        '<p>No complicated forms. Just tell Fasal Raksha what you have — or what you need — in the language you\'re comfortable with.</p>' +
+      '</div>' +
+      '<div class="steps">' +
+        '<div class="step-card"><div class="step-number">01</div><div class="step-icon">🗣️</div><h3>Describe it naturally</h3><p>Farmers describe their crop, quantity and price. Buyers describe what they\'re looking for.</p></div>' +
+        '<div class="step-card"><div class="step-number">02</div><div class="step-icon">🤖</div><h3>We understand you</h3><p>Key details are extracted automatically from your message — crop, quantity, price, location.</p></div>' +
+        '<div class="step-card"><div class="step-number">03</div><div class="step-icon">🎯</div><h3>Get matched</h3><p>See ranked matches based on price, quantity and location fit, then contact directly.</p></div>' +
+      '</div>' +
+    '</section>' +
+
+    '<section class="section features-section" id="features">' +
+      '<div class="section-heading">' +
+        '<div class="eyebrow">BUILT FOR BOTH SIDES</div>' +
+        '<h2>Simple technology.<span> Real impact.</span></h2>' +
+      '</div>' +
+      '<div class="feature-grid">' +
+        '<div class="feature-card large"><div class="feature-icon">🌐</div><h3>Speak your language</h3><p>Describe your crop or requirement naturally in Hindi, Bengali, Punjabi or English.</p>' +
+          '<div class="language-pills"><span>हिन्दी</span><span>বাংলা</span><span>ਪੰਜਾਬੀ</span><span>English</span></div></div>' +
+        '<div class="feature-card"><div class="feature-icon">📍</div><h3>Nearby opportunities</h3><p>Find buyers or farmers based on location and reduce unnecessary transport.</p></div>' +
+        '<div class="feature-card"><div class="feature-icon">💰</div><h3>Compare offers</h3><p>See prices and requirements side by side before you decide.</p></div>' +
+        '<div class="feature-card wide"><div class="feature-icon">🛡️</div><div><h3>Two-sided marketplace</h3><p>A dedicated dashboard for farmers to sell, and for buyers to source — both feeding the same live matching engine.</p></div></div>' +
+      '</div>' +
+    '</section>' +
+
+    '<section class="section role-section" id="roles">' +
+      '<div class="section-heading">' +
+        '<div class="eyebrow">CHOOSE YOUR SIDE</div>' +
+        '<h2>Built for farmers.<span> Built for buyers.</span></h2>' +
+        '<p>Two dashboards, one shared marketplace.</p>' +
+      '</div>' +
+      '<div class="role-grid">' +
+        '<button class="role-card" onclick="window.__fr.go(\'farmer\')">' +
+          '<div class="role-icon">👨‍🌾</div><h3>Farmer dashboard</h3>' +
+          '<p>Describe your crop, get AI-assisted understanding, and see ranked buyer matches. List your crop so buyers can find you too.</p>' +
+          '<span class="role-go">Go to Farmer Dashboard →</span>' +
+        '</button>' +
+        '<button class="role-card buyer" onclick="window.__fr.go(\'buyer\')">' +
+          '<div class="role-icon">🏪</div><h3>Buyer dashboard</h3>' +
+          '<p>Post what you\'re looking to buy, browse live crop listings from farmers, and get ranked matches for your demand.</p>' +
+          '<span class="role-go">Go to Buyer Dashboard →</span>' +
+        '</button>' +
+      '</div>' +
+    '</section>' +
+
+    '<section class="final-cta">' +
+      '<div>' +
+        '<span class="cta-leaf">🌱</span>' +
+        '<h2>Your harvest deserves<br>the right opportunity.</h2>' +
+        '<p>Start finding better matches today — as a farmer or as a buyer.</p>' +
+        '<div class="final-cta-actions">' +
+          '<button class="primary-button" onclick="window.__fr.go(\'farmer\')">👨‍🌾 Start as a Farmer<span>→</span></button>' +
+          '<button class="primary-button blue" onclick="window.__fr.go(\'buyer\')">🏪 Start as a Buyer<span>→</span></button>' +
+        '</div>' +
+      '</div>' +
+    '</section>' +
+
+    '<footer id="about">' +
+      '<div class="footer-brand"><div class="brand-icon">🌾</div><div><strong>Fasal Raksha</strong><span>AI-powered agriculture</span></div></div>' +
+      '<div class="footer-links"><button onclick="window.__fr.openAboutModal()">About this build</button><button onclick="window.__fr.resetDemo()">Reset demo data</button></div>' +
+      '<p class="footer-note">Standalone build — runs fully in your browser. Data is stored only in this browser\'s local storage, not on a server.</p>' +
+      '<span class="footer-copy">© 2026 Fasal Raksha</span>' +
+    '</footer>' +
+  '</div>';
+}
+
+function navBar(active){
+  var farmer = getLoggedInFarmer();
+  return '<nav class="navbar">' +
+    '<button class="brand" onclick="window.__fr.go(\'home\')">' +
+      '<div class="brand-icon">🌾</div>' +
+      '<div><div class="brand-name">Fasal Raksha</div><div class="brand-subtitle">SMART AGRICULTURE</div></div>' +
+    '</button>' +
+    '<div class="nav-links">' +
+      '<button class="nav-pill' + (active==="home"?" active":"") + '" onclick="window.__fr.go(\'home\')">Home</button>' +
+      '<button class="nav-pill' + (active==="farmer"?" active":"") + '" onclick="window.__fr.go(\'farmer\')">👨‍🌾 <span class="long">Farmer</span></button>' +
+      '<button class="nav-pill' + (active==="buyer"?" active":"") + '" onclick="window.__fr.go(\'buyer\')">🏪 <span class="long">Buyer</span></button>' +
+      (farmer ?
+        '<button class="nav-pill" style="color:var(--green);border-color:rgba(185,232,121,0.25);" title="Verified farmer">✅ <span class="long">' + esc(farmer.name.split(" ")[0]) + '</span></button>' +
+        '<button class="nav-cta" style="background:transparent;border-color:rgba(255,120,120,0.25);color:#ff9a9a;" onclick="window.__fr.handleLogout()">Sign out</button>'
+        :
+        '<button class="nav-pill' + (active==="auth"?" active":"") + '" onclick="window.__fr.go(\'auth\')">👤 <span class="long">Sign In</span></button>'
+      ) +
+      (active==="home" ? '<button class="nav-cta" onclick="window.__fr.openRoleModal()">Get Started →</button>' : '') +
+    '</div>' +
+  '</nav>';
+}
+
+/* =========================================================
+   RENDER: FARMER VERIFICATION (SIGN UP / SIGN IN)
+========================================================= */
+function renderAuth(){
+  var mode = state.authMode || "signup";
+  var form = state.authForm || {};
+  var verified = state.authVerified;
+  var err = state.authError;
+  var body = "";
+
+  if (mode === "signup"){
+    body =
+      '<div class="verify-note">🛡️ <div>Only farmers verified against government farmer records can list crops for sale here. This keeps the marketplace genuine for buyers.</div></div>' +
+      '<div class="form-group"><label>Full name</label><input id="a-name" placeholder="e.g. Ramesh Kumar" value="' + esc(form.name || "") + '"' + (verified ? " disabled" : "") + ' /></div>' +
+      '<div class="form-group"><label>Mobile number</label><input id="a-phone" placeholder="e.g. 98765 43210" value="' + esc(form.phone || "") + '"' + (verified ? " disabled" : "") + ' /></div>' +
+      '<div class="form-group"><label>Farmer Verification ID</label><input id="a-farmerid" placeholder="e.g. PMK-WB-2201-04871" value="' + esc(form.farmerId || "") + '"' + (verified ? " disabled" : "") + ' />' +
+        '<span class="hint">Your government-issued farmer ID (e.g. PM-KISAN registration number). We check it against government farmer records before your account can list crops.</span>' +
+      '</div>' +
+      (verified ?
+        '<div class="info-message">✅ Verified against government records: <strong>' + esc(verified.name) + '</strong> — ' + esc(verified.district) + ', ' + esc(verified.state) + '. Confirm the details above match you, then create your account.</div>'
+        : '') +
+      (err ? '<div class="error-message">⚠️ ' + esc(err) + '</div>' : '') +
+      '<button class="action-button" id="a-submit-btn" onclick="window.__fr.handleAuthSubmit()">' + (verified ? "✅ Create verified account" : "🔎 Verify with Government Database") + '</button>' +
+      (verified ? '<button class="advanced-toggle" style="margin-top:10px;" onclick="window.__fr.resetAuthVerification()">Not you? Re-check ID</button>' : '') +
+      '<p style="margin-top:16px;font-size:9.5px;color:#5e6c64;">Try a demo ID: PMK-WB-2201-04871, PMK-UP-1904-11290, PMK-PB-1102-08823, PMK-BR-2005-03345 or PMK-MH-1607-09981.</p>';
+  } else {
+    body =
+      '<div class="form-group"><label>Farmer Verification ID</label><input id="a-farmerid" placeholder="e.g. PMK-WB-2201-04871" value="' + esc(form.farmerId || "") + '" /></div>' +
+      '<div class="form-group"><label>Mobile number</label><input id="a-phone" placeholder="e.g. 98765 43210" value="' + esc(form.phone || "") + '" /></div>' +
+      (err ? '<div class="error-message">⚠️ ' + esc(err) + '</div>' : '') +
+      '<button class="action-button" id="a-submit-btn" onclick="window.__fr.handleAuthSubmit()">Sign in</button>';
+  }
+
+  return '' +
+  '<div class="dashboard-page">' +
+    navBar("auth") +
+    '<main class="dashboard-main" style="max-width:480px;">' +
+      '<div class="dashboard-intro">' +
+        '<p class="tagline">FARMER VERIFICATION</p>' +
+        '<h1>' + (mode === "signup" ? 'Create your <span>verified</span> account' : 'Welcome back, <span>farmer</span>') + '</h1>' +
+        '<p>Sign the seller side of the marketplace with a government-checked identity.</p>' +
+      '</div>' +
+      '<div class="panel">' +
+        '<div class="auth-tabs">' +
+          '<button class="auth-tab' + (mode==="signup"?" active":"") + '" onclick="window.__fr.setAuthMode(\'signup\')">Sign Up</button>' +
+          '<button class="auth-tab' + (mode==="login"?" active":"") + '" onclick="window.__fr.setAuthMode(\'login\')">Sign In</button>' +
+        '</div>' +
+        body +
+      '</div>' +
+      '<p class="demo-disclaimer">🔒 Demo build — verification runs against a small sample registry bundled in this file, standing in for a real government farmer database lookup. <button onclick="window.__fr.openAboutModal()">Learn more</button></p>' +
+    '</main>' +
+  '</div>';
+}
+
+/* =========================================================
+   RENDER: FARMER DASHBOARD
+========================================================= */
+function renderFarmer(){
+  var understandingHtml = "";
+  if (state.lastResult){
+    var r = state.lastResult;
+    understandingHtml =
+      '<div class="understanding-card">' +
+        '<div class="understanding-top"><h3>🤖 AI Understanding</h3><div class="ai-ready"><span class="dot"></span>' + (r.source === "groq" ? "Live AI" : "Local parser") + '</div></div>' +
+        '<div class="understanding-grid">' +
+          '<div><small>CROP</small><strong>' + (r.crop ? r.crop.icon + " " + r.crop.label : "Not detected") + '</strong></div>' +
+          '<div><small>QUANTITY</small><strong>' + (r.quantity ? kg(r.quantity) : "Not detected") + '</strong></div>' +
+          '<div><small>EXPECTED PRICE</small><strong>' + (r.price ? inr(r.price) + "/qtl" : "Not detected") + '</strong></div>' +
+          '<div><small>LOCATION</small><strong>' + esc(r.location || "Not detected") + '</strong></div>' +
+        '</div>' +
+        (r.aiText ? '<div class="understanding-note">' + esc(r.aiText) + '</div>' : '<div class="understanding-note">' + (r.urgent ? "Sounds urgent — flagged as a priority sale. " : "") + 'Parsed locally in your browser — no message data leaves your device unless you enable live AI below.</div>') +
+      '</div>';
+  }
+
+  var matchesHtml = "";
+  if (state.lastMatches){
+    if (state.lastMatches.length === 0){
+      matchesHtml = '<div class="empty-state"><div class="icon">📭</div><h3>No buyers listed yet</h3><p>No buyers are in the marketplace yet. Ask a buyer to post their profile from the Buyer Dashboard, or check back soon.</p></div>';
+    } else {
+      matchesHtml = '<div class="matches-section">' +
+        '<div class="matches-header"><div><p class="tagline">SMART MATCHING</p><h2>🎯 Best Buyer Matches</h2><p>Ranked by crop, price, quantity and location fit.</p></div><div class="match-total">' + state.lastMatches.length + ' matches</div></div>' +
+        state.lastMatches.map(function(m, i){
+          var b = m.buyer;
+          return '<div class="listing-card' + (i===0 ? " best" : "") + '">' +
+            (i===0 ? '<div class="best-badge">⭐ BEST MATCH</div>' : '') +
+            '<div class="listing-main">' +
+              '<div class="listing-identity"><div class="listing-avatar">🏪</div><div><h3>' + esc(b.name) + '</h3><p>' + esc(b.crop) + ' Buyer</p></div></div>' +
+              '<div class="match-score"><strong>' + m.score + '%</strong><span>Match</span></div>' +
+            '</div>' +
+            '<div class="listing-info-grid">' +
+              '<div><span>💰 Offered Price</span><strong>' + inr(b.price) + '</strong></div>' +
+              '<div><span>📍 Location</span><strong>' + esc(b.location) + '</strong></div>' +
+              '<div><span>📦 Required</span><strong>' + kg(b.quantity) + '</strong></div>' +
+            '</div>' +
+            '<div class="listing-actions"><button class="contact-button" onclick="window.__fr.contactBuyer(' + b.id + ')">Contact Buyer →</button></div>' +
+          '</div>';
+        }).join("") +
+      '</div>';
+    }
+  }
+
+  var myListingsHtml = db.listings.length === 0
+    ? '<p style="font-size:11.5px;color:#6f7d76;">You haven\'t listed any crops yet. Use the form above to make yourself visible to buyers.</p>'
+    : db.listings.slice().reverse().map(function(l){
+        return '<div class="mini-listing"><div><div class="l-name">' + esc(l.crop) + ' — ' + esc(l.farmerName) + '</div><div class="l-sub">' + kg(l.quantity) + ' • ' + inr(l.price) + '/qtl • ' + esc(l.location) + '</div></div><button class="remove-button" onclick="window.__fr.removeListing(' + l.id + ')">Remove</button></div>';
+      }).join("");
+
+  var farmer = getLoggedInFarmer();
+
+  return '' +
+  '<div class="dashboard-page">' +
+    navBar("farmer") +
+    '<main class="dashboard-main">' +
+      '<div class="dashboard-intro">' +
+        '<p class="tagline">FARMER DASHBOARD</p>' +
+        '<h1>Find the right buyer<br><span>for your crop.</span></h1>' +
+        '<p>Tell us about your crop in your own language. We\'ll extract the key details and match you against every buyer currently in the marketplace.</p>' +
+      '</div>' +
+
+      (farmer ?
+        '<div class="panel verified-card">' +
+          '<div class="verified-identity"><div class="v-badge">✅</div><div><div class="v-name">' + esc(farmer.name) + '</div><div class="v-sub">Verified Farmer • ID ' + esc(farmer.farmerId) + ' • ' + esc(farmer.district) + ', ' + esc(farmer.state) + '</div></div></div>' +
+          '<button class="action-button danger" style="width:auto;" onclick="window.__fr.handleLogout()">Sign out</button>' +
+        '</div>' : '') +
+
+      '<div class="panel">' +
+        '<div class="panel-top"><div><h2>🌐 Describe your crop</h2><p>Type naturally, or tap the mic and speak — quantities, prices and city names are picked up automatically.</p></div><span class="badge-soft">🔒 Runs locally</span></div>' +
+        '<div class="form-group">' +
+          '<label>Choose your language</label>' +
+          '<select id="f-language">' +
+            '<option>English</option><option>Hindi</option><option>Bengali</option><option>Punjabi</option>' +
+          '</select>' +
+        '</div>' +
+        '<div class="form-group">' +
+          '<div class="field-label-row">' +
+            '<label>🌾 Tell us about your crop</label>' +
+            '<button type="button" id="f-mic-btn" class="mic-button" onclick="window.__fr.toggleVoiceInput()"><span class="mic-dot"></span><span id="f-mic-label">🎙️ Speak</span></button>' +
+          '</div>' +
+          '<textarea id="f-message" placeholder="Example: Mere paas 100 kilo wheat hai aur mujhe 2500 rupaye chahiye, location Kolkata"></textarea>' +
+          '<span class="voice-hint">Voice input transcribes what you say directly into this box, in the language selected above.</span>' +
+        '</div>' +
+        '<button class="action-button" id="f-find-btn" onclick="window.__fr.handleFindBuyers()">🤖 Find Best Buyers</button>' +
+        '<div id="f-error"></div>' +
+        '<button class="advanced-toggle" onclick="window.__fr.toggleAdvanced()">' + (state.showAdvanced ? "Hide" : "Show") + ' advanced: use your own Groq API key for live AI</button>' +
+        (state.showAdvanced ? '<div class="advanced-box"><p>Optional. If you have your own key from <strong>console.groq.com</strong>, paste it here to get live LLM parsing instead of the local parser. It is stored only in this browser\'s local storage and sent directly to Groq\'s API — never to us.</p>' +
+          '<div class="form-group" style="margin-bottom:10px;"><input id="f-groq-key" type="password" placeholder="gsk_..." value="' + esc(settings.groqApiKey || "") + '" /></div>' +
+          '<button class="action-button secondary" style="width:auto;" onclick="window.__fr.saveGroqKey()">Save key</button>' +
+          (settings.groqApiKey ? '<button class="action-button danger" style="width:auto;margin-left:8px;" onclick="window.__fr.clearGroqKey()">Remove key</button>' : '') +
+        '</div>' : '') +
+      '</div>' +
+
+      understandingHtml +
+      matchesHtml +
+
+      '<div class="panel" style="margin-top:30px;">' +
+        '<div class="panel-top"><div><h2>📋 List your crop for sale</h2><p>Structured details so buyers can find and match you directly.</p></div><span class="badge-soft">Visible to buyers</span></div>' +
+        '<div class="form-row">' +
+          '<div class="form-group"><label>Your name</label><input id="l-name" placeholder="e.g. Ramesh Kumar" /></div>' +
+          '<div class="form-group"><label>Crop</label>' +
+            '<select id="l-crop">' + CROPS.map(function(c){ return '<option value="' + c.label + '">' + c.icon + ' ' + c.label + '</option>'; }).join("") + '</select>' +
+          '</div>' +
+        '</div>' +
+        '<div class="form-row">' +
+          '<div class="form-group"><label>Quantity (kg)</label><input id="l-qty" type="number" min="1" placeholder="e.g. 400" /></div>' +
+          '<div class="form-group"><label>Expected price (₹ / quintal)</label><input id="l-price" type="number" min="1" placeholder="e.g. 2500" /></div>' +
+        '</div>' +
+        '<div class="form-row">' +
+          '<div class="form-group"><label>Location</label><input id="l-location" placeholder="e.g. Kolkata" /></div>' +
+          '<div class="form-group"><label>Contact (phone or email)</label><input id="l-contact" placeholder="e.g. +91 90000 00000" /></div>' +
+        '</div>' +
+        '<div class="form-group"><label>Note (optional)</label><input id="l-note" placeholder="e.g. Freshly harvested, ready this week" /></div>' +
+        '<button class="action-button" onclick="window.__fr.handleAddListing()">📢 List this crop</button>' +
+        '<div id="l-error"></div>' +
+      '</div>' +
+
+      '<div class="panel">' +
+        '<div class="panel-top"><div><h2>My listings</h2><p>Shown on the Buyer Dashboard.</p></div></div>' +
+        myListingsHtml +
+      '</div>' +
+    '</main>' +
+  '</div>';
+}
+
+/* =========================================================
+   RENDER: BUYER DASHBOARD
+========================================================= */
+function renderBuyer(){
+  var myProfile = db.buyers.find(function(b){ return b.id === db.myBuyerProfileId; }) || null;
+
+  var matchesHtml = "";
+  var listingsToShow = db.listings.slice();
+
+  var query = state.buyerQuery || "";
+  if (query){
+    var q = query.toLowerCase();
+    listingsToShow = listingsToShow.filter(function(l){
+      return l.crop.toLowerCase().indexOf(q) !== -1 || l.location.toLowerCase().indexOf(q) !== -1 || l.farmerName.toLowerCase().indexOf(q) !== -1;
+    });
+  }
+
+  var ranked = listingsToShow.map(function(l){
+    var score = myProfile ? matchScore(l, myProfile) : matchScore(l, {crop:l.crop, price:l.price, quantity:l.quantity, location:l.location});
+    return { listing: l, score: myProfile ? score : null };
+  });
+  if (myProfile) ranked.sort(function(a,b){ return b.score - a.score; });
+
+  if (ranked.length === 0){
+    matchesHtml = '<div class="empty-state"><div class="icon">📭</div><h3>No crop listings found</h3><p>' + (query ? "Nothing matches \"" + esc(query) + "\". Try a different search." : "No farmers have listed crops yet. Check back soon.") + '</p></div>';
+  } else {
+    matchesHtml = ranked.map(function(item, i){
+      var l = item.listing;
+      var isBest = myProfile && i === 0;
+      return '<div class="listing-card' + (isBest ? " best" : "") + '">' +
+        (isBest ? '<div class="best-badge">⭐ BEST MATCH</div>' : '') +
+        '<div class="listing-main">' +
+          '<div class="listing-identity"><div class="listing-avatar">👨‍🌾</div><div><h3>' + esc(l.farmerName) + '</h3><p>Selling ' + esc(l.crop) + '</p></div></div>' +
+          (item.score !== null ? '<div class="match-score"><strong>' + item.score + '%</strong><span>Match</span></div>' : '') +
+        '</div>' +
+        '<div class="listing-info-grid">' +
+          '<div><span>💰 Asking Price</span><strong>' + inr(l.price) + '</strong></div>' +
+          '<div><span>📍 Location</span><strong>' + esc(l.location) + '</strong></div>' +
+          '<div><span>📦 Available</span><strong>' + kg(l.quantity) + '</strong></div>' +
+        '</div>' +
+        (l.note ? '<p style="font-size:11px;color:#8a978f;margin:-6px 0 16px;">"' + esc(l.note) + '"</p>' : '') +
+        '<div class="listing-actions"><button class="contact-button" onclick="window.__fr.contactFarmer(' + l.id + ')">Contact Farmer →</button></div>' +
+      '</div>';
+    }).join("");
+  }
+
+  return '' +
+  '<div class="dashboard-page buyer-theme">' +
+    navBar("buyer") +
+    '<main class="dashboard-main">' +
+      '<div class="dashboard-intro">' +
+        '<p class="tagline">BUYER DASHBOARD</p>' +
+        '<h1>Find the right crop<br><span>from the right farmer.</span></h1>' +
+        '<p>Post what you\'re looking to buy, then browse live listings from farmers ranked by fit to your demand.</p>' +
+      '</div>' +
+
+      '<div class="panel">' +
+        '<div class="panel-top"><div><h2>🏪 ' + (myProfile ? "Your buying profile" : "Post your buying profile") + '</h2><p>This is what farmers see and get matched against.</p></div>' + (myProfile ? '<span class="badge-soft">Live in marketplace</span>' : '') + '</div>' +
+        '<div class="form-row">' +
+          '<div class="form-group"><label>Business / your name</label><input id="b-name" placeholder="e.g. Sharma Agro Traders" value="' + (myProfile ? esc(myProfile.name) : "") + '" /></div>' +
+          '<div class="form-group"><label>Crop you want to buy</label>' +
+            '<select id="b-crop">' + CROPS.map(function(c){ return '<option value="' + c.label + '"' + (myProfile && myProfile.crop === c.label ? " selected" : "") + '>' + c.icon + ' ' + c.label + '</option>'; }).join("") + '</select>' +
+          '</div>' +
+        '</div>' +
+        '<div class="form-row">' +
+          '<div class="form-group"><label>Quantity needed (kg)</label><input id="b-qty" type="number" min="1" placeholder="e.g. 500" value="' + (myProfile ? myProfile.quantity : "") + '" /></div>' +
+          '<div class="form-group"><label>Price you\'re offering (₹ / quintal)</label><input id="b-price" type="number" min="1" placeholder="e.g. 2700" value="' + (myProfile ? myProfile.price : "") + '" /></div>' +
+        '</div>' +
+        '<div class="form-row">' +
+          '<div class="form-group"><label>Location</label><input id="b-location" placeholder="e.g. Kolkata" value="' + (myProfile ? esc(myProfile.location) : "") + '" /></div>' +
+          '<div class="form-group"><label>Contact (phone or email)</label><input id="b-contact" placeholder="e.g. buyer@example.com" value="' + (myProfile ? esc(myProfile.contact) : "") + '" /></div>' +
+        '</div>' +
+        '<div class="button-row">' +
+          '<button class="action-button blue" onclick="window.__fr.handleSaveBuyerProfile()">' + (myProfile ? "💾 Update profile" : "📢 Post buying profile") + '</button>' +
+          (myProfile ? '<button class="action-button danger" onclick="window.__fr.handleDeleteBuyerProfile()">Remove profile</button>' : '') +
+        '</div>' +
+        '<div id="b-error"></div>' +
+      '</div>' +
+
+      '<div class="matches-section">' +
+        '<div class="matches-header">' +
+          '<div><p class="tagline">' + (myProfile ? "SMART MATCHING" : "MARKETPLACE") + '</p><h2>🎯 ' + (myProfile ? "Best Crop Matches" : "Browse Crop Listings") + '</h2><p>' + (myProfile ? "Ranked by crop, price, quantity and location fit." : "Post your buying profile above to see ranked matches.") + '</p></div>' +
+          '<div class="match-total">' + ranked.length + ' listing' + (ranked.length===1?"":"s") + '</div>' +
+        '</div>' +
+        '<div class="form-group" style="max-width:340px;"><input id="b-search" placeholder="🔎 Search crop, farmer or location" value="' + esc(query) + '" oninput="window.__fr.handleBuyerSearch(this.value)" /></div>' +
+        matchesHtml +
+      '</div>' +
+    '</main>' +
+  '</div>';
+}
+
+/* =========================================================
+   MAIN RENDER
+========================================================= */
+function render(){
+  var app = byId("app");
+  if (state.view === "farmer" && !getLoggedInFarmer()){ state.view = "auth"; }
+  if (state.view === "farmer") app.innerHTML = renderFarmer();
+  else if (state.view === "buyer") app.innerHTML = renderBuyer();
+  else if (state.view === "auth") app.innerHTML = renderAuth();
+  else app.innerHTML = renderHome();
+}
+
+/* =========================================================
+   ACTIONS: FARMER
+========================================================= */
+function handleFindBuyers(){
+  var message = val("f-message");
+  var language = val("f-language") || "English";
+  byId("f-error").innerHTML = "";
+
+  if (!message){
+    byId("f-error").innerHTML = '<div class="error-message">⚠️ Please tell us about your crop first.</div>';
+    return;
+  }
+
+  var btn = byId("f-find-btn");
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Finding buyers...';
+
+  var finish = function(result){
+    state.lastResult = result;
+    var supply = {
+      crop: result.crop ? result.crop.label : null,
+      quantity: result.quantity,
+      price: result.price,
+      location: result.location
+    };
+    var matches = db.buyers.map(function(b){
+      return { buyer: b, score: matchScore(supply, b) };
+    }).sort(function(a,b){ return b.score - a.score; });
+    state.lastMatches = matches;
+    render();
+    var section = byId("app").querySelector(".matches-section, .understanding-card");
+    if (section) section.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
+  var local = parseCropMessage(message, "Kolkata");
+
+  if (settings.groqApiKey){
+    var prompt = "You are an AI assistant for Fasal Raksha, a platform that helps farmers find suitable buyers.\n" +
+      "Understand the farmer's message and return a short, clear, farmer-friendly summary covering: crop, quantity, expected price, location, selling requirement. If something is missing, do not invent it.\n\n" +
+      "Farmer message: " + message + "\nPreferred language: " + language + "\nLocation: " + (local.location || "Kolkata");
+
+    fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + settings.groqApiKey },
+      body: JSON.stringify({
+        model: "openai/gpt-oss-20b",
+        messages: [
+          { role: "system", content: "You are a helpful agricultural AI assistant." },
+          { role: "user", content: prompt }
+        ],
+        temperature: 0.2,
+        max_tokens: 300
+      })
+    }).then(function(res){
+      if (!res.ok) throw new Error("groq_error_" + res.status);
+      return res.json();
+    }).then(function(data){
+      var text = data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+      local.source = "groq";
+      local.aiText = text || "The AI didn't return a summary — showing locally parsed details instead.";
+      finish(local);
+    }).catch(function(err){
+      console.warn("Live Groq call failed, falling back to local parser:", err);
+      toast("Live AI unavailable — used local parsing instead");
+      local.source = "local";
+      finish(local);
+    }).finally(function(){
+      btn.disabled = false;
+      btn.innerHTML = "🤖 Find Best Buyers";
+    });
+  } else {
+    setTimeout(function(){
+      local.source = "local";
+      finish(local);
+      btn.disabled = false;
+      btn.innerHTML = "🤖 Find Best Buyers";
+    }, 350);
+  }
+}
+
+function handleAddListing(){
+  byId("l-error").innerHTML = "";
+  var name = val("l-name");
+  var crop = val("l-crop");
+  var qty = numVal("l-qty");
+  var price = numVal("l-price");
+  var location = val("l-location");
+  var contact = val("l-contact");
+  var note = val("l-note");
+
+  if (!name || !crop || !qty || !price || !location){
+    byId("l-error").innerHTML = '<div class="error-message">⚠️ Please fill in your name, crop, quantity, price and location.</div>';
+    return;
+  }
+
+  var listing = { id: db.nextListingId++, farmerName: name, crop: crop, quantity: qty, price: price, location: location, contact: contact, note: note, createdAt: Date.now() };
+  db.listings.push(listing);
+  saveDB(db);
+  toast("Crop listed — buyers can now find you");
+  render();
+}
+
+function removeListing(id){
+  db.listings = db.listings.filter(function(l){ return l.id !== id; });
+  saveDB(db);
+  toast("Listing removed");
+  render();
+}
+
+function contactBuyer(id){
+  var b = db.buyers.find(function(x){ return x.id === id; });
+  if (!b) return;
+  openContactModal(b.name, b.crop + " buyer • " + b.location, b.contact, b.phone);
+}
+
+function toggleAdvanced(){ state.showAdvanced = !state.showAdvanced; render(); }
+function saveGroqKey(){
+  var key = val("f-groq-key");
+  settings.groqApiKey = key || null;
+  saveSettings(settings);
+  toast(key ? "Groq key saved to this browser" : "Groq key cleared");
+  render();
+}
+function clearGroqKey(){
+  settings.groqApiKey = null;
+  saveSettings(settings);
+  toast("Groq key removed");
+  render();
+}
+
+/* =========================================================
+   ACTIONS: BUYER
+========================================================= */
+function handleSaveBuyerProfile(){
+  byId("b-error").innerHTML = "";
+  var name = val("b-name");
+  var crop = val("b-crop");
+  var qty = numVal("b-qty");
+  var price = numVal("b-price");
+  var location = val("b-location");
+  var contact = val("b-contact");
+
+  if (!name || !crop || !qty || !price || !location){
+    byId("b-error").innerHTML = '<div class="error-message">⚠️ Please fill in your name, crop, quantity, price and location.</div>';
+    return;
+  }
+
+  if (db.myBuyerProfileId){
+    var existing = db.buyers.find(function(b){ return b.id === db.myBuyerProfileId; });
+    if (existing){
+      existing.name = name; existing.crop = crop; existing.quantity = qty; existing.price = price;
+      existing.location = location; existing.contact = contact;
+      saveDB(db);
+      toast("Profile updated");
+      render();
+      return;
+    }
+  }
+
+  var buyer = { id: db.nextBuyerId++, name: name, crop: crop, quantity: qty, price: price, location: location, contact: contact, phone: "" };
+  db.buyers.push(buyer);
+  db.myBuyerProfileId = buyer.id;
+  saveDB(db);
+  toast("Buying profile posted — farmers can now match with you");
+  render();
+}
+
+function handleDeleteBuyerProfile(){
+  db.buyers = db.buyers.filter(function(b){ return b.id !== db.myBuyerProfileId; });
+  db.myBuyerProfileId = null;
+  saveDB(db);
+  toast("Profile removed");
+  render();
+}
+
+function handleBuyerSearch(q){
+  state.buyerQuery = q;
+  render();
+  var input = byId("b-search");
+  if (input){ input.focus(); input.selectionStart = input.selectionEnd = input.value.length; }
+}
+
+function contactFarmer(id){
+  var l = db.listings.find(function(x){ return x.id === id; });
+  if (!l) return;
+  openContactModal(l.farmerName, "Selling " + l.crop + " • " + l.location, l.contact, "");
+}
+
+/* =========================================================
+   ACTIONS: FARMER VERIFICATION (SIGN UP / SIGN IN)
+========================================================= */
+function setAuthMode(mode){
+  state.authMode = mode;
+  state.authError = null;
+  state.authVerified = null;
+  render();
+}
+
+function resetAuthVerification(){
+  state.authVerified = null;
+  state.authError = null;
+  render();
+}
+
+function handleAuthSubmit(){
+  state.authError = null;
+  var mode = state.authMode || "signup";
+  var farmerId = val("a-farmerid");
+  var phone = val("a-phone");
+
+  if (mode === "login"){
+    if (!farmerId || !phone){
+      state.authError = "Enter your Farmer ID and mobile number.";
+      render();
+      return;
+    }
+    var found = db.farmers.find(function(f){
+      return f.farmerId.toUpperCase() === farmerId.trim().toUpperCase() &&
+             f.phone.replace(/\D/g, "") === phone.replace(/\D/g, "");
+    });
+    if (!found){
+      state.authError = "No verified account matches that Farmer ID and mobile number. New here? Use Sign Up.";
+      render();
+      return;
+    }
+    session = { farmerId: found.id };
+    saveSession(session);
+    toast("Welcome back, " + found.name.split(" ")[0]);
+    go("farmer");
+    return;
+  }
+
+  // ---- sign-up mode ----
+  var name = val("a-name");
+  state.authForm = { name: name, phone: phone, farmerId: farmerId };
+
+  if (!state.authVerified){
+    if (!name || !phone || !farmerId){
+      state.authError = "Please fill in your name, mobile number and Farmer Verification ID.";
+      render();
+      return;
+    }
+    if (db.farmers.some(function(f){ return f.farmerId.toUpperCase() === farmerId.trim().toUpperCase(); })){
+      state.authError = "An account already exists for this Farmer ID. Please sign in instead.";
+      render();
+      return;
+    }
+    var btn = byId("a-submit-btn");
+    if (btn){ btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Checking government records...'; }
+    verifyFarmerIdWithGovDB(farmerId, function(match){
+      if (!match){
+        state.authError = "This Farmer ID was not found in government farmer records. Double-check the ID or contact your local agriculture office.";
+        state.authVerified = null;
+        render();
+        return;
+      }
+      state.authVerified = match;
+      state.authError = null;
+      render();
+    });
+    return;
+  }
+
+  // already verified against the mock gov DB — create the local account
+  if (!name || !phone){
+    state.authError = "Please enter your name and mobile number.";
+    render();
+    return;
+  }
+  var newFarmer = {
+    id: db.nextFarmerId++,
+    name: name,
+    phone: phone,
+    farmerId: farmerId.trim().toUpperCase(),
+    state: state.authVerified.state,
+    district: state.authVerified.district,
+    verifiedAt: Date.now()
+  };
+  db.farmers.push(newFarmer);
+  saveDB(db);
+  session = { farmerId: newFarmer.id };
+  saveSession(session);
+  state.authVerified = null;
+  state.authForm = null;
+  toast("✅ Verified — welcome to Fasal Raksha, " + name.split(" ")[0]);
+  go("farmer");
+}
+
+function handleLogout(){
+  session = null;
+  clearSession();
+  toast("Signed out");
+  go("home");
+}
+
+/* =========================================================
+   VOICE INPUT (Web Speech API) — for the farmer chat box
+========================================================= */
+var recognition = null;
+var isListening = false;
+var VOICE_LANG_MAP = { "English": "en-IN", "Hindi": "hi-IN", "Bengali": "bn-IN", "Punjabi": "pa-IN" };
+
+function getSpeechRecognitionCtor(){
+  return window.SpeechRecognition || window.webkitSpeechRecognition || null;
+}
+
+function setMicUI(listening){
+  var btn = byId("f-mic-btn");
+  var label = byId("f-mic-label");
+  if (!btn || !label) return;
+  btn.classList.toggle("listening", listening);
+  label.textContent = listening ? "⏹️ Listening…" : "🎙️ Speak";
+}
+
+function toggleVoiceInput(){
+  var SR = getSpeechRecognitionCtor();
+  if (!SR){
+    toast("🎙️ Voice input isn't supported in this browser — try Chrome on desktop or Android.");
+    return;
+  }
+  if (isListening){
+    if (recognition) recognition.stop();
+    return;
+  }
+
+  var langLabel = val("f-language") || "English";
+  var baseText = val("f-message");
+  if (baseText && !/\s$/.test(baseText)) baseText += " ";
+  var finalTranscript = "";
+
+  recognition = new SR();
+  recognition.lang = VOICE_LANG_MAP[langLabel] || "en-IN";
+  recognition.interimResults = true;
+  recognition.continuous = true;
+  recognition.maxAlternatives = 1;
+
+  recognition.onstart = function(){
+    isListening = true;
+    setMicUI(true);
+  };
+  recognition.onresult = function(event){
+    var interim = "";
+    for (var i = event.resultIndex; i < event.results.length; i++){
+      var transcript = event.results[i][0].transcript;
+      if (event.results[i].isFinal) finalTranscript += transcript + " ";
+      else interim += transcript;
+    }
+    var ta = byId("f-message");
+    if (ta) ta.value = baseText + finalTranscript + interim;
+  };
+  recognition.onerror = function(e){
+    if (e.error === "not-allowed" || e.error === "service-not-allowed"){
+      toast("Microphone access was blocked — please allow mic permission and try again.");
+    } else if (e.error !== "no-speech" && e.error !== "aborted"){
+      toast("Voice input error — please try again.");
+    }
+  };
+  recognition.onend = function(){
+    isListening = false;
+    setMicUI(false);
+  };
+
+  try { recognition.start(); }
+  catch (e) { toast("Couldn't start voice input — please try again."); }
+}
+
+/* =========================================================
+   MISC
+========================================================= */
+function resetDemo(){
+  if (!confirm("Reset all locally stored buyers, listings, farmer accounts and your profile back to the demo defaults? You'll be signed out.")) return;
+  db = defaultDB();
+  saveDB(db);
+  settings = {};
+  saveSettings(settings);
+  session = null;
+  clearSession();
+  if (recognition) { try { recognition.stop(); } catch(e){} }
+  state = { view: "home", lastResult: null, lastMatches: null, showAdvanced: false };
+  render();
+  toast("Demo data reset");
+}
+
+/* =========================================================
+   EXPOSE + INIT
+========================================================= */
+window.__fr = {
+  go: go,
+  openRoleModal: openRoleModal,
+  closeModal: closeModal,
+  openAboutModal: openAboutModal,
+  handleFindBuyers: handleFindBuyers,
+  handleAddListing: handleAddListing,
+  removeListing: removeListing,
+  contactBuyer: contactBuyer,
+  toggleAdvanced: toggleAdvanced,
+  saveGroqKey: saveGroqKey,
+  clearGroqKey: clearGroqKey,
+  handleSaveBuyerProfile: handleSaveBuyerProfile,
+  handleDeleteBuyerProfile: handleDeleteBuyerProfile,
+  handleBuyerSearch: handleBuyerSearch,
+  contactFarmer: contactFarmer,
+  resetDemo: resetDemo,
+  toast: toast,
+  setAuthMode: setAuthMode,
+  resetAuthVerification: resetAuthVerification,
+  handleAuthSubmit: handleAuthSubmit,
+  handleLogout: handleLogout,
+  toggleVoiceInput: toggleVoiceInput
+};
+
+render();
+})();
+</script>
+</body>
+</html>

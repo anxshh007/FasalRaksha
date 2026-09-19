@@ -1,0 +1,342 @@
+
+Fasal Raksha
+Technical and product report · Team Fasal Rakshak · Smart India Hackathon, Problem Statement 26132 — Strengthening market linkages and price discovery for farmers · Government of Maharashtra, Maharashtra State Innovation Society
+1. What Fasal Raksha is
+Fasal Raksha tells a farmer what their crop is worth today, whether the evidence supports selling now or waiting, and which buyer will give them the best realisation — and it works with the network switched off.
+We want to be precise about the claim we are making, because it is narrower and, we think, more useful than the one most agricultural platforms make.
+We did not build another marketplace. Discovery — connecting a farmer to a buyer — is the least broken part of this market. A farmer in Nashik can find a buyer by lunchtime; the buyer will be standing at the field gate. What is broken is that the farmer meets that buyer uninformed, unable to verify them, holding a lot too small to interest anyone who pays properly, with no way to prove quality remotely, no record if payment never arrives, and no practical ability to wait.
+Fasal Raksha is an information-and-trust layer around the agricultural transaction. Every feature in it answers one of those five failures.
+2. The problem, and where the money leaks
+Six mechanisms drain money from a smallholder between harvest and payment. We list them in rough order of damage, with the evidence we used to size them.
+Price information asymmetry. The farmer names or accepts a number without knowing what the crop traded for that morning. The counterparty trades daily and does know. The National Sample Survey's 77th round found only 40.7% of paddy-growing households aware even of the minimum support price, and 37.1% for wheat — awareness of the statutory floor, never mind the day's market rate. A few percentage points on every lot, every harvest, for a working lifetime, is the single largest recoverable loss in the chain.
+Payment default and delay. Buyers take delivery and pay in thirty days, sixty days, or never. The farmer has no contract, no recourse and no record of the counterparty's history. Note where the risk sits: on the buyer's side of the transaction. This is the injury farmers most often describe as ruinous, and it is the one most platforms address backwards.
+Lot size below buyer minimums. Processors, exporters and institutional buyers pay materially better than a village aggregator and hold minimum order quantities a one-hectare holding cannot meet. Around 86% of Indian operational holdings are small or marginal, averaging just over a hectare. The better prices exist and are structurally out of reach — which is exactly why national policy has pushed farmer producer organisations past the 10,000 mark.
+Quality assessment at a distance. Grain trades on variety, grade and moisture. Without a credible remote quality signal no buyer commits, every promising match collapses into a physical inspection, and the platform has removed no friction from the trade.
+Perishability. A tomato or onion lot has a shelf life measured in days. Time spent searching for a better price is time the produce is degrading. The NABCONS study commissioned by the Ministry of Food Processing Industries put post-harvest losses across 54 crops in 2020–22 at 12.49 million tonnes of cereals, 11.97 million tonnes of vegetables and 7.36 million tonnes of fruit.
+Channel exclusion. The farmers with the worst price information are the least likely to hold a device and data plan that reaches a modern web application. Rural India now accounts for roughly 548 million of the country's 958 million active internet users — a large number, and still a population on intermittent connectivity, entry-level Android hardware and variable reading fluency. A solution delivered only as a responsive website systematically excludes the people it claims to serve.
+3. The landscape, and the gap we build into
+We studied what already exists before building, because the fastest way to lose is to rebuild something the government already runs better.
+Platform
+What it does well
+Where it stops
+Agmarknet / OGD platform
+Daily modal, minimum, maximum and arrival volume from thousands of regulated markets, free and programmatic
+A data source, not a product. No forecast, no decision, no transaction. A farmer will not navigate it — so we consume it rather than compete with it.
+e-NAM
+Digitises the mandi auction itself: 1,656 mandis across 23 states and 4 UTs, 1.80 crore farmers, ₹4.84 lakh crore of cumulative trade
+Works inside the mandi. The farmer selling at the field gate — the larger population — never touches it, and it assumes connectivity and arrival at the yard.
+MSAMB (Maharashtra)
+State-run market rate portal and mobile app for Maharashtra APMCs
+Price display. No forecast, no matching, no counterparty trust, no transaction record.
+Full-stack sourcing (DeHaat, Ninjacart, WayCool)
+Own the logistics and the buyer relationship; move genuine volume
+Capital-intensive and geographically bounded. The farmer becomes a supplier to the platform rather than an informed principal negotiating on their own behalf.
+Bijak
+Counterparty trust and payment scoring in B2B agri trade — the right diagnosis
+Oriented to trader-to-trader flows, not to a smallholder's sell-or-wait decision at the field gate.
+Arya.ag
+Warehousing plus e-NWR-backed finance — the "ability to wait" problem solved with capital
+Storage-led, and requires a warehouse relationship the marginal farmer usually does not have. Does not intervene at the moment of price acceptance.
+Listing boards (AgriBazaar, Kisan Network and similar)
+Connect a lot to a buyer
+Discovery-first — and discovery is the least broken part.
+Advisory apps (Kisan Suvidha, IFFCO Kisan)
+Weather and agronomy
+Not transactional, not price-decisional.
+Two national instruments matter to us and are almost never surfaced at the moment a decision is being made. Electronic negotiable warehouse receipts under the Warehousing Development and Regulatory Authority let a farmer deposit produce in an accredited warehouse and borrow against the receipt — now backed by a dedicated credit guarantee scheme. AgriStack, past 10 crore farmer IDs, makes verified farmer identity an engineering task rather than an aspiration. We build on both.
+Where that leaves us. Six differentiators, and we would defend each of them against any platform in the table above.
+Offline-first market intelligence. No comparable product works with the network off. Our benchmark, seasonal position, forecast lookup, parser and buyer ranking are pure on-device arithmetic against a cached bundle of a few kilobytes.
+The benchmark before the price is named. Every screen on which a farmer names or accepts a number shows what the market paid this morning, against MSP, with a seven-day trend. A product that routes a farmer efficiently to an uninformed price is worse than no product.
+Risk-aware, explainable forecasting that refuses to answer. Nine signal layers, a seven-condition guardrail before "wait" is ever suggested, and outright suppression on stale data.
+Trust pointed at the party that causes the harm. Ratings attach only to completed transactions; buyers are gated on GSTIN or Udyam verification before they can make an offer; payment timeliness is the headline score.
+Ranking by net realisation, not quoted price. Gross offer minus real freight minus an expected cost of payment delay derived from that buyer's own completed-deal history.
+Small-lot aggregation with FPOs as first-class actors. Pooling comparable lots into a consignment that clears an institutional buyer's minimum order quantity.
+4. What we built, mapped to the problem statement
+PS 26132's Expected Solution clause names fifteen deliverables. We treated it as a specification rather than a theme, and implemented all fifteen.
+Asked for
+Implemented as
+Section
+Aggregate mandi prices
+Nightly Agmarknet-shaped ingestion, cleaning and district-level benchmark
+5, 6
+Buyer demand
+Buyer requirements — crop, grade floor, quantity, price, district, radius; several concurrent per buyer
+9
+Quality requirements
+Variety, FAQ grade, moisture where relevant; grade minimums on requirements
+7
+Arrival volumes
+Ingested, cleaned, and used as RAKSHA signal layer 3
+6
+Transport options
+District transporter directory with vehicle class, capacity and indicative tariff, attached at acceptance
+11
+Storage options
+Accredited warehouse lookup with distance and cost, and the e-NWR pledge-finance route surfaced at the decision
+11
+Localised price trends
+District modal price, MSP floor, seven-day trend, week-of-year seasonal position
+6
+Sale-window recommendations
+RAKSHA 7- and 14-day direction with band, behind a seven-condition guardrail
+6
+Match farmers and FPOs with verified buyers
+Explained, ranked shortlist; FPO is a distinct account type that transacts for its members
+9
+Lot creation
+Offline-capable listing with photographs, sync-state display, outbox
+12
+Quality grading
+On-device vision pipeline with gates, OOD rejection, confidence bands, farmer confirmation
+7
+Digital offers
+Offer → counter → accept, server-authoritative
+10
+Logistics coordination
+Suggested pickup arrangement recorded on the sauda slip; pickup risk checked against weather
+11
+Payment tracking
+Independent delivery confirmation, farmer payment confirmation feeding buyer reputation
+10
+Dispute or grievance process
+Reason-coded dispute against any deal from delivery onward, with evidence, routed to the district officer
+10
+5. System architecture
+One rule governs the whole system, and everything else follows from it:
+Precompute on the server, ship the output, compute user-specific values on the device.
+This is sound only because of a constraint we hold everywhere: model outputs are user-independent. The model predicts the market — crop × district × horizon — never the farmer. The output space is therefore small and enumerable, so it ships as a few kilobytes of static JSON rather than being queried. Everything user-specific — the benchmark delta, net realisation, the match ranking, the sell-or-wait decision — is arithmetic performed on the device against those cached tables.
+   ml/  (Python, nightly job — the only thing that runs a model)
+   ingest → clean → climatology → RAKSHA → quantile forecast
+   → forward-chain validation → bundles + vision models
+                        │  writes
+                        ▼
+      data/bundles/*.json   (2–10 KB, versioned, ETag'd)
+                        │  read at boot / on demand
+          ┌─────────────┴──────────────┐
+          ▼                            ▼
+   frontend/  (PWA)   ◄───HTTP───►   backend/  (Fastify)
+   React + Vite + TS      /api/*     TypeScript + Postgres
+   Dexie / IndexedDB                 Row Level Security
+   Service worker + outbox           WhatsApp · SMS · IVR
+          │                            │
+          └──────────┬─────────────────┘
+                     ▼
+            @fasal/shared  (TypeScript)
+   parser · benchmark · decision · matching · aggregation
+   dealstate · dispute · vision — one implementation each
+@fasal/shared is imported by the frontend for on-device computation, by the backend so that the API, the WhatsApp bot, the SMS responder and the IVR menu all compute the same answer as the device, and by the ML pipeline's reference-data export. There is exactly one implementation of every piece of domain logic in the codebase, which is what makes a WhatsApp reply and an offline home screen agree on the number.
+Why there is no live inference service. A farmer opening the app on 2G cannot wait for a model round-trip, and a per-query inference cost does not survive contact with a rural user base. The nightly pipeline is the only thing that ever runs a model; the device downloads its output once and never calls it again. The price we pay is staleness, and we handle that explicitly rather than hiding it — see Section 13.
+6. RAKSHA — the decision model, end to end
+RAKSHA — Risk-Aware Agricultural Signal and Knowledge-Horizon Aggregator.
+We want to be honest about what is and is not novel here. We did not invent gradient boosting and we do not claim to. The contribution is in how several independently computed agricultural signals are fused into an uncertainty-aware decision layer, and specifically in what the system refuses to say.
+6.1 The nine layers
+Layer
+Computes
+Method
+Runs
+1 · Market persistence
+Today against lagged prices
+Lag features, exponentially weighted means
+Server
+2 · Seasonal position
+Where this week sits historically
+Empirical week-of-year median and IQR band, per crop × district
+Server
+3 · Arrival pressure
+Arrivals against seasonal norm
+Ratio to week-of-year arrival median
+Server
+4 · Weather pressure
+Rainfall and humidity anomaly × crop sensitivity
+Anomaly against district climatology — weather is consumed, never predicted
+Server
+5 · Market shock
+Abnormal movement
+Rolling volatility, robust z-score on log returns
+Server
+6 · Quantile forecast
+7- and 14-day direction with magnitude band
+Gradient-boosted trees under pinball loss, τ = 0.1 / 0.5 / 0.9
+Server
+7 · Risk asymmetry
+The farmer's own downside
+Cost-sensitive rule on the lower quantile against storage, spoilage and financing cost
+Device
+8 · Evidence agreement
+Whether the signals concur
+Weighted vote across three buckets — up, flat, down
+Server
+9 · Decision guardrail
+Whether "wait" is permissible at all
+Seven-condition conjunction
+Device
+Layers 7 and 9 are on-device by necessity rather than convenience. They are the only layers that take the farmer's lot size, storage access and cash position as input, and a user-specific input must never reach the model — it would make the output space non-enumerable and force a live inference call for every farmer.
+6.2 Workflow
+SERVER — nightly, once per crop × district
+  L1 persistence ┐
+  L2 seasonal    │
+  L3 arrivals    ├──► L6 quantile forecast (τ = .1 / .5 / .9)
+  L4 weather     │              │
+  L5 shock       ┘              ▼
+                    L8 evidence agreement (weighted vote)
+                               │
+        bundle row: direction · band · skill score
+                    · evidence · as-of date
+                               │
+DEVICE — per farmer, works offline
+                               ▼
+     L7 risk asymmetry ◄── lot size · storage access
+                               │      · cash position
+                               ▼
+     L9 guardrail — seven conditions, all must pass
+                               │
+              ┌────────────────┴────────────────┐
+              ▼                                 ▼
+   evidence in favour of waiting     "not enough evidence
+   + storage mechanism + net gain     to suggest waiting"
+6.3 The three decisions that matter
+Quantile regression rather than point prediction. Gradient-boosted trees trained under the pinball loss give us the confidence interval directly, as a property of the estimator rather than a bolt-on. This is what allows the guardrail to reason about a worst case instead of a mean. At this data scale — tabular series of a few thousand observations per crop × district — boosted trees outperform deep sequence models and retain feature importances that a non-technical evaluator can interrogate. We tested an LSTM variant early and set it aside for exactly these reasons.
+Asymmetric decision costs. A wrong "wait" costs a farmer principal, storage and spoilage. A wrong "sell" costs only foregone upside. The errors are not symmetric, so our thresholds are not either. Formally, we require the expected gain net of storage, spoilage and financing to be positive and the lower quantile of the predicted distribution to clear a tolerable-loss floor. This is a quantile-based, cost-sensitive decision rule, not a classifier threshold.
+Evidence agreement as a weighted vote, not a signed sum. An earlier version of layer 8 summed signed votes, so five signals unanimously reading "flat" summed to zero and the system reported "unclear" — discarding the single most useful thing you can tell a farmer deciding whether to wait, namely that nothing strong is expected to happen. It now runs a weighted vote across three buckets, so unanimous calm is reported as confident calm rather than as an absence of evidence.
+6.4 The guardrail
+Before "wait" is ever suggested, all seven of the following must hold:
+The price data is fresh within the crop's own staleness limit.
+The model has actually beaten its naive baseline for that crop.
+Forecast confidence clears the higher of our two thresholds.
+Evidence agreement across the signal layers is sufficient.
+The seasonal position does not strongly contradict the signal.
+The expected gain, net of storage, spoilage and financing, clears its own cost.
+A real, named storage mechanism is within reach of this farmer.
+Otherwise the system says so plainly: "Evidence is not strong enough to suggest waiting." Each of the seven refusals is tested independently in our suite. We regard the refusal path as the product, not as an error state.
+6.5 What the farmer sees
+The interface never shows model terminology. It shows a reading and an explanation on demand:
+Market is leaning upward. Why? — Prices usually rise from this point in the season. Arrivals are below normal. Rainfall is adding upward pressure. Forecast confidence: moderate. As of 4 September.
+And where the guardrail fails, it says what is missing rather than falling silent:
+Not enough current data to advise you. Last updated nine days ago. Onion prices move faster than that.
+7. Camera-assisted quality grading
+Grain is bought on variety, grade and moisture. Without a credible quality signal no buyer commits remotely, so we treated the camera as a product inside the product rather than as a file upload with a badge on it.
+Five components, and the build order mattered more than the model choice:
+Quality gate — Laplacian variance for blur, mean luminance, and subject-area fraction against border colour. A frame failing any gate is never scored. The viewfinder reports why — "too dark", "move closer", "hold steady", "no crop detected" — at roughly 11 fps, using the gates only. It never shows a live-updating quality percentage.
+Out-of-distribution rejection — an explicit unknown class with a hard confidence floor, built on a colour-signature prior per crop family. Its job is to reject a photograph of a ceiling or a shoe, not to grade.
+Classifier — a small per-crop-family model, INT8 quantised, under 5 MB, at 224×224, running entirely on-device through ONNX Runtime Web in the PWA and TFLite on Android. The architecture is a drop-in for MobileNetV3-Small or EfficientNet-Lite0; swapping the trained weights replaces exactly one function.
+Capture aggregation — several stable frames from one deliberate capture, combined into a category and a confidence band. A figure that drifts from 71% to 84% as the wrist turns asserts a precision that does not exist.
+Provenance — the model proposes, the farmer confirms, and the listing records whether the declaration was farmer-declared or farmer-declared, AI-assisted. The model never writes to a listing.
+What we claim, and what we refuse to claim. The camera assesses ripeness stage on tomato, chilli, mango and banana; sprouting, greening, rot and surface damage on potato and onion; and foreign matter, chaff, visible mould and pest damage in grain lots. It cannot measure moisture content — the commercially decisive attribute for grain — because moisture is invisible to an RGB sensor and requires a meter, oven-drying or near-infrared spectroscopy. The interface says so where a farmer would otherwise assume otherwise: "Moisture requires a meter or laboratory measurement."
+On training data, and the build order it dictates. Public leaf-disease corpora are captured under laboratory conditions on uniform backgrounds; models trained on them report near-perfect accuracy and degrade badly on real field photographs. This lab-to-field gap is an active research problem, not a detail. So we shipped photo capture with framing guidance first, because a well-lit, well-framed photograph of the actual lot lets a buyer make a conditional offer with no model behind it at all — which is most of the available value. The transaction loop is then the labelling pipeline: a photograph, the model's proposal, the farmer's declaration and the buyer's confirmed grade at pickup become one labelled field example every time a deal closes. A field-validated model ships when a season of those exists, and the model artefact carries an explicit fieldValidated: false flag until then, reported internally rather than as a marketing claim.
+8. Understanding the farmer's own words
+A farmer describes their crop as they would say it — "मला ५ क्विंटल कांदा विकायचा आहे", "Mere paas 400 kilo soyabean hai, Latur" — rather than completing a six-field form.
+Parsing runs entirely on-device and is deterministic. It is a rule-based cascade over a crop dictionary carrying synonyms in Latin transliteration and in native script — Devanagari first, since it carries both Marathi and Hindi, with Bengali and Gurmukhi coverage retained from the wider build. Quantity extraction is unit-aware, and price and location are matched the same way. This is not a compromise: it is what makes the feature work offline, instantly, and identically every time. It also matters acutely for voice, because Marathi and Hindi speech recognition returns Devanagari — a Latin-only dictionary would fail precisely when voice input is most needed. A server-side model fallback exists for input the deterministic parser cannot resolve. Deterministic first, model second, never the reverse.
+The price-unit boundary is treated as a correctness requirement. "Mala 2500 rupaye pahijet" may mean ₹2,500 per quintal, ₹2,500 per kilogram, or ₹2,500 for the whole lot. These differ by two orders of magnitude, and a silent misreading corrupts the benchmark comparison, the match ranking and the deal value while producing confident wrong answers rather than errors. An unmarked number is never silently assigned a unit. We ask with a single tap, store the unit explicitly at the input boundary, and normalise once, centrally.
+Location never falls back to a constant. Where the message contains no location we use the farmer's verified district from their registry record. A Latur farmer silently placed in Nashik receives matching that is not merely wrong but plausibly wrong.
+Voice runs in both directions. Speech recognition sets its locale from the selected language. Speech synthesis reads back the benchmark, the recommendation and the top match — the half that serves a farmer who speaks comfortably but reads with difficulty. Offline, speech recognition cannot work and we do not pretend it does: we record the audio locally, let the farmer complete the listing through structured fields immediately, and transcribe on reconnection to enrich the record.
+Language selection happens before login, and drives interface strings, number and currency formatting, speech recognition locale, speech synthesis voice and the parser. A selector that changes only the speech locale while leaving the interface in English is a claim the product does not honour.
+9. Matching, net realisation and aggregation
+The matcher produces a ranked, explained shortlist. Never a bare score — a reason:
+Godavari Agro Traders, Lasalgaon — ₹1,950/qtl, ₹110 above today's Nashik rate. 12 km away. Wants your full 5 quintal. ₹9,750 total, ₹9,400 after estimated freight. Verified buyer, 23 completed deals, pays in 4 days on average.
+Every clause in that sentence is a matching dimension, and the farmer can act on it without trusting an algorithm they cannot inspect.
+This is deliberately not machine learning. With no historical transaction corpus, a learned ranker has nothing to learn from and cannot explain itself. We use constrained multi-criteria ranking against an explicit objective — expected net realisation — which is explainable by construction:
+Crop is a hard filter, not a weight, with one auditable substitution table for pairs the trade genuinely treats as interchangeable, always labelled as a substitution in the explanation.
+Quantity is overlap, not ratio. A 5,000 kg lot against a 500 kg requirement is reported as "500 kg matched, 4,500 kg surplus" — never as a 100% or a 10% match. Partial fulfilment is ordinary in this trade.
+Price is scored against the market benchmark, never against the farmer's own ask. Scoring against the ask rewards a buyer for exploiting a farmer who guessed low.
+Distance is scored as cost, using a real hired-vehicle tariff rather than a flat per-kilometre rate.
+Ranking is by risk-adjusted net realisation — gross offer, minus estimated freight, minus an expected cost of payment delay and default risk derived from the buyer's own completed-deal history. A buyer offering ₹50/qtl more who pays in 90 days does not outrank one who pays in four.
+There is no score floor. When nothing clears a workable threshold the response says so and offers the nearest mandi and today's rate there, a watchlist, an aggregation opportunity or a price revision. A shortlist that always looks good is a shortlist that means nothing.
+Aggregation is the highest-leverage structural feature we have, and it is a constrained clustering problem rather than a prediction problem. The system clusters open listings on crop, grade band, availability window and geodesic radius, then pools greedily until a buyer's minimum order quantity is cleared. Participation is opt-in. The pool presents to the buyer as a single consignment with a combined volume, a grade range and one coordinating party. Proceeds split proportionally by contributed volume, recorded in the deal note.
+The coordinating party can be an FPO. An FPO holds an account of its own, carries member farmers, creates pooled lots on their behalf, and transacts as the counterparty of record with the proportional settlement written into the sauda slip. Given that Maharashtra has one of the strongest FPO federations in the country and that national policy has just crossed the 10,000-FPO mark, we treated this as a first-class role rather than a coordinator field.
+10. Trust, privacy, security and grievance
+Verification points at the risky side. Farmers verify through a PM-KISAN or AgriStack farmer identifier; buyers through GSTIN or Udyam. Unverified buyers may browse listings and see prices. Only verified buyers may make offers or be granted contact details. This asymmetry is deliberate: the party more likely to cause financial harm is the party we gate.
+Every registry lookup happens server-side. A browser never holds a government API credential. The verified name becomes the farmer's immutable identity and every listing is bound to their account by foreign key — verification that does not propagate to the point of use is decorative.
+Reputation attaches to completed transactions only. Buyers are rated on payment timeliness, weighment fairness and pickup reliability; farmers on quality as described, quantity as described and availability. Scores display alongside the number of completed deals, so one rating cannot make a new profile look equivalent to a buyer with a hundred closed transactions. Payment timeliness is the load-bearing signal.
+Contact details are never rendered openly. A buyer makes an offer, the farmer acknowledges it, and only then is a masked contact channel opened. Every grant writes an audit row recording who accessed whose details and when, and per-buyer daily rate limits apply. The reasoning is direct: a marketplace holding government-verified farmer identities alongside open phone numbers is a contact-harvesting resource for exactly the intermediaries the product exists to bypass.
+Ownership lives in the database, not the application. Every request runs inside a transaction that sets the acting user and assumes a non-bypassing role, so a malicious client that skips our API entirely and calls the database with a forged farmer id still cannot read another farmer's contact details, modify another buyer's requirement, or approve its own offer. The highest-value decision in the schema is that contact tables are separate from public profiles — a phone number or a registry id is never in the same row as a name a buyer can browse.
+The transaction lifecycle, including grievance.
+LISTED → OFFER → COUNTERED → ACCEPTED → SAUDA SLIP
+   → DELIVERY CONFIRMED (both sides, independently)
+   → PAYMENT CONFIRMED (farmer) → MUTUALLY RATED
+
+   from DELIVERY CONFIRMED onward, either party may raise:
+        └─► DISPUTE OPEN → UNDER REVIEW → RESOLVED
+             reason code · note · evidence photograph
+             routed to the district agriculture officer
+             counterparty reputation held from display
+             while the dispute is open
+Disputes carry a structured reason code — quantity short, grade dispute, payment overdue, no-show — rather than free text alone, so that the institutional dashboard can report grievance patterns at district resolution. An open dispute suppresses the counterparty's reputation from displaying as clean, which is what gives the mechanism teeth. This is the deliverable most agricultural platforms omit, and it is named explicitly in the problem statement.
+Deal-state transitions are server-authoritative and cannot be finalised offline; the interface shows pending server confirmation rather than presenting a deal as closed when it has only closed locally. Two parties accepting the same lot offline is a real conflict with real financial consequence.
+11. Logistics, storage and the ability to wait
+A recommendation to wait is only actionable for a farmer who can afford to wait, and most cannot. So wherever the product suggests prices are likely to rise, it presents the mechanism alongside the advice.
+Storage. Accredited warehouses within reach, with distance and indicative storage cost per quintal per month, and the e-NWR pledge-financing route named — including the credit guarantee scheme that now backs it. Storage cost and expected spoilage are netted out of any projected gain before that gain is shown, so the comparison the farmer sees is the real one. Where no feasible storage mechanism exists, the system says "Waiting may not be practical for this lot" and stops.
+Transport. A district transporter directory carrying vehicle class, capacity and indicative tariff. The freight estimate that drives net-realisation ranking uses a real hired-vehicle tariff rather than a flat per-kilometre rate. On acceptance, a suggested pickup arrangement — vehicle class and indicative cost — is attached to the deal and recorded on the sauda slip alongside the pickup date. We stopped short of building a booking engine; coordinating a pickup is a phone call between two verified parties, and we make that call informed rather than replacing it.
+Weather as urgency, not prediction. We consume public forecast data and never predict weather — operational forecasting is numerical simulation on national supercomputing infrastructure, and a model trained on historical weather tables would be both inferior and indefensible. Rainfall within a few days, combined with a moisture-sensitive or perishable crop and a listing that has been open for some time, produces an actionable warning: "Rain expected Thursday in Nashik. Your lot is moisture-sensitive. Consider moving it within 48 hours." The same forecast checks scheduled pickup dates and feeds listing expiry.
+12. Offline-first behaviour and reach
+Bundles. Prices, forecast, climatology, MSP and regional buyer requirements ship as small, versioned, ETag'd static files. The service worker stale-while-revalidates them; the client downloads whichever changed and stores them in IndexedDB. Sync is progressive and district-first — a farmer's own district is roughly two kilobytes and viable on 2G — widening only if bandwidth allows, with photographs and non-critical sync deferred on slow connections.
+On-device computation. Every function a farmer screen calls reads only from those cached tables. We verified this by killing the backend entirely mid-session and confirming that the home screen, the decision evidence and the buyer shortlist continued to render correct, freshly computed numbers.
+Session persistence across connectivity loss. A farmer who opens the app with no network is not signed out because an identity endpoint could not be reached. We distinguish a genuine auth rejection — the server was reached and said the token is invalid — from a network failure, in which case the last-confirmed profile is restored from local cache. This was a real bug we caught in browser testing, not a hypothetical.
+The outbox. Listing creates, updates and renewals, price-alert creation and photo uploads queue locally and drain with exponential backoff on reconnect. Deal-state transitions are not merely excluded by a runtime check — they are absent from the outbox's own type, so constructing an offline entry for an offer acceptance is a compile error rather than a bug a missed conditional could reintroduce.
+Staleness governs advice, not just display. Every price and forecast displays its as-of date, confidence bands widen with data age, and the sell-or-wait recommendation is suppressed entirely past seven days for perishables and fourteen for grains. There is no code path on which a stale forecast reaches a farmer wearing a recommendation.
+Reach beyond the smartphone. The PWA is the richest channel and the narrowest. The same shared domain logic backs a WhatsApp bot accepting the same natural-language message, an SMS responder — the core value fits in a text message: Kanda Lasalgaon Rs1840/qtl · 7d +4% — and an IVR menu for feature-phone users. The farmers with the worst price information are reachable primarily through the last three, and a product serving only the first optimises for the users least injured by the problem.
+13. Validation, and what we refuse to claim
+This is the section we would most like to be questioned on.
+Every forecast is reported against a naive baseline. For daily price series, "tomorrow equals today" is a very strong predictor, and a model can post an impressive error metric having learned nothing but persistence. We report the skill score — improvement over naive and over seasonal-naive — rather than raw error. A crop whose model does not beat the naive baseline is marked insufficient and its forecast is withheld from the bundle rather than shipped anyway.
+Validation is forward-chaining only. Expanding window: train through time t, test on t+1 to t+k, roll forward. A random train/test split on a time series is catastrophic leakage. We check feature leakage separately — same-day arrival volume is not available at prediction time.
+We report directional accuracy alongside magnitude error, and precision specifically on the "wait" recommendation, because that is the expensive error. Every pipeline run regenerates this report, per crop:
+Metric
+Reported as
+Error against naive baseline
+Skill score, 7-day and 14-day
+Error against seasonal climatology
+Skill score, 7-day and 14-day
+Directional accuracy
+7-day and 14-day
+Precision on the "wait" recommendation
+The expensive error, isolated
+Bundle status
+published, or insufficient and withheld
+On our most recent run, every crop in the bundle beat the naive baseline at both horizons. Onion, tomato and chilli — the volatile, regime-switching crops — show visibly lower skill and wider bands than the storable grains. That is the honest result, not a defect, and the guardrail is correspondingly more likely to refuse a "wait" on them.
+We state our weaknesses before being asked. Onion and tomato prices are volatile and regime-switching. Policy interventions — procurement drives, export restrictions, stock limits — are exogenous and unforecastable, and in Maharashtra onion policy is a live subject. The model is weakest exactly where farmers need it most. Declaring that is more credible than being caught by it.
+On our dataset. A live Agmarknet credential was not available to a hackathon team. Rather than hand-crafting plausible-looking numbers in the UI, we generated a structural price process — prices responding to arrival pressure, a seasonal harvest calendar, rainfall anomaly, autocorrelated noise and occasional shocks — and then deliberately injected the defects a real feed carries: missing trading days, zero-arrival days, duplicate rows, inconsistent commodity naming across markets, and a genuine unit-inconsistency bug where some rows are quoted per kilogram while still labelled per quintal. Our cleaner then has to find and repair all of it, and our tests prove it does: on the last run, 482 unit errors were detected and repaired and 1,434 duplicate sessions collapsed, out of 113,073 raw rows.
+Every external dependency — farmer registry, buyer registry, market prices, weather, messaging, speech, model fallback — sits behind an adapter with a mock mode and a live mode implementing the identical interface. Swapping to the real integration changes environment variables, not application code. The mocks are not stubs returning empty data; they behave like plausible instances of the real service, specifically so the product can be demonstrated and load-tested honestly.
+Test coverage. The shared domain library carries 97 tests targeting the correctness boundaries that matter: parsing across languages in both transliteration and native script, quantity normalisation including Devanagari numerals, the price-unit ambiguity boundary, location fallback, staleness suppression at exact per-crop thresholds, the seven-gate wait guardrail tested as seven independent refusals, the hard crop filter, partial-quantity overlap, net-realisation ranking, the deal state machine including the dispute transitions, and the vision pipeline's distinct refusal paths. The ML pipeline carries 32 tests covering cleaning rules, guardrails and TypeScript/Python feature parity. Fourteen adversarial checks run directly against the database attempting cross-tenant reads and writes, contact-grant bypass and unverified-buyer offers — all must fail to bypass row-level security for the check to pass. An end-to-end script walks the full demonstration journey against a live API with 51 assertions.
+14. Built for Maharashtra
+The problem statement comes from the Maharashtra State Innovation Society, so the demonstration is seeded for Maharashtra rather than generically.
+Districts and crops are the ones that matter to this state: Nashik and the Lasalgaon APMC for onion — the largest onion market in Asia and the most economically and politically salient commodity in the state; Latur for soybean and tur; Jalgaon for banana; Nagpur for orange; Pune and Ahmednagar for horticulture. The market adapter serves MSAMB-shaped district data alongside the Agmarknet feed, and the seeded farmer, buyer and FPO accounts are Maharashtra entities operating in those districts.
+Marathi leads the language selector, with Hindi and English beside it and the Bengali and Punjabi resource files retained so the build remains portable to other states. Marathi drives the interface strings, the number and currency formatting, the speech recognition and synthesis locale, and the crop parser — not the speech locale alone.
+Seeding on onion is also our most honest demonstration. Onion is exactly the crop where the model's skill is lowest and its bands widest, and where the guardrail is most likely to refuse to recommend waiting. We would rather show a panel a case where the system declines to advise than a case where it performs.
+15. What we deliberately did not build
+Restraint is a design decision and we would defend these omissions.
+No chatbot as the primary interface — natural-language input is useful, and a farmer should not have to converse with an AI to perform an ordinary agricultural action. No blockchain, no cryptocurrency, no tokenised anything. No AI-generated farming tips; agronomic advice is a different product with a different liability profile. No weather prediction model. No farmer social network, gamification or points. No fake precision anywhere — no "71.234% confidence", no predicted point price, no "AI Vision Score 83%", no security badges on the farmer's screen. Security is in the backend where it belongs, and the farmer simply experiences a verified buyer, a private contact and a trustworthy record.
+Every feature in this product answers a real failure mode. Anything that did not, we cut.
+16. How we will know it worked
+For the farmer. Share of listings where the realised price exceeds the district modal price on the sale date. Median time from listing to accepted offer. Share of deals with payment confirmed within seven days.
+For the marketplace. Offer-to-deal conversion. Share of listings expiring unsold. Repeat listing rate — the honest measure of whether farmers found it worth returning to. Dispute rate and median time to resolution.
+For reach. Share of sessions occurring offline. Share of users arriving through non-web channels. Share of sessions in a language other than English.
+We deliberately exclude registration and listing counts. Both rise while delivering nothing, and optimising for them produces a busy product that has not moved a single farmer's income.
+17. Walkthrough for the panel
+Three to five minutes, in this order:
+Choose Marathi. Sign in as a verified Nashik farmer. The home screen already carries the onion lot's benchmark, MSP floor, seasonal position, RAKSHA signal and best-buyer match. Tap "Why this signal?" for the layer-by-layer evidence. Open the sell flow and speak "मला ५ क्विंटल कांदा विकायचा आहे" to watch the deterministic parser and the price-unit disambiguation work. Photograph the lot and watch the viewfinder refuse a bad frame before it produces a graded verdict the farmer must confirm. See the ranked buyers with gross against net realisation, and the buyer who pays in sixty days ranked below the one who pays in four. Accept an offer as the farmer, watch the sauda slip generate, confirm delivery and payment, and see the buyer's reputation update. Raise a grade dispute on a second deal and watch the counterparty's score come off clean pending review.
+Then turn off the network and do the whole price journey again.
+That last step is the demonstration. Everything before it explains what the product knows; that step shows it still knows it when the connection does not.
+
+References
+Problem context and evidence
+Ministry of Statistics and Programme Implementation, Situation Assessment of Agricultural Households, NSS 77th Round (2019) — MSP awareness and income composition. Statistical note · PIB release
+NABCONS for the Ministry of Food Processing Industries, Study on post-harvest losses across 54 crops, 2020–22. PIB summary · Open data resource
+Ministry of Agriculture, Agriculture Census 2015–16, All India Report on Number and Area of Operational Holdings. Full report
+IAMAI and Kantar, Internet in India Report 2025. Summary of findings
+ICRIER, Reducing Post-Harvest Losses in Indian Agriculture, Policy Brief 20. PDF
+Data sources, institutions and policy instruments we build on
+Agmarknet daily market prices, Open Government Data platform — the live feed our market adapter targets
+e-NAM · PIB status release, April 2026
+Maharashtra State Agricultural Marketing Board (MSAMB) · Lasalgaon APMC, Nashik
+Warehousing Development and Regulatory Authority — e-NWR · Credit Guarantee Scheme for e-NWR pledge financing (CGS-NPF)
+PIB: 10,000 FPO target achieved under the Central Sector Scheme
+AgriStack and the Digital Agriculture Mission — farmer registry progress
+CEDA Agri Market Data, Ashoka University — cleaned Agmarknet series, used to sanity-check our own cleaner
+Modelling
+Development of an agricultural product price forecasting model via gradient boosting regression trees with a time series sampling approach, International Journal of Data Science and Analytics, 2025. Link
+Enhancing agricultural commodity price forecasting with deep learning, Scientific Reports, 2025 — the deep-sequence counterposition we evaluated and set aside at this data scale. Link
+Hyndman and Athanasopoulos, Forecasting: Principles and Practice — naive baselines and time-series cross-validation. Free text
+Bridging the lab-to-field gap in plant disease diagnosis through unsupervised domain adaptation, Ecological Informatics, 2025 — the basis for our refusal to claim field accuracy. Link
+Plant disease detection model for edge computing devices, Frontiers in Plant Science, 2023 — MobileNet-class architectures under on-device constraints. Link
+Plant disease classification in the wild using vision transformers and mixture of experts, 2025 — the lab-versus-field accuracy gap, quantified. Link
+Problem statement
+Smart India Hackathon — PS 26132, Strengthening market linkages and price discovery for farmers, Government of Maharashtra, Maharashtra State Innovation Society
