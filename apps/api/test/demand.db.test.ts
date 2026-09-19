@@ -69,7 +69,7 @@ describe('FR-09 · the demonstration buyers are real rows, seeded once', () => {
     const before = (await doc('nashik')).requirements.length;
     const again = await seedDemand(db.ownerUrl, VERSION, NOW);
     expect(again.created).toBe(false);
-    expect(again.buyers).toBe(13);
+    expect(again.buyers).toBe(14); // every trader in data/reference/demo-buyers.json, the bulk buyer included
     const after = await doc('nashik');
     expect(after.requirements).toHaveLength(before); // replaced, not duplicated
     expect(seeded(after, 'godavari')?.history.completedDeals).toBe(23); // history not re-seeded

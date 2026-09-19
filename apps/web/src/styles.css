@@ -1207,6 +1207,39 @@ button.spine__item:hover {
   font-size: var(--size-small);
 }
 
+/* ── group sales (P14): one consignment, and the farmer's lot in it ──────────────────────── */
+
+.consignment {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  padding: var(--space-4);
+  border: var(--hairline);
+  border-left: 2px solid var(--fpo);
+  border-radius: var(--radius);
+  background: var(--fpo-tint);
+}
+.consignment p {
+  margin: 0;
+}
+.consignment__who {
+  font-weight: 700;
+}
+.consignment__volume {
+  font-family: var(--font-display);
+  font-size: var(--size-lead);
+}
+.consignment__cleared {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--accent);
+  font-weight: 700;
+}
+.consignment .btn {
+  justify-self: start;
+}
+
 /* ── buyers (P13): the explained shortlist, never a percentage ───────────────────────────── */
 
 .buyers__rate {

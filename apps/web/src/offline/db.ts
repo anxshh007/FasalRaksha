@@ -133,6 +133,15 @@ export interface StoredPhoto {
   createdAt: number;
 }
 
+/** A consignment one of this farmer's lots is in (§6.6), kept so it shows with no network. */
+export interface StoredPool {
+  id: string;
+  userId: string;
+  listingClientId: string | null;
+  fetchedAt: number;
+  pool: import('../pools/pools.js').ConsignmentView;
+}
+
 /** The district's buyer demand, verified and parsed (FR-09): what the shortlist is ranked from, offline too. */
 export interface StoredDemand {
   district: string;
@@ -159,6 +168,7 @@ export class DeviceStore extends Dexie {
   recordings!: Table<Recording, string>;
   photos!: Table<StoredPhoto, string>;
   demand!: Table<StoredDemand, string>;
+  pools!: Table<StoredPool, string>;
 
   constructor(name = 'fasal-raksha') {
     super(name);
@@ -183,6 +193,10 @@ export class DeviceStore extends Dexie {
     // v4 (P13): the district's buyer demand.
     this.version(4).stores({
       demand: 'district',
+    });
+    // v5 (P14): the consignments this farmer's lots are in.
+    this.version(5).stores({
+      pools: 'id, userId',
     });
   }
 }

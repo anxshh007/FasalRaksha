@@ -43,6 +43,16 @@
       "requirements": [{ "crop": "onion", "price": { "scenario": 2100 }, "min": 1, "max": 50, "radiusKm": 80, "gradeFloor": null }]
     },
     {
+      "key": "yeola-export",
+      "name": "Yeola Onion Export Terminal",
+      "district": "nashik",
+      "market": "yeola",
+      "verified": true,
+      "gstinLast4": "5E2X",
+      "history": { "paymentDays": [[12, 7]], "defaults": 0, "openDisputes": 0 },
+      "requirements": [{ "crop": "onion", "price": { "relative": 1.06 }, "min": 30, "max": 200, "radiusKm": 90, "gradeFloor": null }]
+    },
+    {
       "key": "yeola-cotton",
       "name": "Yeola Cotton Ginning",
       "district": "nashik",
@@ -139,5 +149,19 @@
       "history": { "paymentDays": [[9, 5]], "defaults": 0, "openDisputes": 0 },
       "requirements": [{ "crop": "orange", "price": { "relative": 1.03 }, "min": 5, "max": 120, "radiusKm": 80, "gradeFloor": null }]
     }
-  ]
+  ],
+  "coordinator": {
+    "key": "kadwa",
+    "name": "Kadwa Valley Farmer Producer Company",
+    "registrationNo": "FPO/MH/NSK/2019/0442",
+    "district": "nashik",
+    "market": "niphad"
+  },
+  "pooledLots": {
+    "note": "Small opted-in onion lots from demonstration farmers near the collection centre, already in the coordinator's forming consignment for the bulk requirement. Together they fall short of its 30 quintal minimum: one more farmer's lot clears it (§6.6).",
+    "district": "nashik",
+    "crop": "onion",
+    "requirementOf": "yeola-export",
+    "quintals": [6, 5, 4, 5, 4, 4]
+  }
 }

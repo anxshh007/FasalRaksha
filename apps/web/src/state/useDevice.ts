@@ -19,6 +19,7 @@ import { attachRecording, saveRecording, transcribePending } from '../offline/re
 import { effectiveType, probe, type Reachability } from '../offline/reach';
 import { adoptSession, refreshProfile, restoreSession, signOut as endSession, type SessionState } from '../offline/session';
 import { syncDemand, syncDistrict } from '../offline/sync';
+import { refreshMyPools, storedPools, type ConsignmentView } from '../pools/pools';
 import { applyToDocument, savePreference, watchForBrightLight, type Preferences, type Theme } from './preferences';
 
 const LOOP_MS = 20_000;
@@ -43,6 +44,10 @@ export interface Device {
   selectCrop: (crop: string) => void;
   /** The farmer's listings on this phone, with where each is on its way to the server. */
   listings: ListingState[];
+  /** Group sales this farmer's lots are in (§6.6), as last known to this phone. */
+  consignments: ConsignmentView[];
+  /** Re-read the consignments after joining or leaving one. */
+  reloadConsignments: () => Promise<void>;
   createListing: (draft: ListingDraft, said: string, recordingId: string | null, photo?: AttachedPhoto | null) => Promise<void>;
   keepRecording: (blob: Blob) => Promise<string | null>;
   /** After an OTP sign-in or a verification, adopt the new state. */
@@ -84,6 +89,7 @@ export function useDevice(initial: Preferences): Device {
   const [briefing, setBriefing] = useState<HomeBriefing | null>(null);
   const [queue, setQueue] = useState<QueueSummary | null>(null);
   const [listings, setListings] = useState<ListingState[]>([]);
+  const [consignments, setConsignments] = useState<ConsignmentView[]>([]);
   const [context, setContext] = useState<DecisionContext>({ ...DEFAULT_CONTEXT, quantityQtl: initial.quantityQtl ?? DEFAULT_CONTEXT.quantityQtl });
   const [selectedCrop, setSelectedCrop] = useState<string | null>(initial.selectedCrop ?? null);
   const contextRef = useRef(context);
@@ -107,6 +113,7 @@ export function useDevice(initial: Preferences): Device {
     const photoEntries = await store().outbox.bulkGet(photos.map((p) => p.key));
     const photoOf = new Map(photos.map((stored, i) => [stored.listingClientId, { stored, state: photoState(stored, photoEntries[i]?.state), error: photoEntries[i]?.lastError ?? null }]));
     setListings(mine.map((listing, i) => ({ listing, state: listingState(entries[i]?.state), error: entries[i]?.lastError ?? null, photo: photoOf.get(listing.clientId) ?? null })));
+    setConsignments(await storedPools(state.profile.userId));
   }, []);
 
   /**
@@ -133,6 +140,7 @@ export function useDevice(initial: Preferences): Device {
         if (state.status === 'signed-in' && state.profile.district !== null) {
           await syncDistrict(state.profile.district);
           await syncDemand(state.profile.district);
+          await refreshMyPools(state.profile.userId);
           await drain(state.profile.userId, { effectiveType: effectiveType() });
           await transcribePending(state.profile.userId);
         }
@@ -282,6 +290,13 @@ export function useDevice(initial: Preferences): Device {
     [locale],
   );
 
+  const reloadConsignments = useCallback(async () => {
+    const state = sessionRef.current;
+    if (state === null || state.status === 'signed-out') return;
+    await refreshMyPools(state.profile.userId);
+    setConsignments(await storedPools(state.profile.userId));
+  }, []);
+
   const signOut = useCallback(async () => {
     await endSession();
     const next: SessionState = { status: 'signed-out', reason: 'no-session' };
@@ -290,7 +305,7 @@ export function useDevice(initial: Preferences): Device {
     await recompute(next);
   }, [recompute]);
 
-  return { locale, setLocale, theme, setTheme, themeOffer, dismissThemeOffer, session, reach, briefing, queue, listings, createListing, keepRecording, context, setQuantity, selectedCrop, selectCrop, adopt, reloadProfile, queueAction, signOut };
+  return { locale, setLocale, theme, setTheme, themeOffer, dismissThemeOffer, session, reach, briefing, queue, listings, consignments, reloadConsignments, createListing, keepRecording, context, setQuantity, selectedCrop, selectCrop, adopt, reloadProfile, queueAction, signOut };
 }
 
 /**

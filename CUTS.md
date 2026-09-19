@@ -191,3 +191,29 @@ relationships between the three offers are the specification's.
 
 **To close.** Replace the seed file with real onboarded buyers; their requirements and history
 then flow through the identical path, and the demonstration line disappears with the flag.
+
+## C-10 · The coordinator's screen is deferred; the FPO account type is not
+
+**What.** A farmer producer company is a first-class account in this build — `app.fpos`,
+`app.fpo_members`, its own role in every policy, its consignments, and `POST /api/pools`, which
+runs the clustering engine over opted-in lots and opens a consignment for one buyer requirement.
+What it does not have is a screen of its own. A coordinator cannot sign in and watch their
+consignments fill.
+
+**Why.** §16's rehearsal is walked by a farmer, and the farmer's side of aggregation is the part
+the demonstration turns on: seeing the consignment, putting a lot into it, watching it clear. A
+coordinator dashboard that nobody walks through would be a surface with no test behind it, built
+in the time the offer and deal path (P15) needs.
+
+**What exists instead.** Every rule the screen would sit on is built and proven against a real
+PostgreSQL: only an `fpo` actor may open a consignment (a farmer and a buyer are both refused
+403), the clustering engine reports what could be gathered before anything is created, a second
+call returns the consignment already being coordinated rather than a duplicate, and
+`app.pool_totals` gives the coordinator the same volume, grade range and window it gives a member.
+The demonstration consignment is coordinated by a real FPO account, Kadwa Valley Farmer Producer
+Company, with six member farmers and their real listings.
+
+**To close.** A coordinator sign-in and one screen over the endpoints that already exist:
+requirements in the district, what could be gathered for each, the consignments forming, and the
+proportional settlement at the sauda slip (P15) — which is where the coordinator becomes the
+counterparty of record and the screen starts earning its tests.

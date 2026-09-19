@@ -28,6 +28,7 @@ import { demandFor } from '../modules/demand/service.js';
 import { listMine } from '../modules/listings/service.js';
 import { getMe } from '../modules/me/service.js';
 import { appendChunk, openUpload, PHOTO_LIMITS, readPhoto, type PhotoDeps } from '../modules/photos/service.js';
+import { createPool, CreateBody, JoinBody, joinPool, leavePool, myPools, OpenQuery, openPools } from '../modules/pools/service.js';
 import { parseOutboxEntry } from '../modules/outbox/schema.js';
 import { deliverOutboxEntry } from '../modules/outbox/service.js';
 import { verifyBuyer, verifyFarmer } from '../modules/verify/service.js';
@@ -296,6 +297,20 @@ export function buildApp(deps: AppDependencies) {
     }
     return { db: requireDb(), keys: deps.keys, farmers: deps.farmerRegistry, businesses: deps.buyerRegistry };
   };
+
+  // Aggregation (§6.6): a coordinator opens a consignment, and each farmer puts their own
+  // opted-in lot into it. The database allows nothing else (migration 0003's policies).
+  app.post('/api/pools', { config: { rateLimit: { max: 30, timeWindow: '10 minutes' } } }, async (request) => createPool(requireDb(), requireActor(request), CreateBody.parse(request.body)));
+  app.get('/api/pools/open', async (request) => ({ pools: await openPools(requireDb(), requireActor(request), OpenQuery.parse(request.query).listing) }));
+  app.get('/api/pools/mine', async (request) => ({ pools: await myPools(requireDb(), requireActor(request)) }));
+  app.post('/api/pools/:id/join', async (request) => {
+    const { id } = z.object({ id: z.uuid() }).parse(request.params);
+    return joinPool(requireDb(), requireActor(request), id, JoinBody.parse(request.body).listingClientId);
+  });
+  app.post('/api/pools/:id/leave', async (request) => {
+    const { id } = z.object({ id: z.uuid() }).parse(request.params);
+    return leavePool(requireDb(), requireActor(request), id, JoinBody.parse(request.body).listingClientId);
+  });
 
   app.post('/api/verify/farmer', { config: { rateLimit: { max: 10, timeWindow: '1 hour' } } }, async (request) => {
     const body = z.object({ registry: z.enum(['pm-kisan', 'agristack']), id: z.string().trim().min(5).max(40) }).parse(request.body);

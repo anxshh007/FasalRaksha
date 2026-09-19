@@ -9,8 +9,11 @@
  *                in the file, spread over the past year; a `default` is a delivered deal left
  *                unpaid for 120 days; an `openDispute` is a recent unpaid deal with a payment-overdue
  *                dispute open. Sellers are demonstration farmers of the buyer's district.
- *   demand       every run: the demonstration requirements are replaced, priced against the
- *                current release's benchmark and valid around its date, so they stay current.
+ *   demand       every run: the demonstration requirements are re-priced in place against the
+ *                current release's benchmark and kept valid around its date, so they stay current.
+ *   consignment  a farmer producer company at a collection centre, six members' small opted-in
+ *                lots, and the forming consignment they have joined (§6.6), two quintals short of
+ *                the bulk buyer's minimum.
  *
  * Accounts and history are created once (identities are stable UUIDs derived from the file);
  * demand is refreshed on every call. Idempotent.
@@ -54,6 +57,8 @@ interface BuyerSpec {
 interface SeedFile {
   scenarioBenchmarkPerQtl: number;
   buyers: BuyerSpec[];
+  coordinator: { key: string; name: string; registrationNo: string; district: string; market: string };
+  pooledLots: { district: string; crop: string; requirementOf: string; quintals: number[] };
 }
 
 interface Market {
@@ -99,6 +104,47 @@ export interface DemandSeedResult {
   buyers: number;
   requirements: number;
   completedDeals: number;
+}
+
+/**
+ * The coordinator and the small lots it has gathered (§6.6): a farmer producer company at a
+ * collection centre, six demonstration farmers' opted-in onion lots near it, and the forming
+ * consignment they have joined. Together they fall short of the bulk buyer's minimum on purpose:
+ * one more farmer's lot is what clears it. Created once.
+ */
+async function seedConsignment(client: pg.Client, seed: SeedFile, places: ReturnType<typeof markets>, requirements: Map<string, string>, now: Date): Promise<void> {
+  const { coordinator, pooledLots } = seed;
+  const fpoId = demoId(`fpo:${coordinator.key}`);
+  if ((await client.query('SELECT 1 FROM app.fpos WHERE user_id = $1', [fpoId])).rowCount !== 0) return;
+  const centre = places.get(coordinator.market);
+  const requirementId = requirements.get(`${pooledLots.requirementOf}|${pooledLots.crop}`);
+  if (centre === undefined || requirementId === undefined) return; // nothing to coordinate against
+
+  await client.query("INSERT INTO app.users (id, kind) VALUES ($1, 'fpo')", [fpoId]);
+  await client.query('INSERT INTO app.fpos (user_id, name, registration_no, district, location_lat, location_lon) VALUES ($1, $2, $3, $4, $5, $6)', [
+    fpoId, coordinator.name, coordinator.registrationNo, coordinator.district, centre.market.location.lat, centre.market.location.lon,
+  ]);
+  const pool = await client.query<{ id: string }>(
+    "INSERT INTO app.aggregation_pools (requirement_id, coordinator_id, crop, district, status) VALUES ($1, $2, $3, $4, 'forming') RETURNING id",
+    [requirementId, fpoId, pooledLots.crop, pooledLots.district],
+  );
+  const poolId = pool.rows[0]!.id;
+  const from = new Date(now.getTime() - 2 * DAY).toISOString().slice(0, 10);
+  const until = new Date(now.getTime() + 21 * DAY).toISOString().slice(0, 10);
+  for (const [i, quintals] of pooledLots.quintals.entries()) {
+    const farmerId = demoId(`member:${coordinator.key}:${i}`);
+    await client.query("INSERT INTO app.users (id, kind) VALUES ($1, 'farmer')", [farmerId]);
+    await client.query('INSERT INTO app.farmer_profiles (user_id, display_name, district, village, verified_at) VALUES ($1, $2, $3, $4, $5)', [
+      farmerId, `Demonstration member ${i + 1}`, pooledLots.district, centre.market.names.en, new Date(now.getTime() - 200 * DAY),
+    ]);
+    await client.query('INSERT INTO app.fpo_members (fpo_id, farmer_id) VALUES ($1, $2)', [fpoId, farmerId]);
+    const listing = await client.query<{ id: string }>(
+      `INSERT INTO app.listings (client_id, farmer_id, crop, qty, qty_unit, available_from, available_until, pool_opt_in, status)
+       VALUES ($1, $2, $3, $4, 'quintal', $5, $6, true, 'open') RETURNING id`,
+      [`demo-pool-${coordinator.key}-${i}`, farmerId, pooledLots.crop, quintals, from, until],
+    );
+    await client.query('INSERT INTO app.aggregation_members (pool_id, listing_id, farmer_id, contributed_kg) VALUES ($1, $2, $3, $4)', [poolId, listing.rows[0]!.id, farmerId, quintals * 100]);
+  }
 }
 
 export async function seedDemand(ownerUrl: string, version: string, now: Date = new Date()): Promise<DemandSeedResult> {
@@ -185,9 +231,9 @@ export async function seedDemand(ownerUrl: string, version: string, now: Date = 
       }
     }
 
-    // Demand, refreshed every run against the current release.
-    const buyerIds = seed.buyers.map((b) => demoId(`buyer:${b.key}`));
-    await client.query('DELETE FROM app.buyer_requirements WHERE buyer_id = ANY($1::uuid[])', [buyerIds]);
+    // Demand, re-placed against the current release on every run. Requirement rows are updated
+    // in place, never replaced: a forming consignment points at one (§6.6).
+    const wanted = new Map<string, string>(); // `${buyerKey}|${crop}` → requirement id
     for (const buyer of seed.buyers) {
       const place = places.get(buyer.market)!;
       for (const spec of buyer.requirements) {
@@ -195,17 +241,34 @@ export async function seedDemand(ownerUrl: string, version: string, now: Date = 
         const price = priceFor(spec, bench, seed.scenarioBenchmarkPerQtl);
         if (price === null) continue; // no published price to place this offer against
         const anchor = new Date(`${bench?.asOf ?? now.toISOString().slice(0, 10)}T00:00:00Z`).getTime();
-        await client.query(
-          `INSERT INTO app.buyer_requirements (buyer_id, crop, grade_floor, min_qty, min_qty_unit, max_qty, max_qty_unit, price, price_unit, district, location_lat, location_lon, radius_km, valid_from, valid_until)
-           VALUES ($1, $2, $3, $4, 'quintal', $5, 'quintal', $6, 'quintal', $7, $8, $9, $10, $11, $12)`,
-          [
-            demoId(`buyer:${buyer.key}`), spec.crop, spec.gradeFloor, spec.min, spec.max, price, buyer.district, place.market.location.lat, place.market.location.lon, spec.radiusKm,
-            new Date(anchor - 30 * DAY).toISOString().slice(0, 10), new Date(anchor + 90 * DAY).toISOString().slice(0, 10),
-          ],
-        );
+        const buyerId = demoId(`buyer:${buyer.key}`);
+        const values = [
+          buyerId, spec.crop, spec.gradeFloor, spec.min, spec.max, price, buyer.district, place.market.location.lat, place.market.location.lon, spec.radiusKm,
+          new Date(anchor - 30 * DAY).toISOString().slice(0, 10), new Date(anchor + 90 * DAY).toISOString().slice(0, 10),
+        ];
+        const existing = await client.query<{ id: string }>('SELECT id FROM app.buyer_requirements WHERE buyer_id = $1 AND crop = $2', [buyerId, spec.crop]);
+        const id = existing.rows[0]?.id;
+        if (id === undefined) {
+          const inserted = await client.query<{ id: string }>(
+            `INSERT INTO app.buyer_requirements (buyer_id, crop, grade_floor, min_qty, min_qty_unit, max_qty, max_qty_unit, price, price_unit, district, location_lat, location_lon, radius_km, valid_from, valid_until)
+             VALUES ($1, $2, $3, $4, 'quintal', $5, 'quintal', $6, 'quintal', $7, $8, $9, $10, $11, $12) RETURNING id`,
+            values,
+          );
+          wanted.set(`${buyer.key}|${spec.crop}`, inserted.rows[0]!.id);
+        } else {
+          await client.query(
+            `UPDATE app.buyer_requirements SET grade_floor = $3, min_qty = $4, max_qty = $5, price = $6, district = $7, location_lat = $8, location_lon = $9,
+                    radius_km = $10, valid_from = $11, valid_until = $12, active = true
+              WHERE buyer_id = $1 AND crop = $2`,
+            values,
+          );
+          wanted.set(`${buyer.key}|${spec.crop}`, id);
+        }
         requirements++;
       }
     }
+
+    await seedConsignment(client, seed, places, wanted, now);
     await client.query('COMMIT');
   } catch (error) {
     await client.query('ROLLBACK').catch(() => undefined);

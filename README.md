@@ -19,8 +19,8 @@ farmers* · Government of Maharashtra, Maharashtra State Innovation Society · T
 
 ## Status
 
-Built phase by phase, each gate proven and committed (PROMPT PART XV). **Current: P13 — the buyer
-shortlist.** Done so far:
+Built phase by phase, each gate proven and committed (PROMPT PART XV). **Current: P14 — group sales.**
+Done so far:
 - the foundation, and the shared domain engine;
 - the schema with row-level security, and authentication;
 - the nine adapters;
@@ -51,12 +51,19 @@ shortlist.** Done so far:
   No match percentage anywhere; a buyer offering more that ranks lower says why; buyers left out
   are counted by reason; and when nothing beats the farmer's own mandi, the list is empty and
   says what to do instead.
+- group sales: a lot offered for group sale shows the one consignment it can join — who is
+  gathering it, for which buyer, how much is in it against the buyer's minimum, and how much is
+  still needed. Putting the lot in clears the consignment when the volume clears the minimum;
+  taking it out re-opens it. The farmer's own share is shown in quintals of the total, which is
+  how the money will be split. Joining needs a network, and the screen says why.
 
 A farmer can choose a language, sign in, verify a PM-KISAN record and see their district's prices
 and a sell/wait decision computed on the phone, with the reasons laid out, then list a crop by
 speaking or typing, with a graded photograph, and see which buyer leaves them best off. All of it
 keeps working with the API killed or the network gone — the shortlist included, which is the
-second half of Gate A. Offers, the sauda slip and the deal state machine come next (P14–P15).
+second half of Gate A. A small lot that no bulk buyer would look at twice can join six of its
+neighbours and clear that buyer's minimum. Offers, the sauda slip and the deal state machine come
+next (P15).
 
 `REQUIREMENTS.csv` is the source of truth for what is real. Run `pnpm requirements` to see it.
 

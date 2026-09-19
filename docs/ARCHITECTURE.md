@@ -218,6 +218,19 @@ worth committing.
 | Buyers left out are counted by reason behind "Why some buyers are not here" | The absence of a buyer the farmer expected is information: another crop, unverified, too far, below the mandi. Silence would look like a bug. |
 | A crop with no district price on the phone says so instead of ranking | Scoring an offer with no benchmark to compare it against is exactly P1-06's defect in another form. |
 
+### Decisions taken in P14
+
+| Decision | Reason |
+|---|---|
+| A consignment's totals — contributors, volume, grade range, shared window — come from `app.pool_totals`, a SECURITY DEFINER function returning sums and counts only | Migration 0003 keeps every membership row private to its own farmer and the coordinator, and that is right: a farmer deciding whether to join needs to know what the consignment holds, not whose lots are in it. Without the function the joining farmer sees a consignment of one lot — their own. |
+| Whether a consignment has cleared is written by `app.pool_settle` (migration 0010), derived from the lots in it against the buyer's stated minimum, and both join and leave read the status back out of the table | It is arithmetic, not anybody's opinion. The API used to set it after a join; row-level security silently dropped that UPDATE — a farmer is not the coordinator — and the answer said "cleared" while the database still said "forming". A test that only read the response passed. The DB test now reads the row. |
+| Joining and leaving a consignment are the one thing in this build that need a network, and the screen says so in plain words | A join changes what another buyer is promised. Two phones offline could each be told they took the last place. Everything the phone already knows — the consignments your lots are in — is kept in IndexedDB and shown offline like the rest. |
+| Aggregation is opt-in twice over: the listing carries `pool_opt_in`, and the farmer taps to join. `pool_members_join` checks both in the database | §6.6. Nobody can pool another farmer's lot, and the check is not in application code that could be forgotten on another path. |
+| The panel asks "what could this lot join?" only once the server holds the lot | A lot written in the field has no server id yet, and the server cannot answer about a listing it has not received. It asks the moment the outbox lands, so a listing composed offline finds its consignment without a reload. |
+| The demonstration consignment is six member farmers' real listings — 28 quintals against a 30-quintal minimum — joined to a real forming pool, coordinated by a real FPO account | The gate is "a real MOQ cleared from real listings". Two quintals short on purpose: one more farmer's lot is what clears it, through the production path. Seeded once, flagged `demonstration` (CUTS C-09). |
+| The farmer's share is shown as quintals of the total, never as a percentage | §8 of the Constitution: no match percentages, and a share is the same arithmetic wearing a different hat. "Your 5 quintals of the 33" is the number that governs the money. |
+| The coordinator's own screen is deferred; the FPO account type, its members, its consignments and `POST /api/pools` are built and tested | CUTS C-10. The farmer's side is what §16 demonstrates, and an FPO dashboard nobody walks through in the rehearsal would be untested surface. |
+
 ## 4 · Environment (measured 2026-09-19)
 
 Windows 11 · Node 24.19 · pnpm 10.34.5 · Python 3.12.6 (`.venv`, pinned `ml/requirements.txt`) ·
@@ -266,7 +279,7 @@ precisely what v3 PART IX forbids.
 | P11 | Parser UI, voice, price-unit question, parse-confirm | **Gates H, I** |
 | P12 | Camera pipeline | **Gate C** — CAM-01…14 walked |
 | P13 | Matching + shortlist + honest emptiness | **Gate F** |
-| P14 | FPO pools | a real MOQ cleared from real listings |
+| P14 | FPO pools | **a real MOQ cleared from real listings** — 28 qtl + 5 qtl ≥ 30 qtl, in the browser |
 | P15 | Offers, deals, sauda slip | **Gate G** |
 | P16 | Delivery, payment, reputation | reputation moves only on completed deals |
 | P17 | Disputes, grievance routing | open dispute suppresses clean reputation |

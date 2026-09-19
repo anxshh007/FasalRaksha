@@ -3,12 +3,14 @@
  * and price basis, and each showing where it is on its way to the server. "Saved on this phone"
  * and "Waiting to send" are honest states, not errors, and a listing is never shown as received
  * until the server has confirmed it. A listing's photograph has its own journey, shown beside it
- * (CAM-13), and never holds the listing back. Offers and deals join this screen in P15.
+ * (CAM-13), and never holds the listing back. A lot offered for group sale shows the consignment
+ * it can join, or is in (§6.6). Offers and deals join this screen in P15.
  */
 import { Glyph } from '../design/Glyph';
 import { day, number, rupees, t } from '../i18n/strings';
 import type { Device, ListingState } from '../state/useDevice';
 import { gradeLine, useObjectUrl } from './PhotoPanel';
+import { ConsignmentPanel } from '../pools/ConsignmentPanel';
 
 function ListingPhoto({ device, photo }: { device: Device; photo: NonNullable<ListingState['photo']> }) {
   const { locale } = device;
@@ -76,6 +78,7 @@ export function ListingsScreen({ device, onSell, onBuyers }: { device: Device; o
                   <Glyph name="buyers" size={16} />
                   {t(locale, 'listings.buyers')}
                 </button>
+                <ConsignmentPanel device={device} listingClientId={listing.clientId} optedIn={d.poolOptIn} listed={state === 'sent'} />
               </li>
             );
           })}
