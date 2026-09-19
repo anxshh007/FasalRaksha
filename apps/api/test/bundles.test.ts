@@ -22,6 +22,7 @@ const sources: PublishSources = {
   storage: new MockStorageRegistryAdapter(),
   transport: new MockTransportTariffAdapter(),
   crops: JSON.parse(readFileSync(join(ROOT, 'data', 'reference', 'crops.json'), 'utf8')) as { version: string; crops: CropProfile[] },
+  districts: JSON.parse(readFileSync(join(ROOT, 'data', 'reference', 'districts.json'), 'utf8')) as { version: string },
 };
 
 let release: Release;
@@ -107,7 +108,7 @@ describe('FR-08 · what the publisher adds is exactly what the pipeline does not
     const manifest = JSON.parse(release.manifest.body) as { dataSource: string; bundles: { integrity: string }[]; shared: { name: string }[] };
     expect(manifest.dataSource).toBe('synthetic');
     expect(manifest.bundles.map((b) => b.integrity)).toEqual(release.bundles.map((b) => b.integrity));
-    expect(manifest.shared.map((s) => s.name)).toEqual(expect.arrayContaining(['crops', 'msp', 'climatology/nashik']));
+    expect(manifest.shared.map((s) => s.name)).toEqual(expect.arrayContaining(['crops', 'districts', 'msp', 'climatology/nashik']));
   });
 
   it('every single crop bundle is about 1 KB on the wire (PROMPT §5.8 budget: ~2 KB)', () => {

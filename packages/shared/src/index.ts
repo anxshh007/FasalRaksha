@@ -14,6 +14,7 @@ export * from './core/dates.js';
 export * from './core/geo.js';
 export * from './constants/policy.js';
 export * from './crops/types.js';
+export * from './crops/locate.js';
 export * from './units/units.js';
 export * from './staleness/staleness.js';
 export * from './bundle/types.js';

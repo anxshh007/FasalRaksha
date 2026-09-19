@@ -19,16 +19,23 @@ farmers* · Government of Maharashtra, Maharashtra State Innovation Society · T
 
 ## Status
 
-Built phase by phase, each gate proven and committed (PROMPT PART XV). **Current: P7 — bundles.**
-Done so far:
+Built phase by phase, each gate proven and committed (PROMPT PART XV). **Current: P8 — the
+offline PWA.** Done so far:
 - the foundation, and the shared domain engine;
 - the schema with row-level security, and authentication;
 - the nine adapters;
 - the synthetic dataset with its cleaner;
 - the forecast pipeline with its validation table;
-- sealed, versioned bundles served with ETags from the API.
+- sealed, versioned bundles served with ETags;
+- the offline core: service worker, device store, verified district-first sync, session persistence
+  across connectivity loss, and the outbox.
 
-**There is no product surface yet:** no screens and no recommendations reach a farmer.
+A farmer can sign in, verify a PM-KISAN record and see their district's prices and a sell/wait
+decision computed on the phone. That keeps working with the API process killed or the network
+gone (Gate A, automated). Screens are functional, not yet designed: the Phase-1 design system
+arrives in P9, and the briefing, evidence panel and buyer shortlist in P10–P13. The shortlist
+half of Gate A is proven when the shortlist exists (P13).
+
 `REQUIREMENTS.csv` is the source of truth for what is real. Run `pnpm requirements` to see it.
 
 ## Quick start
@@ -41,6 +48,7 @@ pnpm db:start          # real PostgreSQL 18 (no Docker needed); writes .env; Ctr
 pnpm dev:api           # in a second terminal — http://127.0.0.1:8787/api/health
                        # bundles: /api/bundles/manifest · /api/bundles/onion/nashik
 pnpm dev:web           # http://localhost:5173
+pnpm e2e               # Gate A in Microsoft Edge: kills the API mid-session and checks home still computes
 ```
 
 With Docker instead: `docker compose -f infra/docker-compose.yml --env-file .env up -d`, then
@@ -61,11 +69,11 @@ python -m venv .venv
 ## Prove it
 
 ```bash
-pnpm verify            # strict typecheck · build · unit · real-PostgreSQL · ml · traceability
+pnpm verify            # strict typecheck · build · unit · real-PostgreSQL · ml · Gate A end-to-end · traceability
 pnpm verify --deps     # … plus the dependency audit (fails at high)
 ```
 
-Individually: `pnpm typecheck` · `pnpm build` · `pnpm test` · `pnpm test:db` · `pnpm ml:test` ·
+Individually: `pnpm typecheck` · `pnpm build` · `pnpm test` · `pnpm test:db` · `pnpm e2e` · `pnpm ml:test` ·
 `pnpm requirements`.
 
 ## Honesty notes (stated before anyone asks)

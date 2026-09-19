@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Fasal Raksha">
+  <rect width="64" height="64" fill="#2f5d3a"/>
+  <path d="M32 50V22M32 30c-8 0-12-6-12-12 8 0 12 6 12 12zm0 8c8 0 12-6 12-12-8 0-12 6-12 12z" fill="none" stroke="#fbf8f1" stroke-width="3" stroke-linejoin="miter"/>
+  <path d="M16 50h32" stroke="#fbf8f1" stroke-width="3"/>
+</svg>

@@ -79,3 +79,54 @@ export const OUTBOX_KINDS: readonly OutboxKind[] = ['listing.create', 'listing.u
 export function isOutboxKind(kind: unknown): kind is OutboxKind {
   return typeof kind === 'string' && (OUTBOX_KINDS as readonly string[]).includes(kind);
 }
+
+// ─── Drain policy (PROMPT §XI, CAM-13). Pure, so every client drains the same way. ──────────
+
+/** First retry after ~2 s, doubling to a ceiling of ~15 min: a 2G reconnection is not hammered. */
+export const OUTBOX_BACKOFF_BASE_MS = 2_000;
+export const OUTBOX_BACKOFF_CEILING_MS = 15 * 60_000;
+
+/** A stable 0–1 fraction from a string (FNV-1a), so jitter is deterministic per entry. */
+function unitHash(text: string): number {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) {
+    h ^= text.charCodeAt(i);
+    h = Math.imul(h, 0x01000193) >>> 0;
+  }
+  return h / 0x1_0000_0000;
+}
+
+/**
+ * Wait before retry number `attempts` (1-based): exponential with ±25 % jitter derived from the
+ * idempotency key. Jitter spreads a village's phones apart when a tower comes back; deriving it
+ * from the key rather than a random source keeps this function pure and testable.
+ */
+export function nextBackoffMs(attempts: number, idempotencyKey: string): number {
+  if (!(attempts >= 1)) throw new RangeError('Backoff is for a retry: attempts must be at least 1.');
+  const exponential = Math.min(OUTBOX_BACKOFF_CEILING_MS, OUTBOX_BACKOFF_BASE_MS * 2 ** (attempts - 1));
+  return Math.round(exponential * (0.75 + 0.5 * unitHash(idempotencyKey)));
+}
+
+const DRAIN_RANK: Readonly<Record<OutboxKind, number>> = {
+  'listing.create': 0,
+  'listing.update': 1,
+  'listing.renew': 1,
+  'price-alert.create': 2,
+  'photo.upload': 3,
+};
+
+/**
+ * Drain order: a listing is created before anything that refers to it, text before photos, and
+ * otherwise first queued, first sent.
+ */
+export function drainOrder<T extends { entry: OutboxEntry }>(queue: readonly T[]): T[] {
+  return [...queue].sort((a, b) => DRAIN_RANK[a.entry.kind] - DRAIN_RANK[b.entry.kind] || a.entry.createdAt.localeCompare(b.entry.createdAt));
+}
+
+/** Network types on which photographs wait (PROMPT §XI: photos and non-critical data sync later). */
+const SLOW_NETWORKS: readonly string[] = ['slow-2g', '2g'];
+
+/** True when this entry should wait for a better network than `effectiveType`. Unknown networks do not defer. */
+export function deferOnSlowNetwork(entry: OutboxEntry, effectiveType: string | null): boolean {
+  return entry.kind === 'photo.upload' && effectiveType !== null && SLOW_NETWORKS.includes(effectiveType);
+}

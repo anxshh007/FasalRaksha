@@ -1,0 +1,68 @@
+/*
+ * Interim styles (P8). Plain on purpose: P9 ports the Phase-1 design system (tokens for both
+ * themes, self-hosted type, the glyph set) and replaces this file. Square corners, no shadows,
+ * no glows — nothing here will need to be unlearned. Every text size is at least 13px, and every
+ * pair below passes WCAG AA.
+ */
+:root {
+  color-scheme: light;
+  --ink: #1d1b16;
+  --ink-muted: #4a463d;
+  --paper: #fbf8f1;
+  --rule: #cfc7b4;
+  --field: #2f5d3a;
+  --field-ink: #ffffff;
+  --offline: #6b4e16;
+  --offline-ink: #ffffff;
+  --sell: #2f5d3a;
+  --refuse: #7a3b12;
+  --focus: #1f4fbf;
+  font-family: system-ui, 'Noto Sans Devanagari', 'Nirmala UI', sans-serif;
+  font-size: 16px;
+  line-height: 1.55; /* Devanagari needs more line-height than Latin (V-2 lesson) */
+  color: var(--ink);
+  background: var(--paper);
+}
+
+body { margin: 0; }
+.app { max-width: 40rem; margin: 0 auto; padding: 0 1rem 3rem; }
+
+.field-strip { display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; padding: 0.5rem 1rem; margin: 0 -1rem; font-size: 0.875rem; }
+.field-strip--live { background: var(--field); color: var(--field-ink); }
+.field-strip--field { background: var(--offline); color: var(--offline-ink); }
+.field-strip--checking { background: var(--rule); color: var(--ink); }
+.field-strip__detail { opacity: 0.95; }
+
+.masthead { display: flex; align-items: baseline; justify-content: space-between; border-bottom: 2px solid var(--ink); margin-bottom: 1rem; }
+.masthead h1 { font-size: 1.5rem; margin: 0.75rem 0 0.5rem; }
+.masthead__actions { display: flex; gap: 1rem; }
+
+h2 { font-size: 1.125rem; margin: 1.25rem 0 0.5rem; }
+h3 { font-size: 1.125rem; margin: 0; }
+
+.panel { border-top: 1px solid var(--rule); padding-top: 0.5rem; }
+label { display: block; margin: 0.75rem 0; font-size: 0.9375rem; }
+input, select { display: block; width: 100%; box-sizing: border-box; font: inherit; padding: 0.5rem; border: 1px solid var(--ink-muted); border-radius: 0; background: #fff; color: var(--ink); margin-top: 0.25rem; }
+button { font: inherit; padding: 0.5rem 1.25rem; border: 2px solid var(--ink); border-radius: 0; background: var(--ink); color: var(--paper); cursor: pointer; }
+button:disabled { opacity: 0.6; cursor: not-allowed; }
+button.link { background: none; color: var(--ink); border: none; padding: 0; text-decoration: underline; font-size: 0.9375rem; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.crops { display: grid; gap: 1rem; }
+.crop { border-top: 2px solid var(--ink); padding-top: 0.5rem; }
+.crop__head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+.crop__asof { font-size: 0.875rem; color: var(--ink-muted); }
+.crop__rate { margin: 0.25rem 0; display: flex; align-items: baseline; gap: 0.5rem; flex-wrap: wrap; }
+.crop__rate strong { font-size: 2rem; font-variant-numeric: tabular-nums; }
+.crop__range, .unit, .label { font-size: 0.875rem; color: var(--ink-muted); }
+.crop__stale { color: var(--refuse); font-size: 0.9375rem; }
+.verdict { border-left: 4px solid var(--rule); padding-left: 0.75rem; }
+.verdict--sell { border-color: var(--sell); }
+.verdict--refuse { border-color: var(--refuse); }
+.verdict--wait { border-color: var(--focus); }
+.verdict__headline { font-weight: 600; margin: 0.25rem 0; }
+.verdict__lot { font-size: 0.875rem; color: var(--ink-muted); margin: 0; }
+details { margin: 0.25rem 0; font-size: 0.9375rem; }
+
+.computed, .note, .tagline { font-size: 0.875rem; color: var(--ink-muted); }
+.error { color: var(--refuse); font-size: 0.9375rem; }

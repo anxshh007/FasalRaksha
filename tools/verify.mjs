@@ -14,6 +14,7 @@ const steps = [
   ['unit tests', 'pnpm', ['-r', 'run', 'test']],
   ['database tests (real PostgreSQL)', 'pnpm', ['test:db']],
   ['ml tests', 'node', ['tools/py.mjs', '-m', 'pytest', 'ml', '-q']],
+  ['end-to-end (Gate A: real API + PostgreSQL, Edge)', 'pnpm', ['e2e']],
   ['requirements audit', 'node', ['tools/requirements/audit.mjs']],
 ];
 if (process.argv.includes('--deps')) steps.push(['dependency audit (high)', 'pnpm', ['audit', '--audit-level', 'high']]);

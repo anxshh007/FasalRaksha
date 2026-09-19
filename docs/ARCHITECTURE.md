@@ -128,6 +128,23 @@ worth committing.
 | `generatedAt` is the run's **logical time** (02:00 IST after as-of) | Reruns with the same `--as-of` are byte-identical (§14.2); the wall clock would make every run a new hash. |
 | Releases are **committed** under `data/bundles/<version>/` | The app runs, and `pnpm db:start` serves prices, without the Python pipeline installed. |
 
+### Decisions taken in P8
+
+| Decision | Reason |
+|---|---|
+| The home screen reads **only IndexedDB** (Dexie); the network only refreshes it | Gate A by construction: with the API dead, nothing on the render path waits on a request. |
+| Failures classified as **unreachable / rejected / failed**, never from `navigator.onLine` | §XI: a missing network must never sign a farmer out; only a server that answers "no" can. Captive portals report online (V-2 lesson). |
+| **Single-flight session refresh** | Refresh tokens rotate with reuse detection (P3); React StrictMode's double effect would otherwise present one token twice and end the session. |
+| Access token **in memory only**; refresh token an httpOnly cookie; the profile cached with its confirmation time | An XSS payload cannot lift a long-lived credential from storage; offline, the farmer is restored and the screen can say how old the profile is. |
+| Device verifies every bundle (hash + manifest integrity + strict parser) before it replaces anything | SEC-14 on the phone; a failed document is logged for Judge Mode and the last verified copy stays. |
+| SW precache list **generated from the built `dist/`**, version = hash of file contents | V-2 hand-listed the shell and missed hashed assets; the first offline reload then failed. |
+| SW shell match uses **`ignoreVary`** | Vite's server sends `Vary: Origin`, module scripts carry Origin: without it the offline reload found index.html but not its script. Found by the Gate A run, not assumed. |
+| Bundle requests from the sync are network-first with a **marked** cache fallback | The sync must see a real 304/200; a cached answer is labelled `x-fasal-from-cache` so it is never mistaken for the server (V-2 lesson). |
+| `POST /api/outbox`: one entry per request, **idempotent under its key**, request hash checked | A 2G retry replays the recorded answer; the same key with different content is a 409, not an overwrite. Kinds whose features come later answer 501 and stay on the phone. |
+| Price alerts are the first real outbox kind (migration 0006) | The only offline-queueable action with no dependency on later phases; it gives the outbox a true round trip now. District is taken from the verified profile on the server (P1-04). |
+| Farmer location = the **market town the village names**, else the district centroid, and it says which | The registry gives a village name, not coordinates; GR-7 needs a distance. No arbitrary constant location (P1-04). |
+| E2E in the **installed Microsoft Edge** (`channel: 'msedge'`) with a stack supervisor that really kills the API process | No browser download (G-4 closed); "kill the backend" is a SIGKILL of a real process over a real PostgreSQL, not a mocked route. |
+
 ## 4 · Environment (measured 2026-09-19)
 
 Windows 11 · Node 24.19 · pnpm 10.34.5 · Python 3.12.6 (`.venv`, pinned `ml/requirements.txt`) ·
@@ -141,7 +158,7 @@ TensorFlow, Playwright browsers (not yet attempted).
 | G-1 | No real market dataset | §4.4 synthetic structural process with every §4.2 defect injected; header-tolerant ingest so a real file drops in; labelled synthetic everywhere | P5 |
 | G-2 | Policy constants (MSP 2025-26, storage tariffs, e-NWR pledge rate, freight tariffs, spoilage curves) have no machine-readable source here | One `constants` module in `@fasal/shared`, each value with its named source and a `verified` flag; **I will ask you to confirm the values** (§0.4) | P2, P18 |
 | G-3 | No PyTorch/TensorFlow; no field-labelled grading images | Decide at P12 between a CPU PyTorch MobileNetV3-Small trained on a clearly-labelled proxy set, and a smaller trained model on image descriptors — either exported to ONNX and **actually run by ONNX Runtime Web** (V-2 left the runtime unwired; v3 requires it). `fieldValidated: false` in every case | P12 |
-| G-4 | Playwright browsers not installed | Attempt `playwright install chromium` at P8; if the download is unavailable, log a cut and prove Gate A with a process-kill harness plus the in-app browser | P8, P20 |
+| G-4 | Playwright browsers not installed | **Closed in P8:** Playwright drives the installed Microsoft Edge (`channel: 'msedge'`); no browser download needed | P8 |
 | G-5 | Marathi copy must be culturally natural, not machine-translated | I will write it deliberately and flag it for a native-speaker review by the team before the demo | P11 |
 | G-6 | HEIC decode on the client needs a WASM decoder (~1 MB) | Either lazy-load it only on a HEIC file, or reject clearly (both allowed by CAM-07); decide by size | P12 |
 | G-7 | Argon2id needs a native module | Try `@node-rs/argon2` (prebuilt, no compiler); V-2 fell back to scrypt | P3 |

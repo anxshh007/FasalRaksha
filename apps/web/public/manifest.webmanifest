@@ -1,0 +1,12 @@
+{
+  "name": "फसल रक्षा · Fasal Raksha",
+  "short_name": "फसल रक्षा",
+  "description": "Offline-first price intelligence and a verified-buyer marketplace for the field gate.",
+  "lang": "mr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fbf8f1",
+  "theme_color": "#2f5d3a",
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}

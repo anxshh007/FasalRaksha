@@ -56,6 +56,7 @@ beforeAll(async () => {
     storage: new MockStorageRegistryAdapter(),
     transport: new MockTransportTariffAdapter(),
     crops: JSON.parse(readFileSync(join(ROOT, 'data', 'reference', 'crops.json'), 'utf8')) as { version: string; crops: CropProfile[] },
+    districts: JSON.parse(readFileSync(join(ROOT, 'data', 'reference', 'districts.json'), 'utf8')) as { version: string },
   });
 }, 180_000);
 
@@ -112,7 +113,7 @@ describe('P7 · serving a release', () => {
   });
 
   it('serves the shared bundles: crop dictionary, MSP and district climatology', async () => {
-    for (const url of ['/api/bundles/shared/crops', '/api/bundles/shared/msp', '/api/bundles/shared/climatology/nashik']) {
+    for (const url of ['/api/bundles/shared/crops', '/api/bundles/shared/districts', '/api/bundles/shared/msp', '/api/bundles/shared/climatology/nashik']) {
       const response = await app.inject({ method: 'GET', url });
       expect(response.statusCode, url).toBe(200);
       expect(verifyIntegrity(response.json<Record<string, unknown>>())).toBe(true);

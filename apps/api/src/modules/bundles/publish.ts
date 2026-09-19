@@ -68,6 +68,8 @@ export interface PublishSources {
   transport: TransportTariffAdapter;
   /** The crop dictionary (`data/reference/crops.json`). */
   crops: { version: string; crops: CropProfile[] } & Doc;
+  /** The district registry (`data/reference/districts.json`): names, markets, coordinates. */
+  districts: { version: string } & Doc;
 }
 
 function seal(content: Doc): Doc {
@@ -146,6 +148,7 @@ export async function buildRelease(pipelineDir: string, sources: PublishSources)
     shared.push(sealed(`climatology/${entry.district}`, document));
   }
   shared.push(sealed('crops', seal({ schemaVersion: BUNDLE_SCHEMA_VERSION, kind: 'crops', version, generatedAt, dictionary: sources.crops })));
+  shared.push(sealed('districts', seal({ schemaVersion: BUNDLE_SCHEMA_VERSION, kind: 'districts', version, generatedAt, registry: sources.districts })));
   shared.push(
     sealed(
       'msp',

@@ -33,11 +33,12 @@ export function latestPipelineVersion(): string | null {
 /** Storage and transport as `.env` names them. Live adapters need the full, validated config. */
 export function publishSources(env: Readonly<Record<string, string | undefined>>): PublishSources & { describe: string } {
   const crops = JSON.parse(readFileSync(join(REPO_ROOT, 'data', 'reference', 'crops.json'), 'utf8')) as { version: string; crops: CropProfile[] } & Record<string, unknown>;
+  const districts = JSON.parse(readFileSync(join(REPO_ROOT, 'data', 'reference', 'districts.json'), 'utf8')) as { version: string } & Record<string, unknown>;
   if (env['STORAGE_ADAPTER'] === 'live' || env['TRANSPORT_ADAPTER'] === 'live') {
     const adapters = createAdapters(loadConfig(env), REPO_ROOT);
-    return { storage: adapters.storage, transport: adapters.transport, crops, describe: `storage ${adapters.storage.mode}, transport ${adapters.transport.mode}` };
+    return { storage: adapters.storage, transport: adapters.transport, crops, districts, describe: `storage ${adapters.storage.mode}, transport ${adapters.transport.mode}` };
   }
-  return { storage: new MockStorageRegistryAdapter(), transport: new MockTransportTariffAdapter(), crops, describe: 'storage mock, transport mock' };
+  return { storage: new MockStorageRegistryAdapter(), transport: new MockTransportTariffAdapter(), crops, districts, describe: 'storage mock, transport mock' };
 }
 
 function write(path: string, body: string): void {

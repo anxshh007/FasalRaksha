@@ -23,6 +23,8 @@ import type { Logger } from '../log/logger.js';
 import { refreshSession, requestOtp, revokeSession, verifyOtp, type AuthDeps, type SessionTokens } from '../modules/auth/service.js';
 import { cropBundle, currentManifest, sharedBundle, type ServedDocument } from '../modules/bundles/store.js';
 import { getMe } from '../modules/me/service.js';
+import { parseOutboxEntry } from '../modules/outbox/schema.js';
+import { deliverOutboxEntry } from '../modules/outbox/service.js';
 import { verifyBuyer, verifyFarmer } from '../modules/verify/service.js';
 import type { KeyRing } from '../security/keys.js';
 import { verifyAccessToken } from '../security/tokens.js';
@@ -180,6 +182,7 @@ export function buildApp(deps: AppDependencies) {
   app.get('/api/bundles/manifest', async (request, reply) => sendDocument(request, reply, await currentManifest(requireDb())));
   app.get('/api/bundles/shared/crops', async (request, reply) => sendDocument(request, reply, await sharedBundle(requireDb(), 'crops')));
   app.get('/api/bundles/shared/msp', async (request, reply) => sendDocument(request, reply, await sharedBundle(requireDb(), 'msp')));
+  app.get('/api/bundles/shared/districts', async (request, reply) => sendDocument(request, reply, await sharedBundle(requireDb(), 'districts')));
   app.get('/api/bundles/shared/climatology/:district', async (request, reply) => {
     const { district } = z.object({ district: Slug }).parse(request.params);
     return sendDocument(request, reply, await sharedBundle(requireDb(), `climatology/${district}`));
@@ -216,6 +219,17 @@ export function buildApp(deps: AppDependencies) {
   });
 
   app.get('/api/me', async (request) => getMe(requireDb(), requireActor(request)));
+
+  // The drain endpoint for a phone's offline outbox: one entry per request, idempotent under
+  // its key. Deal transitions cannot be queued (compile-time) and are refused here too (SEC-09).
+  app.post('/api/outbox', { config: { rateLimit: { max: 120, timeWindow: '1 minute' } } }, async (request, reply) => {
+    const actor = requireActor(request);
+    const entry = parseOutboxEntry(request.body);
+    const header = request.headers['idempotency-key'];
+    const result = await deliverOutboxEntry(requireDb(), actor, entry, typeof header === 'string' ? header : undefined);
+    void reply.header('idempotent-replay', result.replayed ? 'true' : 'false');
+    return reply.status(result.status).send(result.body);
+  });
 
   const verifyDeps = () => {
     if (deps.keys === undefined || deps.farmerRegistry === undefined || deps.buyerRegistry === undefined) {

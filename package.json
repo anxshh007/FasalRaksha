@@ -13,6 +13,7 @@
     "typecheck": "pnpm -r run typecheck",
     "test": "pnpm -r run test",
     "test:db": "pnpm --filter @fasal/api run test:db",
+    "e2e": "pnpm --filter @fasal/web run e2e",
     "test:security": "pnpm --filter @fasal/api run test:security",
     "db:start": "pnpm --filter @fasal/api run db:local",
     "db:bootstrap": "pnpm --filter @fasal/api run bootstrap",
