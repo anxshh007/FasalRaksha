@@ -63,6 +63,7 @@ const STRINGS = {
   'refusal.RK-7': { mr: 'संभाव्य तोटा तुम्ही सहन करू शकता त्यापेक्षा जास्त आहे.', en: 'The possible loss is more than you can afford to risk.' },
 
   'alert.title': { mr: 'भावाची सूचना', en: 'Price alert' },
+  'alert.crop': { mr: 'पीक', en: 'Crop' },
   'alert.explain': { mr: '{crop} चा दर इतका झाल्यावर कळवा (₹ प्रति क्विंटल)', en: 'Tell me when {crop} reaches (₹ per quintal)' },
   'alert.set': { mr: 'सूचना ठेवा', en: 'Set alert' },
   'alert.queued': { mr: 'फोनवर जतन केले. नेटवर्क आल्यावर पाठवले जाईल.', en: 'Saved on this phone. It will be sent when there is a network.' },
@@ -70,6 +71,46 @@ const STRINGS = {
   'alert.rejected': { mr: 'स्वीकारले नाही: {reason}', en: 'Not accepted: {reason}' },
 
   'error.generic': { mr: 'हे पूर्ण झाले नाही: {reason}', en: 'That did not go through: {reason}' },
+
+  'spine.brand': { mr: 'फसल रक्षा — सुरुवात', en: 'Fasal Raksha — start' },
+  'spine.district': { mr: 'जिल्हा', en: 'District' },
+  'spine.language': { mr: 'भाषा बदला', en: 'Change language' },
+  'spine.theme': { mr: 'रंगसंगती', en: 'Theme' },
+  'spine.asOf': { mr: 'भावांची तारीख', en: 'Prices as of' },
+  'theme.night': { mr: 'गडद', en: 'NIGHT' },
+  'theme.field': { mr: 'उजळ', en: 'FIELD' },
+  'theme.offer': { mr: 'उन्हात वापरणार आहात? उजळ रंगसंगती उन्हात वाचायला सोपी आहे.', en: 'Using this outdoors? The Field theme is easier to read in sunlight.' },
+  'theme.bright': { mr: 'इथे खूप उजेड आहे. उजळ रंगसंगती वापरायची?', en: 'It is very bright here. Switch to the Field theme?' },
+  'theme.useField': { mr: 'उजळ वापरा', en: 'Use Field' },
+  'theme.keepNight': { mr: 'गडदच ठेवा', en: 'Keep Night' },
+
+  'nav.label': { mr: 'मुख्य मेनू', en: 'Main menu' },
+  'nav.home': { mr: 'मुख्य', en: 'HOME' },
+
+  'strip.live': { mr: 'जोडलेले', en: 'LIVE' },
+  'strip.field': { mr: 'फील्ड मोड', en: 'FIELD MODE' },
+  'strip.lastSync': { mr: 'शेवटचा संपर्क {time}', en: 'LAST SYNC {time}' },
+  'strip.never': { mr: 'अजून संपर्क नाही', en: 'NOT YET SYNCED' },
+  'strip.checking': { mr: 'तपासत आहे', en: 'CHECKING' },
+  'strip.waiting': { mr: 'पाठवायचे बाकी {n}', en: '{n} WAITING TO SEND' },
+  'strip.explain': { mr: 'नेटवर्क नसतानाही सर्व भाव आणि निर्णय या फोनवर मोजले जातात.', en: 'With no network, every price and decision is calculated on this phone.' },
+
+  'landing.title': { mr: 'आधी आजचा दर. मग तुमचा सुरक्षित निर्णय.', en: "Today's rate first. Then your decision, protected." },
+  'landing.thesis': {
+    mr: 'खरेदीदार भाव सांगण्याआधीच फसल रक्षा तुमचा निर्णय सुरक्षित ठेवते — आणि शेतात नेटवर्क नसतानाही चालते.',
+    en: 'Fasal Raksha protects your decision before the buyer names the price — and keeps working in the field without a network.',
+  },
+  'landing.language': { mr: 'भाषा निवडा', en: 'Choose your language' },
+  'landing.how': { mr: 'हे कसे काम करते', en: 'How it works' },
+  'step.label': { mr: 'पायरी {n}', en: 'STEP {n}' },
+  'step.1.title': { mr: 'आजचा जिल्ह्याचा दर', en: "Today's district rate" },
+  'step.1.body': { mr: 'तुमच्या जिल्ह्यातील बाजार समितीचा आजचा भाव, हमीभाव आणि सात दिवसांचा कल.', en: 'Your district market rate, the MSP floor and the seven-day movement.' },
+  'step.2.title': { mr: 'थांबावं की विकावं', en: 'Wait or sell' },
+  'step.2.body': { mr: 'साठवण, नासाडी आणि व्याजाचा खर्च धरून. पुरावा पुरेसा नसेल तर तसं स्पष्ट सांगितलं जातं.', en: 'Net of storage, spoilage and interest. When the evidence is not enough, it says so plainly.' },
+  'step.3.title': { mr: 'नेटवर्कशिवायही', en: 'Without a network' },
+  'step.3.body': { mr: 'शेतात नेटवर्क नसलं तरी दर आणि निर्णय तुमच्या फोनवरच मोजले जातात.', en: 'In the field with no signal, the rate and the decision are still calculated on your phone.' },
+  'signin.verifyNote': { mr: 'चाचणी आवृत्ती: पडताळणी एका छोट्या नमुना नोंदवहीवर चालते.', en: 'Test build: verification runs against a small sample registry.' },
+  'signin.back': { mr: 'नंबर बदला', en: 'Change number' },
 } as const satisfies Record<string, Record<Locale, string>>;
 
 export type StringKey = keyof typeof STRINGS;
@@ -81,19 +122,34 @@ export function t(locale: Locale, key: StringKey, values: Record<string, string 
 export const headlineKey = (h: Headline): StringKey => `headline.${h}`;
 export const refusalKey = (c: ConditionId): StringKey => `refusal.${c}`;
 
-/** ₹ with Indian grouping; Devanagari digits in Marathi. */
+/**
+ * Figures use Latin digits with Indian grouping in every language: every figure is set in DM Mono
+ * for tabular alignment (§9.5), and DM Mono has no Devanagari digits. The words around them stay
+ * Marathi. (`-u-nu-latn` keeps Marathi month names with Latin digits.)
+ */
+const intlLocale = (locale: Locale) => (locale === 'mr' ? 'mr-IN-u-nu-latn' : 'en-IN');
+
 export function rupees(locale: Locale, amount: number): string {
-  return new Intl.NumberFormat(locale === 'mr' ? 'mr-IN' : 'en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(amount);
+  return new Intl.NumberFormat(intlLocale(locale), { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(amount);
 }
 
 export function number(locale: Locale, value: number): string {
-  return new Intl.NumberFormat(locale === 'mr' ? 'mr-IN' : 'en-IN', { maximumFractionDigits: 1 }).format(value);
+  return new Intl.NumberFormat(intlLocale(locale), { maximumFractionDigits: 1 }).format(value);
 }
 
 export function clock(locale: Locale, epochMs: number): string {
-  return new Intl.DateTimeFormat(locale === 'mr' ? 'mr-IN' : 'en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZone: 'Asia/Kolkata' }).format(epochMs);
+  return new Intl.DateTimeFormat(intlLocale(locale), { hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23', timeZone: 'Asia/Kolkata' }).format(epochMs);
 }
 
 export function day(locale: Locale, iso: string): string {
-  return new Intl.DateTimeFormat(locale === 'mr' ? 'mr-IN' : 'en-IN', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${iso}T00:00:00Z`));
+  return new Intl.DateTimeFormat(intlLocale(locale), { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(new Date(`${iso}T00:00:00Z`));
+}
+
+export function shortDay(locale: Locale, iso: string): string {
+  return new Intl.DateTimeFormat(intlLocale(locale), { day: '2-digit', month: 'short', timeZone: 'UTC' }).format(new Date(`${iso}T00:00:00Z`));
+}
+
+export function shortTime(locale: Locale, epochMs: number, sameDay: boolean): string {
+  const options: Intl.DateTimeFormatOptions = sameDay ? { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' } : { day: '2-digit', month: 'short' };
+  return new Intl.DateTimeFormat(intlLocale(locale), { ...options, timeZone: 'Asia/Kolkata' }).format(epochMs);
 }

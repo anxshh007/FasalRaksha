@@ -1,0 +1,135 @@
+/*
+ * Design tokens (PROMPT §9.4). The only place a colour, size, radius, shadow or duration is
+ * defined. Nothing anywhere else hardcodes one; `src/design/contrast.test.ts` reads this file and
+ * checks every text/background pair against WCAG AA in both themes.
+ *
+ * NIGHT extends Phase 1's palette and is the default. FIELD is a high-contrast ink-on-paper
+ * theme for outdoor use. Same components, same layout, same type scale.
+ *
+ * One deliberate deviation from the specification's values: `--text-faint`. The values in §9.4
+ * (#65736B NIGHT, #7C8981 FIELD) fail AA against every ground (2.97–3.85:1), and §9.10 requires
+ * AA on all text. Each is moved toward `--text-muted` by the least amount that passes 4.5:1 on
+ * every ground and tint (CUTS C-04). Hierarchy then comes from size, weight and case, not a
+ * colour too faint to read in sunlight.
+ */
+
+:root,
+:root[data-theme='night'] {
+  color-scheme: dark;
+  --ground: #07110c;
+  --ground-soft: #0b1710;
+  --surface: #0e1b13;
+  --surface-raised: #122018;
+  --rule: #1c2b22;
+  --rule-strong: #2a3c31;
+
+  --text: #f4f7f3;
+  --text-muted: #91a097;
+  --text-faint: #87968d; /* spec #65736B fails AA; see header */
+
+  --farmer: #b9e879;
+  --farmer-tint: rgba(185, 232, 121, 0.08);
+  --buyer: #7ec4ff;
+  --buyer-tint: rgba(126, 196, 255, 0.08);
+  --fpo: #d2c09e;
+  --fpo-tint: rgba(210, 192, 158, 0.08);
+
+  --caution: #e8b44a;
+  --caution-tint: rgba(232, 180, 74, 0.08);
+  --refuse: #e8836b;
+  --refuse-tint: rgba(232, 131, 107, 0.09);
+
+  /* The ink on a filled accent button: the ground, so the pair is the ground/accent pair. */
+  --on-accent: #07110c;
+}
+
+:root[data-theme='field'] {
+  color-scheme: light;
+  --ground: #f7f8f7;
+  --ground-soft: #edf2ee;
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --rule: #dce0dd;
+  --rule-strong: #a9beb0;
+
+  --text: #1a1e1c;
+  --text-muted: #5c645e;
+  --text-faint: #616a64; /* spec #7C8981 fails AA; see header */
+
+  --farmer: #1e5631;
+  --farmer-tint: #e9f3eb;
+  --buyer: #1f3864;
+  --buyer-tint: #ecf0f8;
+  --fpo: #8a5a00;
+  --fpo-tint: #eee7db;
+  --caution: #8a5a00;
+  --caution-tint: #fdf3e0;
+  --refuse: #9c3a2a;
+  --refuse-tint: #fbeeeb;
+
+  --on-accent: #ffffff;
+}
+
+:root {
+  /* Role accent: whose surface this is. One accent per screen (§9.4). */
+  --accent: var(--farmer);
+  --accent-tint: var(--farmer-tint);
+
+  /* Type (§9.5). ₹ lives in Noto's Devanagari subset, so every stack falls through to it. */
+  --font-display: 'Manrope', 'Noto Sans Devanagari', system-ui, sans-serif;
+  --font-ui: 'DM Sans', 'Noto Sans Devanagari', system-ui, sans-serif;
+  --font-mono: 'DM Mono', 'Noto Sans Devanagari', ui-monospace, monospace;
+  --font-deva: 'Noto Sans Devanagari', 'DM Sans', system-ui, sans-serif;
+
+  /* Scale on a 4px grid: 12/14/16/20/25/31/39/49, with the 13px interface floor (§9.5). */
+  --size-label: 13px;
+  --size-small: 14px;
+  --size-body: 16px;
+  --size-lead: 20px;
+  --size-h3: 25px;
+  --size-h2: 31px;
+  --size-h1: 39px;
+  --size-figure: 49px;
+  --leading: 1.5;
+  --leading-deva: 1.75; /* Devanagari needs more leading than Latin (V-2 lesson) */
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+
+  /* Materials (§9.6): hairlines do the work; one shadow, for floating surfaces only. */
+  --radius: 4px;
+  --radius-input: 2px;
+  --hairline: 1px solid var(--rule);
+  --shadow-float: 0 1px 2px rgb(0 0 0 / 0.18), 0 8px 24px rgb(0 0 0 / 0.12);
+  --touch: 44px;
+  --spine: 72px;
+
+  /* Motion (§9.6): 120–180ms, opacity and 2–4px translate only. */
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+  --dur-fast: 120ms;
+  --dur: 180ms;
+  --dur-number: 90ms;
+}
+
+/* Role theming (§9.1): the buyer side is sky, the FPO side sand. */
+.role-buyer {
+  --accent: var(--buyer);
+  --accent-tint: var(--buyer-tint);
+}
+.role-fpo {
+  --accent: var(--fpo);
+  --accent-tint: var(--fpo-tint);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0ms;
+    --dur: 0ms;
+    --dur-number: 0ms;
+  }
+}

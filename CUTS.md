@@ -74,3 +74,40 @@ before storing, P8). The application role cannot write a bundle at all.
 **To close.** Sign `integrity` with Ed25519 in the publisher (key in `.env`, never committed),
 ship the signature in the manifest, pin the public key in the web build, and verify on the
 device with WebCrypto where available and a vendored verifier otherwise.
+
+## C-04 · `--text-faint` is lighter (NIGHT) and darker (FIELD) than §9.4 specifies
+
+**What.** §9.4 gives `--text-faint` as `#65736B` (NIGHT) and `#7C8981` (FIELD). The shipped
+values are `#87968D` and `#616A64`.
+
+**Why.** §9.10 requires WCAG AA on all text in both themes, and the specified values fail it
+against every ground: 2.99–3.85:1 in NIGHT, 2.97–3.65:1 in FIELD, where 4.5:1 is required. The
+specification's own criticism of Phase 1 (faint greys below AA) applies to them. Each value was
+moved toward `--text-muted` by the smallest step that passes on every ground and tint.
+
+**What exists instead.** `apps/web/src/design/contrast.test.ts` computes every text/background
+pair from `tokens.css` in both themes and prints the table. The lowest pair is now 4.79:1 in NIGHT
+and 4.55:1 in FIELD. Faint and muted are therefore close in colour, so hierarchy comes from size,
+weight and case. The test also asserts that the original values fail, so the reason stays
+checkable.
+
+**To close.** Nothing to close unless the team prefers a different AA-passing shade. Any value is
+acceptable if the contrast test passes.
+
+## C-05 · The performance budget is measured with Playwright + DevTools throttling, not the Lighthouse CLI
+
+**What.** The P9 gate asks for "Lighthouse budget printed". `apps/web/e2e/budget.spec.ts`
+measures and prints the §9.10 budget in the installed Microsoft Edge through the Chrome DevTools
+Protocol, not through the Lighthouse CLI. It covers JS gzip size, FCP from cache on a 4× CPU /
+2G-throttled phone, rendering with no network, and requests to other origins.
+
+**Why.** Lighthouse brings a second browser-automation stack and a large dependency tree into the
+repository to compute the same paint timing from the same engine. The Playwright run already
+drives the real browser, kills the real API, and asserts the budget, so a regression fails
+`pnpm verify` rather than producing a report somebody has to read.
+
+**What exists instead.** Every number is printed on each run and asserted: JS < 200 KB gzip,
+median FCP from cache < 1.5 s, a paint with the network gone, and zero third-party requests.
+
+**To close.** `npx lighthouse http://127.0.0.1:4179 --preset=perf --throttling-method=devtools`
+against `pnpm e2e`'s preview server gives the same numbers in Lighthouse's format.

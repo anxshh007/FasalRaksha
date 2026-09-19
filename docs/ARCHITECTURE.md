@@ -145,6 +145,21 @@ worth committing.
 | Farmer location = the **market town the village names**, else the district centroid, and it says which | The registry gives a village name, not coordinates; GR-7 needs a distance. No arbitrary constant location (P1-04). |
 | E2E in the **installed Microsoft Edge** (`channel: 'msedge'`) with a stack supervisor that really kills the API process | No browser download (G-4 closed); "kill the backend" is a SIGKILL of a real process over a real PostgreSQL, not a mocked route. |
 
+### Decisions taken in P9
+
+| Decision | Reason |
+|---|---|
+| Tokens in `design/tokens.css` for NIGHT (default) and FIELD, switched by `data-theme` on `<html>` | §9.3–§9.4: one identity, two first-class themes; nothing else writes a colour (checked by `interface.test.ts`). |
+| `--text-faint` corrected to pass AA (CUTS C-04) | The specified values fail §9.10; the contrast test computes all 246 pairs from the shipped tokens and prints the table. |
+| Figures in **Latin digits with Indian grouping** in every language (`mr-IN-u-nu-latn`) | Every figure is DM Mono for tabular alignment (§9.5), and DM Mono has no Devanagari digits. Mixed fallback produced `₹३ , ५०८`. Words stay Marathi; dates read `18 सप्टेंबर, 2026`. |
+| Self-hosted woff2 subsets, own `@font-face` rules (Latin for Manrope/DM Sans/DM Mono, Devanagari for Noto) | P1-12 and offline: precached with the shell; Fontsource's CSS would also ship .woff fallbacks and double what a 2G phone stores. ₹ comes from Noto's Devanagari subset through the font stack. |
+| Theme and language read from IndexedDB **before first render** | No theme flash; `lang` is right for the first text drawn. An IndexedDB read, never a network request. |
+| Record spine: vertical rail ≥ 700px, top band on a phone | §9.6 wants a full-height spine; at 360px a 72px rail would take a fifth of the screen, so the phone gets the same items as a band. |
+| Navigation shows only built sections | §9.7's four tabs arrive as their phases land; a tab to a page that does not exist would be a fake. |
+| Drawn glyph set (27 SVGs, 20px grid, 1.25px square-cap stroke) inlined at build | §9.6: no icon library, no emoji; `currentColor` so role and semantic colours carry through. |
+| Interface rules enforced by a source scan (`interface.test.ts`) | Security chips, emoji, model terminology, external fonts, stray colours, radii > 4px, blur, gradients and sub-13px text fail the build rather than a review. |
+| Visual snapshots at 360 and 1440 in both themes under a fixed clock | A design change is always deliberate (`--update-snapshots`); wall-clock readouts are masked. |
+
 ## 4 · Environment (measured 2026-09-19)
 
 Windows 11 · Node 24.19 · pnpm 10.34.5 · Python 3.12.6 (`.venv`, pinned `ml/requirements.txt`) ·

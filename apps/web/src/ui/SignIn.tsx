@@ -1,15 +1,27 @@
 /**
- * Sign in with a phone number and a one-time code, then (P1-09) verify the farmer record that
- * fixes district and village. Farmer verification establishes identity; it is not a barrier to
- * seeing prices. P9–P11 give these screens their final design and copy.
+ * Sign in with a phone number and a one-time code, then verify the farmer record that fixes
+ * district and village (P1-09: farmer verification establishes identity; it is not a barrier to
+ * seeing prices). Phase 1's auth panel and verification round-trip, on the design system: the
+ * honest test-build sentence is kept, the padlock and shield chips are not (P1-07).
  */
 import { useState, type FormEvent } from 'react';
 
+import { Glyph } from '../design/Glyph';
 import { t } from '../i18n/strings';
 import { identity, type Device } from '../state/useDevice';
 
 function reasonOf(result: { kind: string; message?: string; code?: string }, fallback: string): string {
   return result.message !== undefined && result.message !== '' ? result.message : (result.code ?? fallback);
+}
+
+function Problem({ message }: { message: string | null }) {
+  if (message === null) return null;
+  return (
+    <p className="notice notice--error" role="alert">
+      <Glyph name="caution" />
+      <span>{message}</span>
+    </p>
+  );
 }
 
 export function SignIn({ device }: { device: Device }) {
@@ -53,42 +65,53 @@ export function SignIn({ device }: { device: Device }) {
 
   return (
     <section className="panel" aria-labelledby="signin-title">
-      <h2 id="signin-title">{t(locale, 'signin.title')}</h2>
+      <h2 id="signin-title" className="panel__title">
+        {t(locale, 'signin.title')}
+      </h2>
       {step === 'phone' ? (
         <form onSubmit={(e) => void sendCode(e)}>
-          <label>
-            {t(locale, 'signin.phone')}
+          <label className="field">
+            <span className="field__label-row">
+              <span className="label">{t(locale, 'signin.phone')}</span>
+            </span>
             <input name="phone" type="tel" inputMode="tel" autoComplete="tel" required value={phone} onChange={(e) => setPhone(e.target.value)} />
           </label>
-          <button type="submit" disabled={pending}>
+          <button type="submit" className="btn btn--block" disabled={pending}>
+            {pending && <span className="spinner" aria-hidden="true" />}
             {t(locale, 'signin.sendCode')}
           </button>
         </form>
       ) : (
         <form onSubmit={(e) => void verify(e)}>
           {devCode !== null && (
-            <p className="note" data-testid="dev-code" data-code={devCode}>
-              {t(locale, 'signin.devCode', { code: devCode })}
+            <p className="notice" data-testid="dev-code" data-code={devCode}>
+              <span className="figure">{t(locale, 'signin.devCode', { code: devCode })}</span>
             </p>
           )}
-          <label>
-            {t(locale, 'signin.code')}
-            <input name="code" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" required value={code} onChange={(e) => setCode(e.target.value)} />
+          <label className="field">
+            <span className="field__label-row">
+              <span className="label">{t(locale, 'signin.code')}</span>
+            </span>
+            <input name="code" className="figure" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" required value={code} onChange={(e) => setCode(e.target.value)} />
           </label>
-          <label>
-            {t(locale, 'signin.name')}
+          <label className="field">
+            <span className="field__label-row">
+              <span className="label">{t(locale, 'signin.name')}</span>
+            </span>
             <input name="name" autoComplete="name" required value={name} onChange={(e) => setName(e.target.value)} />
           </label>
-          <button type="submit" disabled={pending}>
-            {t(locale, 'signin.continue')}
-          </button>
+          <div className="row">
+            <button type="submit" className="btn" disabled={pending}>
+              {pending && <span className="spinner" aria-hidden="true" />}
+              {t(locale, 'signin.continue')}
+            </button>
+            <button type="button" className="btn btn--quiet" onClick={() => setStep('phone')}>
+              {t(locale, 'signin.back')}
+            </button>
+          </div>
         </form>
       )}
-      {error !== null && (
-        <p className="error" role="alert">
-          {error}
-        </p>
-      )}
+      <Problem message={error} />
     </section>
   );
 }
@@ -113,23 +136,26 @@ export function VerifyFarmer({ device }: { device: Device }) {
   };
 
   return (
-    <section className="panel" aria-labelledby="verify-title">
-      <h2 id="verify-title">{t(locale, 'verify.title')}</h2>
-      <p>{t(locale, 'verify.explain')}</p>
+    <section className="panel" aria-labelledby="verify-title" style={{ maxWidth: 560 }}>
+      <h2 id="verify-title" className="panel__title">
+        {t(locale, 'verify.title')}
+      </h2>
+      <p className="muted">{t(locale, 'verify.explain')}</p>
       <form onSubmit={(e) => void submit(e)}>
-        <label>
-          {t(locale, 'verify.id')}
-          <input name="pmkisan" required value={id} onChange={(e) => setId(e.target.value)} autoCapitalize="characters" />
+        <label className="field">
+          <span className="field__label-row">
+            <span className="label">{t(locale, 'verify.id')}</span>
+          </span>
+          <input name="pmkisan" className="figure" required value={id} onChange={(e) => setId(e.target.value)} autoCapitalize="characters" spellCheck={false} />
         </label>
-        <button type="submit" disabled={pending || reach?.reachable === false}>
+        <button type="submit" className="btn btn--block" disabled={pending || reach?.reachable === false}>
+          {pending && <span className="spinner" aria-hidden="true" />}
+          <Glyph name="seal" />
           {t(locale, 'verify.submit')}
         </button>
       </form>
-      {error !== null && (
-        <p className="error" role="alert">
-          {error}
-        </p>
-      )}
+      <p className="field__hint">{t(locale, 'signin.verifyNote')}</p>
+      <Problem message={error} />
     </section>
   );
 }

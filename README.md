@@ -19,8 +19,8 @@ farmers* · Government of Maharashtra, Maharashtra State Innovation Society · T
 
 ## Status
 
-Built phase by phase, each gate proven and committed (PROMPT PART XV). **Current: P8 — the
-offline PWA.** Done so far:
+Built phase by phase, each gate proven and committed (PROMPT PART XV). **Current: P9 — the
+design system.** Done so far:
 - the foundation, and the shared domain engine;
 - the schema with row-level security, and authentication;
 - the nine adapters;
@@ -28,13 +28,16 @@ offline PWA.** Done so far:
 - the forecast pipeline with its validation table;
 - sealed, versioned bundles served with ETags;
 - the offline core: service worker, device store, verified district-first sync, session persistence
-  across connectivity loss, and the outbox.
+  across connectivity loss, and the outbox (Gate A, automated);
+- the Phase-1 identity on a real design system: NIGHT and FIELD themes, self-hosted Manrope, DM
+  Sans, DM Mono and Noto Sans Devanagari, a drawn glyph set, the record spine and the field-mode
+  strip. Every colour pair passes AA in both themes, and the performance budget is measured on
+  every run.
 
-A farmer can sign in, verify a PM-KISAN record and see their district's prices and a sell/wait
-decision computed on the phone. That keeps working with the API process killed or the network
-gone (Gate A, automated). Screens are functional, not yet designed: the Phase-1 design system
-arrives in P9, and the briefing, evidence panel and buyer shortlist in P10–P13. The shortlist
-half of Gate A is proven when the shortlist exists (P13).
+A farmer can choose a language, sign in, verify a PM-KISAN record and see their district's prices
+and a sell/wait decision computed on the phone. That keeps working with the API killed or the
+network gone. The morning briefing, evidence panel and buyer shortlist come next (P10–P13). The
+shortlist half of Gate A is proven when the shortlist exists (P13).
 
 `REQUIREMENTS.csv` is the source of truth for what is real. Run `pnpm requirements` to see it.
 

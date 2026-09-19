@@ -78,6 +78,18 @@ importers:
       '@fasal/shared':
         specifier: workspace:*
         version: link:../../packages/shared
+      '@fontsource/dm-mono':
+        specifier: ^5.3.0
+        version: 5.3.0
+      '@fontsource/dm-sans':
+        specifier: ^5.3.0
+        version: 5.3.0
+      '@fontsource/manrope':
+        specifier: ^5.3.0
+        version: 5.3.0
+      '@fontsource/noto-sans-devanagari':
+        specifier: ^5.3.0
+        version: 5.3.0
       dexie:
         specifier: ^4.4.6
         version: 4.4.6
@@ -373,6 +385,18 @@ packages:
 
   '@fastify/rate-limit@11.2.0':
     resolution: {integrity: sha512-X7osJd4XSvMoejYrnJkSZYYjY1eNYoBqhjlzf1RakC2204qExFqZFTKj5+T7VuzA/iUI9Z3UoSqQRkB2HpG0oQ==}
+
+  '@fontsource/dm-mono@5.3.0':
+    resolution: {integrity: sha512-OINjI8C1S/wpchhQxl7njZdMn4+hnDCpQ4YtvvOpKNARo+0J8O1x1IcrChxNjHOhfVv1by8C/FQoy3hXK+C1Ug==}
+
+  '@fontsource/dm-sans@5.3.0':
+    resolution: {integrity: sha512-lYJtMXXO28q1z+yz+z8XKd0s4hXaa9QdkETzkyD760sidCv5heI86weYA0sx0Nc4pAMAQTUuyf4gO44cYKKS9g==}
+
+  '@fontsource/manrope@5.3.0':
+    resolution: {integrity: sha512-obJ1Dv3+uCA6HlHgW8u4BGYxJR9In2HW7gjJhlflEvkrj1X1iSEwu0fToL+JYGC/FEKFfIz1sBuPduvcL2gIAA==}
+
+  '@fontsource/noto-sans-devanagari@5.3.0':
+    resolution: {integrity: sha512-7khYmipS/5KAUUmrO1DKir8yL8XI00d0+ZE9BqbS8XF1jzObv6CpPOk3UeYxF+Pvi8bx9bBvprBCOcbx/eQWTQ==}
 
   '@jridgewell/resolve-uri@3.1.2':
     resolution: {integrity: sha512-bRISgCIjP20/tbWSPWMEi54QVPRZExkuD9lJL+UIxUKtwVJA8wW1Trb1jMs1RFXo1CBTNZ/5hpC9QvmKWdopKw==}
@@ -1351,6 +1375,14 @@ snapshots:
       fastify-plugin: 6.0.0
       ip-address: 10.7.2
       toad-cache: 3.7.4
+
+  '@fontsource/dm-mono@5.3.0': {}
+
+  '@fontsource/dm-sans@5.3.0': {}
+
+  '@fontsource/manrope@5.3.0': {}
+
+  '@fontsource/noto-sans-devanagari@5.3.0': {}
 
   '@jridgewell/resolve-uri@3.1.2': {}
 

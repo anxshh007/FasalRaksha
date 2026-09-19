@@ -9,18 +9,23 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { Locale } from '../i18n/strings';
 import { computeHome, DEFAULT_CONTEXT, type HomeBriefing } from '../offline/compute';
-import { store } from '../offline/db';
 import { request } from '../offline/http';
 import { drain, enqueue, queueSummary, type QueueSummary } from '../offline/outbox';
 import { effectiveType, probe, type Reachability } from '../offline/reach';
 import { adoptSession, refreshProfile, restoreSession, signOut as endSession, type SessionState } from '../offline/session';
 import { syncDistrict } from '../offline/sync';
+import { applyToDocument, savePreference, watchForBrightLight, type Preferences, type Theme } from './preferences';
 
 const LOOP_MS = 20_000;
 
 export interface Device {
   locale: Locale;
   setLocale: (locale: Locale) => void;
+  theme: Theme;
+  setTheme: (theme: Theme) => void;
+  /** Show the first-run FIELD offer, or a one-time bright-light suggestion. */
+  themeOffer: 'first-run' | 'bright-light' | null;
+  dismissThemeOffer: () => void;
   session: SessionState | null;
   reach: Reachability | null;
   briefing: HomeBriefing | null;
@@ -32,8 +37,10 @@ export interface Device {
   signOut: () => Promise<void>;
 }
 
-export function useDevice(): Device {
-  const [locale, setLocaleState] = useState<Locale>('mr');
+export function useDevice(initial: Preferences): Device {
+  const [locale, setLocaleState] = useState<Locale>(initial.locale);
+  const [theme, setThemeState] = useState<Theme>(initial.theme);
+  const [themeOffer, setThemeOffer] = useState<'first-run' | 'bright-light' | null>(initial.themeChosen ? null : 'first-run');
   const [session, setSession] = useState<SessionState | null>(null);
   const [reach, setReach] = useState<Reachability | null>(null);
   const [briefing, setBriefing] = useState<HomeBriefing | null>(null);
@@ -80,8 +87,6 @@ export function useDevice(): Device {
   useEffect(() => {
     let cancelled = false;
     void (async () => {
-      const stored = (await store().settings.get('locale'))?.value;
-      if (!cancelled && (stored === 'mr' || stored === 'en')) setLocaleState(stored);
       // Render from the device first, then ask the network.
       const restored = await restoreSession();
       if (cancelled) return;
@@ -102,9 +107,33 @@ export function useDevice(): Device {
     };
   }, [recompute, tick]);
 
+  useEffect(() => {
+    applyToDocument({ locale, theme });
+  }, [locale, theme]);
+
+  useEffect(() => {
+    if (initial.lightSuggested || theme === 'field') return undefined;
+    return watchForBrightLight(() => {
+      setThemeOffer('bright-light');
+      void savePreference('lightSuggested', true);
+    });
+  }, [initial.lightSuggested, theme]);
+
   const setLocale = useCallback((next: Locale) => {
     setLocaleState(next);
-    void store().settings.put({ key: 'locale', value: next });
+    void savePreference('locale', next);
+  }, []);
+
+  const setTheme = useCallback((next: Theme) => {
+    setThemeState(next);
+    setThemeOffer(null);
+    void savePreference('theme', next);
+    void savePreference('themeChosen', true);
+  }, []);
+
+  const dismissThemeOffer = useCallback(() => {
+    setThemeOffer(null);
+    void savePreference('themeChosen', true);
   }, []);
 
   const adopt = useCallback(
@@ -146,7 +175,7 @@ export function useDevice(): Device {
     await recompute(next);
   }, [recompute]);
 
-  return { locale, setLocale, session, reach, briefing, queue, adopt, reloadProfile, queueAction, signOut };
+  return { locale, setLocale, theme, setTheme, themeOffer, dismissThemeOffer, session, reach, briefing, queue, adopt, reloadProfile, queueAction, signOut };
 }
 
 /** Thin wrappers over the identity endpoints for the sign-in screens. */
