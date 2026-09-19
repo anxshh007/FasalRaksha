@@ -1,0 +1,143 @@
+{
+  "note": "Demonstration buyers (PROMPT §16.1–16.2). Fictional Maharashtra traders at real market towns; every screen that shows one says it is a demonstration buyer. Track records are seeded as completed deals in the real tables, so the record the farmer sees is computed exactly as a real one would be. Offers are placed against the published synthetic benchmark: `scenario` prices are §16.2's figures, written for a ₹1,840 onion market and scaled to today's benchmark; `relative` prices are a multiple of the benchmark; `absolute` prices are for crops with no published bundle.",
+  "scenarioBenchmarkPerQtl": 1840,
+  "buyers": [
+    {
+      "key": "godavari",
+      "name": "Godavari Agro Traders",
+      "district": "nashik",
+      "market": "lasalgaon",
+      "verified": true,
+      "gstinLast4": "1Z5Q",
+      "history": { "paymentDays": [[12, 4], [6, 3], [5, 5]], "defaults": 0, "openDisputes": 0 },
+      "requirements": [{ "crop": "onion", "price": { "scenario": 1950 }, "min": 1, "max": 50, "radiusKm": 60, "gradeFloor": null }]
+    },
+    {
+      "key": "deccan",
+      "name": "Deccan Exports",
+      "district": "nashik",
+      "market": "pimpalgaon-baswant",
+      "verified": true,
+      "gstinLast4": "7K2P",
+      "history": { "paymentDays": [[9, 60], [5, 55], [4, 65]], "defaults": 1, "openDisputes": 0 },
+      "requirements": [{ "crop": "onion", "price": { "scenario": 2000 }, "min": 1, "max": 50, "radiusKm": 60, "gradeFloor": null }]
+    },
+    {
+      "key": "niphad",
+      "name": "Niphad Traders",
+      "district": "nashik",
+      "market": "niphad",
+      "verified": true,
+      "gstinLast4": "3M8D",
+      "history": { "paymentDays": [[31, 2]], "defaults": 0, "openDisputes": 0 },
+      "requirements": [{ "crop": "onion", "price": { "scenario": 1900 }, "min": 1, "max": 50, "radiusKm": 60, "gradeFloor": null }]
+    },
+    {
+      "key": "manmad",
+      "name": "Manmad Fresh Buyers",
+      "district": "nashik",
+      "market": "manmad",
+      "verified": false,
+      "gstinLast4": null,
+      "history": { "paymentDays": [], "defaults": 0, "openDisputes": 0 },
+      "requirements": [{ "crop": "onion", "price": { "scenario": 2100 }, "min": 1, "max": 50, "radiusKm": 80, "gradeFloor": null }]
+    },
+    {
+      "key": "yeola-cotton",
+      "name": "Yeola Cotton Ginning",
+      "district": "nashik",
+      "market": "yeola",
+      "verified": true,
+      "gstinLast4": "9C4G",
+      "history": { "paymentDays": [[8, 7]], "defaults": 0, "openDisputes": 0 },
+      "requirements": [{ "crop": "cotton", "price": { "absolute": 7100 }, "min": 5, "max": 200, "radiusKm": 90, "gradeFloor": null }]
+    },
+    {
+      "key": "pimpalgaon-tomato",
+      "name": "Baswant Tomato Company",
+      "district": "nashik",
+      "market": "pimpalgaon-baswant",
+      "verified": true,
+      "gstinLast4": "4T6B",
+      "history": { "paymentDays": [[10, 3], [4, 6]], "defaults": 0, "openDisputes": 0 },
+      "requirements": [{ "crop": "tomato", "price": { "relative": 1.04 }, "min": 1, "max": 40, "radiusKm": 60, "gradeFloor": "B" }]
+    },
+    {
+      "key": "rahuri",
+      "name": "Rahuri Kanda Traders",
+      "district": "ahilyanagar",
+      "market": "rahuri",
+      "verified": true,
+      "gstinLast4": "2R7K",
+      "history": { "paymentDays": [[14, 5], [3, 9]], "defaults": 0, "openDisputes": 0 },
+      "requirements": [{ "crop": "onion", "price": { "relative": 1.05 }, "min": 1, "max": 60, "radiusKm": 70, "gradeFloor": null }]
+    },
+    {
+      "key": "sangamner",
+      "name": "Sangamner Fruit Co.",
+      "district": "ahilyanagar",
+      "market": "sangamner",
+      "verified": true,
+      "gstinLast4": "5F1S",
+      "history": { "paymentDays": [[7, 4]], "defaults": 0, "openDisputes": 0 },
+      "requirements": [{ "crop": "pomegranate", "price": { "relative": 1.03 }, "min": 1, "max": 30, "radiusKm": 80, "gradeFloor": "B" }]
+    },
+    {
+      "key": "narayangaon",
+      "name": "Narayangaon Fresh Traders",
+      "district": "pune",
+      "market": "narayangaon",
+      "verified": true,
+      "gstinLast4": "8N3F",
+      "history": { "paymentDays": [[16, 3], [2, 8]], "defaults": 0, "openDisputes": 0 },
+      "requirements": [
+        { "crop": "tomato", "price": { "relative": 1.04 }, "min": 1, "max": 40, "radiusKm": 60, "gradeFloor": null },
+        { "crop": "onion", "price": { "absolute": 3450 }, "min": 2, "max": 40, "radiusKm": 60, "gradeFloor": null }
+      ]
+    },
+    {
+      "key": "manchar",
+      "name": "Manchar Potato Mart",
+      "district": "pune",
+      "market": "manchar",
+      "verified": true,
+      "gstinLast4": "6P9M",
+      "history": { "paymentDays": [[11, 6]], "defaults": 0, "openDisputes": 1 },
+      "requirements": [{ "crop": "potato", "price": { "relative": 1.03 }, "min": 2, "max": 60, "radiusKm": 60, "gradeFloor": null }]
+    },
+    {
+      "key": "manjara",
+      "name": "Manjara Oilseeds & Pulses",
+      "district": "latur",
+      "market": "latur-apmc",
+      "verified": true,
+      "gstinLast4": "1L4M",
+      "history": { "paymentDays": [[20, 5], [6, 10]], "defaults": 0, "openDisputes": 0 },
+      "requirements": [
+        { "crop": "soybean", "price": { "relative": 1.03 }, "min": 2, "max": 100, "radiusKm": 90, "gradeFloor": "B" },
+        { "crop": "tur", "price": { "relative": 1.02 }, "min": 2, "max": 100, "radiusKm": 90, "gradeFloor": null },
+        { "crop": "gram", "price": { "relative": 1.02 }, "min": 2, "max": 100, "radiusKm": 90, "gradeFloor": null }
+      ]
+    },
+    {
+      "key": "tapi",
+      "name": "Tapi Banana Traders",
+      "district": "jalgaon",
+      "market": "raver",
+      "verified": true,
+      "gstinLast4": "3B8T",
+      "history": { "paymentDays": [[12, 4]], "defaults": 0, "openDisputes": 0 },
+      "requirements": [{ "crop": "banana", "price": { "relative": 1.04 }, "min": 5, "max": 150, "radiusKm": 70, "gradeFloor": null }]
+    },
+    {
+      "key": "kalamna",
+      "name": "Kalamna Citrus Traders",
+      "district": "nagpur",
+      "market": "kalamna",
+      "verified": true,
+      "gstinLast4": "7O2K",
+      "history": { "paymentDays": [[9, 5]], "defaults": 0, "openDisputes": 0 },
+      "requirements": [{ "crop": "orange", "price": { "relative": 1.03 }, "min": 5, "max": 120, "radiusKm": 80, "gradeFloor": null }]
+    }
+  ]
+}

@@ -24,6 +24,7 @@ import type { Actor, Database } from '../db/actor.js';
 import type { Logger } from '../log/logger.js';
 import { refreshSession, requestOtp, revokeSession, verifyOtp, type AuthDeps, type SessionTokens } from '../modules/auth/service.js';
 import { cropBundle, currentManifest, sharedBundle, type ServedDocument } from '../modules/bundles/store.js';
+import { demandFor } from '../modules/demand/service.js';
 import { listMine } from '../modules/listings/service.js';
 import { getMe } from '../modules/me/service.js';
 import { appendChunk, openUpload, PHOTO_LIMITS, readPhoto, type PhotoDeps } from '../modules/photos/service.js';
@@ -198,6 +199,13 @@ export function buildApp(deps: AppDependencies) {
   app.get('/api/bundles/:crop/:district', async (request, reply) => {
     const { crop, district } = z.object({ crop: Slug, district: Slug }).parse(request.params);
     return sendDocument(request, reply, await cropBundle(requireDb(), crop, district));
+  });
+
+  // Demand for the buyer shortlist (FR-09): signed-in only, verified on the phone like a bundle,
+  // revalidated by ETag. The phone ranks it against its own lot, which never leaves the phone.
+  app.get('/api/demand/:district', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (request, reply) => {
+    const { district } = z.object({ district: Slug }).parse(request.params);
+    return sendDocument(request, reply, await demandFor(requireDb(), requireActor(request), district, now()));
   });
 
   app.post('/api/auth/otp/request', { config: { rateLimit: { max: 5, timeWindow: '10 minutes' } } }, async (request) => {

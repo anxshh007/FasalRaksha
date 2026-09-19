@@ -1,8 +1,9 @@
 /**
  * Home is a morning field briefing, not a dashboard (PROMPT §9.7). Before the farmer is asked to
  * type anything they see what their crop is worth: the benchmark first and largest, then the
- * RAKSHA answer with its band, then their own lot. The evidence sits beside it on a wide screen
- * and below it on a phone. The district's other crops follow in compact rows.
+ * RAKSHA answer with its band, then their own lot and the best buyer for it (§16.3 step 3). The
+ * evidence sits beside it on a wide screen and below it on a phone. The district's other crops
+ * follow in compact rows.
  *
  * Every figure is computed on this phone from verified bundles at the moment of rendering. The
  * line under the briefing says when, and a reload recomputes it (Gate A).
@@ -14,9 +15,11 @@ import { EvidencePanel } from '../briefing/EvidencePanel';
 import { LotControl } from '../briefing/LotControl';
 import { RakshaCard } from '../briefing/RakshaCard';
 import { Glyph } from '../design/Glyph';
-import { clock, headlineKey, rupees, t, type Locale } from '../i18n/strings';
+import { clock, headlineKey, number, rupees, t, type Locale } from '../i18n/strings';
+import { Tx } from '../i18n/Tx';
+import { shortlistFor } from '../match/shortlist';
 import { SpeakButton } from '../sell/SpeakButton';
-import type { CropBriefing } from '../offline/compute';
+import { todayInIndia, type CropBriefing, type DecisionContext, type HomeBriefing } from '../offline/compute';
 import type { Device } from '../state/useDevice';
 
 const cropName = (locale: Locale, item: CropBriefing) => (locale === 'en' ? item.names.en : locale === 'hi' ? (item.names.hi ?? item.names.mr) : item.names.mr);
@@ -105,7 +108,35 @@ function PriceAlert({ device, crops }: { device: Device; crops: CropBriefing[] }
   );
 }
 
-export function Home({ device }: { device: Device }) {
+/** The best buyer for the lot on this screen, from the same shortlist BUYERS shows. */
+function BestBuyer({ locale, briefing, crop, context, onBuyers }: { locale: Locale; briefing: HomeBriefing; crop: string; context: DecisionContext; onBuyers: () => void }) {
+  const today = todayInIndia(briefing.computedAt);
+  const shortlist = shortlistFor(briefing, { crop, quantity: { value: context.quantityQtl, unit: 'quintal' }, grade: null, availableFrom: today, availableUntil: today, listingClientId: null }, context);
+  if (shortlist.kind !== 'ranked') return null;
+  const best = shortlist.result.matches[0];
+  return (
+    <div className="best-buyer" data-testid="best-buyer" data-buyer={best?.buyerId ?? ''}>
+      <p>
+        {best === undefined ? (
+          t(locale, 'home.noBuyer')
+        ) : (
+          <Tx
+            locale={locale}
+            k="home.bestBuyer"
+            values={{ name: best.buyerName, place: best.buyerPlace, qty: number(locale, context.quantityQtl), amount: rupees(locale, Math.round(best.afterFreight)) }}
+            words={['name', 'place']}
+          />
+        )}
+      </p>
+      <button type="button" className="btn btn--quiet" onClick={onBuyers} data-testid="home-all-buyers">
+        <Glyph name="buyers" size={16} />
+        {t(locale, 'home.allBuyers')}
+      </button>
+    </div>
+  );
+}
+
+export function Home({ device, onBuyers }: { device: Device; onBuyers: () => void }) {
   const { locale, briefing, context } = device;
   const evidenceRef = useRef<HTMLDivElement>(null);
   const [evidenceOpen, setEvidenceOpen] = useState(false);
@@ -158,6 +189,7 @@ export function Home({ device }: { device: Device }) {
             location={briefing.location}
             marketName={briefing.locationNames === null ? null : locale === 'en' ? briefing.locationNames.en : briefing.locationNames.mr}
           />
+          <BestBuyer locale={locale} briefing={briefing} crop={lead.crop} context={context} onBuyers={onBuyers} />
         </article>
         <div className="brief__side" ref={evidenceRef}>
           <EvidencePanel locale={locale} bundle={lead.bundle} evaluation={lead.evaluation} open={evidenceOpen} />

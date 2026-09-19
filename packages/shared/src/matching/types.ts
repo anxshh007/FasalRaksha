@@ -66,6 +66,8 @@ export interface BuyerProfile {
   place: string;
   /** GSTIN/Udyam verified. Unverified buyers may browse; they may not offer (PROMPT §8.3). */
   verified: boolean;
+  /** A seeded demonstration trader (PROMPT §16.1): every screen that shows one says so. */
+  demonstration?: boolean;
   history: BuyerHistory;
 }
 

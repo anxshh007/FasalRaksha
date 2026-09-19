@@ -1207,6 +1207,135 @@ button.spine__item:hover {
   font-size: var(--size-small);
 }
 
+/* ── buyers (P13): the explained shortlist, never a percentage ───────────────────────────── */
+
+.buyers__rate {
+  margin: 0;
+  font-size: var(--size-lead);
+}
+.lot-picker {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+.lot-picker__option {
+  min-height: var(--touch);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+.lot-picker__option[aria-pressed='true'] {
+  border-color: var(--accent);
+  background: var(--accent-tint);
+}
+.buyer-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-4);
+}
+.buyer-card {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-5);
+  background: var(--surface);
+  border: var(--hairline);
+  border-radius: var(--radius);
+}
+.buyer-card:first-child {
+  border-left: 2px solid var(--accent);
+}
+.buyer-card__head {
+  font-family: var(--font-display);
+  font-size: var(--size-lead);
+  letter-spacing: 0.01em;
+}
+.buyer-card__name {
+  text-transform: uppercase;
+}
+.buyer-card p {
+  margin: 0;
+}
+.buyer-card__price {
+  font-size: var(--size-h3);
+}
+.buyer-card__facts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-1);
+  color: var(--text-muted);
+}
+.buyer-card__gross {
+  margin-top: var(--space-2);
+  color: var(--text-muted);
+}
+/* The headline figure (§6.5): what reaches the farmer after freight. */
+.buyer-card__net {
+  font-family: var(--font-display);
+  font-size: var(--size-lead);
+  font-weight: 700;
+}
+.buyer-card__net .figure {
+  font-size: var(--size-h3);
+}
+.buyer-card__vehicle {
+  font-size: var(--size-small);
+}
+.buyer-card__risk {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+  color: var(--caution);
+  font-size: var(--size-small);
+}
+.buyer-card__why {
+  padding: var(--space-2) var(--space-3);
+  border-left: 2px solid var(--caution);
+  background: var(--caution-tint);
+  font-size: var(--size-small);
+}
+.alternatives {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding-left: var(--space-5);
+}
+.excluded summary {
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: var(--size-small);
+}
+.excluded ul {
+  margin: var(--space-2) 0 0;
+  padding-left: var(--space-5);
+  color: var(--text-muted);
+  font-size: var(--size-small);
+}
+.best-buyer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  padding: var(--space-3) var(--space-4);
+  border-left: 2px solid var(--accent);
+  background: var(--accent-tint);
+}
+.best-buyer p {
+  margin: 0;
+}
+.listing-item__buyers {
+  margin-top: var(--space-2);
+  padding-left: 0;
+}
+
 /* ── the camera (P12): viewfinder, one message at a time, the proposal, the farmer's decision ── */
 
 .camera {

@@ -25,7 +25,7 @@ function ListingPhoto({ device, photo }: { device: Device; photo: NonNullable<Li
   );
 }
 
-export function ListingsScreen({ device, onSell }: { device: Device; onSell: () => void }) {
+export function ListingsScreen({ device, onSell, onBuyers }: { device: Device; onSell: () => void; onBuyers: (clientId: string) => void }) {
   const { locale, listings, briefing } = device;
   const cropName = (id: string) => briefing?.dictionary?.crops.find((c) => c.id === id)?.names[locale] ?? id;
   return (
@@ -72,6 +72,10 @@ export function ListingsScreen({ device, onSell }: { device: Device; onSell: () 
                   </p>
                 )}
                 {photo !== null && <ListingPhoto device={device} photo={photo} />}
+                <button type="button" className="btn btn--quiet listing-item__buyers" onClick={() => onBuyers(listing.clientId)} data-testid="listing-buyers">
+                  <Glyph name="buyers" size={16} />
+                  {t(locale, 'listings.buyers')}
+                </button>
               </li>
             );
           })}

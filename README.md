@@ -19,8 +19,8 @@ farmers* · Government of Maharashtra, Maharashtra State Innovation Society · T
 
 ## Status
 
-Built phase by phase, each gate proven and committed (PROMPT PART XV). **Current: P12 — the
-camera.** Done so far:
+Built phase by phase, each gate proven and committed (PROMPT PART XV). **Current: P13 — the buyer
+shortlist.** Done so far:
 - the foundation, and the shared domain engine;
 - the schema with row-level security, and authentication;
 - the nine adapters;
@@ -46,11 +46,17 @@ camera.** Done so far:
   (ONNX Runtime Web, an INT8 model per crop family) into a grade and a confidence band, and the
   farmer confirms, changes or skips it. The photo is queued with the listing and uploads in
   resumable pieces; the server strips it of all metadata and keeps it behind signed links.
+- an explained buyer shortlist, ranked on the phone by what actually reaches the farmer: the
+  offer, less freight, less the cost of waiting for payment and the chance of not being paid.
+  No match percentage anywhere; a buyer offering more that ranks lower says why; buyers left out
+  are counted by reason; and when nothing beats the farmer's own mandi, the list is empty and
+  says what to do instead.
 
 A farmer can choose a language, sign in, verify a PM-KISAN record and see their district's prices
 and a sell/wait decision computed on the phone, with the reasons laid out, then list a crop by
-speaking or typing, with a graded photograph. All of it keeps working with the API killed or the
-network gone. The buyer shortlist comes next (P13), and with it the shortlist half of Gate A.
+speaking or typing, with a graded photograph, and see which buyer leaves them best off. All of it
+keeps working with the API killed or the network gone — the shortlist included, which is the
+second half of Gate A. Offers, the sauda slip and the deal state machine come next (P14–P15).
 
 `REQUIREMENTS.csv` is the source of truth for what is real. Run `pnpm requirements` to see it.
 

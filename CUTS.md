@@ -167,3 +167,27 @@ whatever a scanner says. The scan hook runs on every upload and its refusal path
 
 **To close.** An S3-compatible `PhotoStore` and a ClamAV (or cloud) `ScanAdapter` behind the same
 interfaces, selected by configuration.
+
+## C-09 · The buyers are seeded demonstration traders, and their offers are scaled to the synthetic market
+
+**What.** The buyers a farmer sees — Godavari Agro Traders, Deccan Exports, Niphad Traders and the
+rest of `data/reference/demo-buyers.json` — are fictional Maharashtra traders seeded by
+`apps/api/scripts/lib/demand-seed.ts`, and their track records are seeded completed deals. §16.2's
+offers (₹1,950 / ₹2,000 / ₹1,900) are scaled by today's benchmark ÷ the ₹1,840 market they were
+written for.
+
+**Why.** There is no real buyer-side data for this build, and the market data is synthetic
+(C-01's sibling, ARCHITECTURE G-1). At the synthetic onion price of about ₹3,508 the literal §16.2
+figures sit below what the farmer would get at their own mandi, so the engine excludes all three
+and shows an empty shortlist — correct behaviour, but not the scenario the specification asks to
+be demonstrated.
+
+**What exists instead.** Nothing about the mechanism is faked: the accounts, verifications,
+requirements, deals, deliveries and payments are real rows, and the record on each card is
+computed by `app.buyer_track_records` from completed deals exactly as a real trader's would be.
+Every shortlist that contains a seeded buyer says "Demonstration buyers: names and track records
+are illustrative", in all three languages. The scaling is one line in the seed, and the
+relationships between the three offers are the specification's.
+
+**To close.** Replace the seed file with real onboarded buyers; their requirements and history
+then flow through the identical path, and the demonstration line disappears with the flag.

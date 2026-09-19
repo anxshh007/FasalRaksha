@@ -21,6 +21,7 @@ import EmbeddedPostgres from 'embedded-postgres';
 import { bootstrapDatabase, installContextKey } from '../src/db/bootstrap.js';
 import { migrate } from '../src/db/migrate.js';
 import { upsertEnv } from './lib/envfile.js';
+import { seedDemand } from './lib/demand-seed.js';
 import { latestPipelineVersion, publish } from './lib/release.js';
 import { ENV_FILE, LOCAL_PG_DIR, MIGRATIONS_DIR } from './lib/paths.js';
 
@@ -85,6 +86,9 @@ let bundles = 'no bundle release found (run `pnpm ml:pipeline`, then `pnpm bundl
 if (latest !== null) {
   const { release } = await publish(latest, { ownerUrl: urls.ownerUrl, env: process.env });
   bundles = `bundle release ${release.version} loaded (${release.bundles.length} crop × district bundles, ${release.dataSource} data)`;
+  const demand = await seedDemand(urls.ownerUrl, release.version);
+  bundles += `
+  demonstration buyers: ${demand.buyers} (${demand.created ? `created, ${demand.completedDeals} completed deals of history` : 'already present'}), ${demand.requirements} requirements placed against this release`;
 }
 
 process.stdout.write(

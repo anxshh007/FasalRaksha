@@ -22,6 +22,7 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 
 import { createTestDatabase, startCluster } from '../test/support/cluster.js';
+import { seedDemand } from './lib/demand-seed.js';
 import { latestPipelineVersion, publish } from './lib/release.js';
 
 const API_PORT = Number(process.env['E2E_API_PORT'] ?? 8799);
@@ -34,6 +35,7 @@ const db = await createTestDatabase(cluster);
 const version = latestPipelineVersion();
 if (version === null) throw new Error('No committed bundle release under data/bundles.');
 await publish(version, { ownerUrl: db.ownerUrl, env: {} });
+await seedDemand(db.ownerUrl, version); // the §16 buyers, so Gate F runs against the real API
 
 const env: NodeJS.ProcessEnv = {
   ...process.env,

@@ -17,6 +17,7 @@ import {
   type Benchmark,
   type CropBundle,
   type CropDictionary,
+  type Demand,
   type DistrictRegistry,
   type FarmerLocation,
   type ISODate,
@@ -67,6 +68,8 @@ export interface HomeBriefing {
   /** The crop dictionary and district registry, for the parser (null before the first sync). */
   dictionary: CropDictionary | null;
   registry: DistrictRegistry | null;
+  /** The district's buyer demand, verified; null before the first signed-in sync. */
+  demand: Demand | null;
 }
 
 /** Today's date in India (IST, UTC+05:30, no daylight saving), from a clock reading. */
@@ -77,11 +80,12 @@ export function todayInIndia(now: number): ISODate {
 export async function computeHome(profile: StoredProfile, context: DecisionContext = DEFAULT_CONTEXT, now = Date.now()): Promise<HomeBriefing | null> {
   if (profile.district === null) return null;
   const db = store();
-  const [bundles, cropsDoc, districtsDoc, manifest] = await Promise.all([
+  const [bundles, cropsDoc, districtsDoc, manifest, demandDoc] = await Promise.all([
     db.bundles.where('district').equals(profile.district).toArray(),
     db.shared.get('crops'),
     db.shared.get('districts'),
     db.manifest.get('current'),
+    db.demand.get(profile.district),
   ]);
   const dictionaryDoc = (cropsDoc?.document['dictionary'] as CropDictionary | undefined) ?? null;
   const dictionary = dictionaryDoc?.crops ?? [];
@@ -110,5 +114,5 @@ export async function computeHome(profile: StoredProfile, context: DecisionConte
     .sort((a, b) => Number(a.benchmark.adviceSuppressed) - Number(b.benchmark.adviceSuppressed) || a.crop.localeCompare(b.crop));
 
   const market = location?.marketId === null || location === null ? null : (district?.markets.find((m) => m.id === location.marketId) ?? null);
-  return { district: profile.district, districtNames: district?.names ?? null, locationNames: market?.names ?? null, location, crops, computedAt: now, release: manifest?.version ?? null, dataSource: manifest?.dataSource ?? null, dictionary: dictionaryDoc, registry: registry ?? null };
+  return { district: profile.district, districtNames: district?.names ?? null, locationNames: market?.names ?? null, location, crops, computedAt: now, release: manifest?.version ?? null, dataSource: manifest?.dataSource ?? null, dictionary: dictionaryDoc, registry: registry ?? null, demand: demandDoc?.demand ?? null };
 }

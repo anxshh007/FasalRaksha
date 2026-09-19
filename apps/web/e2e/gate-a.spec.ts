@@ -8,7 +8,8 @@
  * figure on the phone. Then the network goes entirely and it must still work. A price alert set
  * while offline waits in the outbox and reaches the server exactly once when the API returns.
  *
- * The buyer-shortlist half of Gate A arrives with the shortlist (P13) and extends this file.
+ * And the buyer shortlist (P13): with the API dead it is still ranked on the phone, from the
+ * district's demand the phone verified while it could, and stamped with the moment it was computed.
  */
 import { expect, test, type Page } from '@playwright/test';
 
@@ -48,6 +49,8 @@ test('Gate A · kill the backend mid-session: home keeps rendering freshly compu
   expect(Number(onlineModal)).toBeGreaterThan(0);
   await expect(page.getByTestId('verdict-onion')).toHaveAttribute('data-verdict', /^(sell|wait|refuse)$/);
   const onlineVerdict = await page.getByTestId('verdict-onion').getAttribute('data-verdict');
+  // The district's buyer demand has reached the phone: home names a best buyer.
+  await expect(page.getByTestId('best-buyer')).toHaveAttribute('data-buyer', /.+/, { timeout: 30_000 });
   // The off-season crop is shown with its date and no advice.
   await expect(page.getByTestId('verdict-grapes')).toHaveAttribute('data-verdict', 'suppressed');
 
@@ -67,6 +70,14 @@ test('Gate A · kill the backend mid-session: home keeps rendering freshly compu
   await expect(page.getByTestId('modal-onion')).toHaveAttribute('data-value', onlineModal ?? '');
   await expect(page.getByTestId('verdict-onion')).toHaveAttribute('data-verdict', onlineVerdict ?? '');
   expect(await computedAt(page)).toBeGreaterThanOrEqual(killedAt); // computed after the kill, not remembered
+
+  // The buyer shortlist, with the API dead: ranked on the phone, now.
+  await page.getByTestId('nav-buyers').click();
+  await expect(page.getByTestId('shortlist')).toBeVisible();
+  expect(await page.getByTestId('buyer-card').count()).toBeGreaterThanOrEqual(1);
+  expect(Number(await page.getByTestId('buyers-computed-at').getAttribute('data-computed-at'))).toBeGreaterThanOrEqual(killedAt);
+  await expect(page.getByTestId('buyers')).not.toContainText('%');
+  await page.getByTestId('nav-home').click();
 
   // ── no network at all: the shell comes from the service worker ────────────────────────────
   await context.setOffline(true);

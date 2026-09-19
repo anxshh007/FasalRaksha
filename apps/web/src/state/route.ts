@@ -1,7 +1,7 @@
 /**
- * Three places in this build: home, sell, and the farmer's own listings. Hash routes, so the
+ * Four places (§9.7): home, sell, buyers and the farmer's own listings. Hash routes, so the
  * phone's back button works, a reload keeps the place, and the service worker serves one shell
- * for all of them.
+ * for all of them. `#/buyers/<listing>` opens the shortlist for one listing.
  *
  * The camera is a step inside "sell" (`#/sell/photo`), so the back button closes it, and closing
  * it, by any route, turns the camera off. It is opened only by a tap (CAM-06: a user gesture);
@@ -9,29 +9,45 @@
  */
 import { useEffect, useState } from 'react';
 
-export type Route = 'home' | 'sell' | 'deals';
+export type Route = 'home' | 'sell' | 'buyers' | 'deals';
 
-const ROUTES: readonly Route[] = ['home', 'sell', 'deals'];
+const ROUTES: readonly Route[] = ['home', 'sell', 'buyers', 'deals'];
 const CAMERA_HASH = '#/sell/photo';
 
+function segments(): string[] {
+  return window.location.hash.replace(/^#\/?/, '').split('/');
+}
+
 function current(): Route {
-  const top = window.location.hash.replace(/^#\/?/, '').split('/')[0] ?? '';
+  const top = segments()[0] ?? '';
   return (ROUTES as readonly string[]).includes(top) ? (top as Route) : 'home';
 }
 
-export function useRoute(): [Route, (next: Route) => void] {
+/** The segment after the route, e.g. the listing in `#/buyers/<listing>`; null if none. */
+function param(): string | null {
+  if (current() !== 'buyers') return null;
+  const second = segments()[1];
+  return second === undefined || second === '' ? null : decodeURIComponent(second);
+}
+
+export function useRoute(): [Route, (next: Route, detail?: string) => void, string | null] {
   const [route, setRoute] = useState<Route>(current);
+  const [detail, setDetail] = useState<string | null>(param);
   useEffect(() => {
-    const onChange = () => setRoute(current());
+    const onChange = () => {
+      setRoute(current());
+      setDetail(param());
+    };
     window.addEventListener('hashchange', onChange);
     return () => window.removeEventListener('hashchange', onChange);
   }, []);
-  const go = (next: Route) => {
-    window.location.hash = next === 'home' ? '' : `/${next}`;
+  const go = (next: Route, extra?: string) => {
+    window.location.hash = next === 'home' ? '' : `/${next}${extra === undefined ? '' : `/${encodeURIComponent(extra)}`}`;
     setRoute(next);
+    setDetail(extra ?? null);
     window.scrollTo({ top: 0 });
   };
-  return [route, go];
+  return [route, go, detail];
 }
 
 export const href = (route: Route) => (route === 'home' ? '#' : `#/${route}`);

@@ -4,14 +4,15 @@
  * none of the three states needs a network to render: a farmer who was signed in stays signed
  * in offline (PROMPT §XI), and home is computed from the device store.
  *
- * Navigation carries only what this build can do: HOME · SELL · MY DEALS now; BUYERS joins
- * when the shortlist lands (§9.7). No link ever leads to a page that does not exist yet.
+ * Navigation is §9.7's four: HOME · SELL · BUYERS · MY DEALS. No link ever leads to a page that
+ * does not exist.
  */
 import { Glyph } from './design/Glyph';
 import { t } from './i18n/strings';
 import type { Preferences } from './state/preferences';
 import { href, useRoute, type Route } from './state/route';
 import { useDevice } from './state/useDevice';
+import { BuyersScreen } from './match/BuyersScreen';
 import { ListingsScreen } from './sell/ListingsScreen';
 import { SellScreen } from './sell/SellScreen';
 import { FieldStrip } from './ui/FieldStrip';
@@ -24,12 +25,13 @@ import { ThemeOffer } from './ui/ThemeOffer';
 export function App({ preferences }: { preferences: Preferences }) {
   const device = useDevice(preferences);
   const { locale, session } = device;
-  const [route, go] = useRoute();
+  const [route, go, detail] = useRoute();
   const signedIn = session !== null && session.status !== 'signed-out';
   const verified = signedIn && session.profile.district !== null;
-  const nav: { route: Route; glyph: 'home' | 'sell' | 'deals'; label: 'nav.home' | 'nav.sell' | 'nav.deals' }[] = [
+  const nav: { route: Route; glyph: 'home' | 'sell' | 'buyers' | 'deals'; label: 'nav.home' | 'nav.sell' | 'nav.buyers' | 'nav.deals' }[] = [
     { route: 'home', glyph: 'home', label: 'nav.home' },
     { route: 'sell', glyph: 'sell', label: 'nav.sell' },
+    { route: 'buyers', glyph: 'buyers', label: 'nav.buyers' },
     { route: 'deals', glyph: 'deals', label: 'nav.deals' },
   ];
 
@@ -72,10 +74,12 @@ export function App({ preferences }: { preferences: Preferences }) {
               <VerifyFarmer device={device} />
             ) : route === 'sell' ? (
               <SellScreen device={device} onListed={() => go('deals')} />
+            ) : route === 'buyers' ? (
+              <BuyersScreen key={detail ?? 'buyers'} device={device} listingClientId={detail} onHome={() => go('home')} />
             ) : route === 'deals' ? (
-              <ListingsScreen device={device} onSell={() => go('sell')} />
+              <ListingsScreen device={device} onSell={() => go('sell')} onBuyers={(clientId) => go('buyers', clientId)} />
             ) : (
-              <Home device={device} />
+              <Home device={device} onBuyers={() => go('buyers')} />
             )}
           </main>
         </div>

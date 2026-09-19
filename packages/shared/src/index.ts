@@ -27,6 +27,7 @@ export * from './matching/types.js';
 export * from './matching/freight.js';
 export * from './matching/risk.js';
 export * from './matching/rank.js';
+export * from './matching/demand.js';
 export * from './aggregation/pools.js';
 export * from './dealstate/dealstate.js';
 export * from './dealstate/outbox.js';

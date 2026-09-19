@@ -18,7 +18,7 @@ import { photoKey } from '../offline/photos';
 import { attachRecording, saveRecording, transcribePending } from '../offline/recordings';
 import { effectiveType, probe, type Reachability } from '../offline/reach';
 import { adoptSession, refreshProfile, restoreSession, signOut as endSession, type SessionState } from '../offline/session';
-import { syncDistrict } from '../offline/sync';
+import { syncDemand, syncDistrict } from '../offline/sync';
 import { applyToDocument, savePreference, watchForBrightLight, type Preferences, type Theme } from './preferences';
 
 const LOOP_MS = 20_000;
@@ -132,6 +132,7 @@ export function useDevice(initial: Preferences): Device {
         }
         if (state.status === 'signed-in' && state.profile.district !== null) {
           await syncDistrict(state.profile.district);
+          await syncDemand(state.profile.district);
           await drain(state.profile.userId, { effectiveType: effectiveType() });
           await transcribePending(state.profile.userId);
         }

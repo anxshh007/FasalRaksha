@@ -13,7 +13,7 @@
  * yesterday's verified price is better than today's unverifiable one. Other districts are not
  * fetched unless asked for.
  */
-import { parseCropBundle, verifyIntegrity } from '@fasal/shared';
+import { parseCropBundle, parseDemand, verifyIntegrity } from '@fasal/shared';
 
 import { recordEvent, store, type ManifestEntry, type StoredManifest } from './db.js';
 import { request } from './http.js';
@@ -65,6 +65,43 @@ function verified(raw: string, expected: string): { ok: true; doc: Doc } | { ok:
   if (!verifyIntegrity(doc)) return { ok: false, reason: 'content does not match its integrity hash' };
   if (doc['integrity'] !== expected) return { ok: false, reason: 'not the document the manifest lists' };
   return { ok: true, doc };
+}
+
+/**
+ * The district's buyer demand (FR-09), for a shortlist computed on the phone. Signed-in only.
+ * Revalidated by its integrity as the ETag; a document is stored only after its hash verifies
+ * and the strict shared parser accepts every field. Otherwise the phone keeps what it had.
+ */
+export async function syncDemand(district: string, now = Date.now()): Promise<'synced' | 'unchanged' | 'unreachable' | 'rejected'> {
+  if (!SLUG.test(district)) throw new Error('A district id is a lower-case slug.');
+  const db = store();
+  const held = await db.demand.get(district);
+  const got = await request<string>(`/api/demand/${district}`, { raw: true, headers: held ? { 'if-none-match': `"${held.integrity}"` } : {} });
+  if (got.kind === 'unreachable') return 'unreachable';
+  if (got.kind === 'not-modified') return 'unchanged';
+  if (got.kind !== 'ok') {
+    await recordEvent({ kind: 'server-error', subject: `demand/${district}`, detail: `${got.status} ${got.message}` }, now);
+    return 'rejected';
+  }
+  let doc: unknown;
+  try {
+    doc = JSON.parse(got.body);
+  } catch {
+    doc = null;
+  }
+  if (!isRecord(doc) || !verifyIntegrity(doc)) {
+    await recordEvent({ kind: 'integrity-rejected', subject: `demand/${district}`, detail: 'content does not match its integrity hash' }, now);
+    return 'rejected';
+  }
+  try {
+    const demand = parseDemand(doc);
+    if (demand.district !== district) throw new Error('a document for another district');
+    await db.demand.put({ district, asOf: demand.asOf, integrity: demand.integrity, storedAt: now, demand });
+    return 'synced';
+  } catch (error) {
+    await recordEvent({ kind: 'shape-rejected', subject: `demand/${district}`, detail: error instanceof Error ? error.message : 'unreadable' }, now);
+    return 'rejected';
+  }
 }
 
 export async function syncDistrict(district: string, now = Date.now()): Promise<SyncReport> {

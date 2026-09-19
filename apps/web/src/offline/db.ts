@@ -9,7 +9,7 @@
  * page cannot lift a long-lived credential from storage) and the refresh token (an httpOnly
  * cookie the page cannot read at all).
  */
-import type { CropBundle, ListingDraft, OutboxEntry } from '@fasal/shared';
+import type { CropBundle, Demand, ListingDraft, OutboxEntry } from '@fasal/shared';
 import Dexie, { type Table } from 'dexie';
 
 export interface StoredBundle {
@@ -133,6 +133,15 @@ export interface StoredPhoto {
   createdAt: number;
 }
 
+/** The district's buyer demand, verified and parsed (FR-09): what the shortlist is ranked from, offline too. */
+export interface StoredDemand {
+  district: string;
+  asOf: string;
+  integrity: string;
+  storedAt: number;
+  demand: Demand;
+}
+
 export interface Setting {
   key: string;
   value: unknown;
@@ -149,6 +158,7 @@ export class DeviceStore extends Dexie {
   listings!: Table<LocalListing, string>;
   recordings!: Table<Recording, string>;
   photos!: Table<StoredPhoto, string>;
+  demand!: Table<StoredDemand, string>;
 
   constructor(name = 'fasal-raksha') {
     super(name);
@@ -169,6 +179,10 @@ export class DeviceStore extends Dexie {
     // v3 (P12): photographs of lots, waiting for the network.
     this.version(3).stores({
       photos: 'key, userId, listingClientId',
+    });
+    // v4 (P13): the district's buyer demand.
+    this.version(4).stores({
+      demand: 'district',
     });
   }
 }

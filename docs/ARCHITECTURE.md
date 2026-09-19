@@ -204,6 +204,20 @@ worth committing.
 | HEIC: the phone converts it where the browser decodes HEIC (Safari) and otherwise refuses it in plain words; the server refuses an undecodable HEIC as `IMAGE_UNDECODABLE` | G-6: no 1 MB WASM decoder. Both are allowed by CAM-07; the prebuilt sharp has no HEVC decoder (patents). |
 | The camera is a step inside Sell (`#/sell/photo`), opened only by a tap; a reload lands on Sell with the camera closed | The back button closes it; every way out (close, back, route, hidden tab, closed tab, a stream granted after close) stops every track. |
 
+### Decisions taken in P13
+
+| Decision | Reason |
+|---|---|
+| The district's demand is one document (`GET /api/demand/:district`), verified on the phone by its integrity hash and a strict shared parser, then stored; the shortlist is ranked **on the phone** by `rankBuyers` | Gate A: the shortlist must render, freshly computed, with the API dead. It also keeps the farmer's lot on the phone: the server is never told what they are about to sell. |
+| A buyer's track record reaches the phone only as aggregates, from `app.buyer_track_records`, a SECURITY DEFINER function | Row-level security keeps every deal private to its two parties. The card needs "23 completed deals · pays in ~4 days", not a deal. The function refuses a caller with no asserted actor, application role included. |
+| Reputation counts completed deals only: payment days from confirmed payments, a **default** is a delivered deal unpaid 90 days later (exposure capped at that), and an unresolved dispute is shown on the card | §8.9. Risk is then priced from the buyer's own history, so "₹50 more but pays in 90 days" ranks below a prompt payer by arithmetic, not by a rule about days. |
+| The demonstration buyers are real rows: accounts, GSTIN verifications, requirements, and their history as completed deals (listing → deal → both deliveries → payment) | The shortlist and the track records are then computed by the production path, not stubbed. Seeded once, flagged `demonstration`, and every screen that shows one says so (CUTS C-09). |
+| §16.2's offers (₹1,950 / ₹2,000 / ₹1,900) are **scaled** by today's benchmark ÷ ₹1,840, the market they were written for | At the synthetic ₹3,508 onion price the literal figures fall below the farmer's walk-away price and the engine correctly shows nothing. Scaling keeps every relative gap, so the scenario is the one the specification describes: A above C above B, B's higher gross undone by payment risk. |
+| Requirements are refreshed on every seed, priced against the current release and valid around its date; accounts and history are not | A new bundle release moves the benchmark; stale offers would drift away from it and quietly vanish below the walk-away price. |
+| The card's headline is what reaches the farmer after freight; the order key also subtracts payment-delay and default cost, and any card offering more than one above it says why | §6.5. A farmer can check every clause: the offer, the distance, the quantity overlap, the gross, the freight, the record. Nothing on the screen asks to be trusted. |
+| Buyers left out are counted by reason behind "Why some buyers are not here" | The absence of a buyer the farmer expected is information: another crop, unverified, too far, below the mandi. Silence would look like a bug. |
+| A crop with no district price on the phone says so instead of ranking | Scoring an offer with no benchmark to compare it against is exactly P1-06's defect in another form. |
+
 ## 4 · Environment (measured 2026-09-19)
 
 Windows 11 · Node 24.19 · pnpm 10.34.5 · Python 3.12.6 (`.venv`, pinned `ml/requirements.txt`) ·
