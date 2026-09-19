@@ -24,6 +24,15 @@ const EnvSchema = z.object({
   LOG_LEVEL: z.enum(LOG_LEVELS).default('info'),
   /** The least-privilege application role (NOBYPASSRLS, not an owner). Required, no default. */
   DATABASE_URL: postgresUrl,
+  /**
+   * Shared only with the database (app_private.context_key): signs each transaction's actor so
+   * row-level security cannot be fed a forged identity. 32 bytes, hex. Required, no default.
+   */
+  DB_CONTEXT_KEY: z.string().regex(/^[0-9a-f]{64,}$/i, 'must be at least 32 bytes of hex'),
+  /** The API's own secret: token signing, phone and registry-id hashing, row MACs. 32 bytes, hex. */
+  AUTH_SECRET: z.string().regex(/^[0-9a-f]{64,}$/i, 'must be at least 32 bytes of hex'),
+  /** Where registry lookups go. `live` needs the gateway variables of the live adapters (P4). */
+  REGISTRY_ADAPTER: z.enum(['mock', 'live']).default('mock'),
   /** Strict CORS allowlist, comma-separated origins. */
   CORS_ORIGINS: z
     .string()

@@ -8,7 +8,7 @@ import { createLogger } from '../src/log/logger.js';
 describe('GET /api/health', () => {
   it('says the database is down when there is none, and forbids caching', async () => {
     const app = buildApp({
-      config: loadConfig({ DATABASE_URL: 'postgres://u:p@127.0.0.1:1/x', NODE_ENV: 'test' }),
+      config: loadConfig({ DATABASE_URL: 'postgres://u:p@127.0.0.1:1/x', NODE_ENV: 'test', DB_CONTEXT_KEY: 'a'.repeat(64), AUTH_SECRET: 'b'.repeat(64) }),
       logger: createLogger({ level: 'silent' }),
     });
     const response = await app.inject({ method: 'GET', url: '/api/health' });

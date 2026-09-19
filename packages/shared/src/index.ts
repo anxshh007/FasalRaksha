@@ -17,6 +17,7 @@ export * from './crops/types.js';
 export * from './units/units.js';
 export * from './staleness/staleness.js';
 export * from './bundle/types.js';
+export * from './bundle/integrity.js';
 export * from './benchmark/benchmark.js';
 export * from './decision/storage.js';
 export * from './decision/decision.js';

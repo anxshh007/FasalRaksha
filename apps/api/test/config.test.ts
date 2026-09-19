@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 
 import { ConfigError, loadConfig } from '../src/config.js';
 
-const VALID = { DATABASE_URL: 'postgres://fasal_app:s3cret-value@127.0.0.1:5432/fasal' };
+const VALID = { DATABASE_URL: 'postgres://fasal_app:s3cret-value@127.0.0.1:5432/fasal', DB_CONTEXT_KEY: 'a'.repeat(64), AUTH_SECRET: 'b'.repeat(64) };
 
 describe('ARCH-04 · configuration', () => {
   it('parses a minimal valid environment and applies only non-secret defaults', () => {
@@ -17,9 +17,15 @@ describe('ARCH-04 · configuration', () => {
     expect(() => loadConfig({})).toThrow(/DATABASE_URL is not set/);
   });
 
+  it('refuses to start without the context key and auth secret, or with short ones', () => {
+    expect(() => loadConfig({ DATABASE_URL: VALID.DATABASE_URL })).toThrow(/DB_CONTEXT_KEY is not set/);
+    expect(() => loadConfig({ DATABASE_URL: VALID.DATABASE_URL })).toThrow(/AUTH_SECRET is not set/);
+    expect(() => loadConfig({ ...VALID, AUTH_SECRET: 'abc123' })).toThrow(/AUTH_SECRET must be at least 32 bytes/);
+  });
+
   it('names every problem at once and never echoes a value', () => {
     try {
-      loadConfig({ DATABASE_URL: 'mysql://root:hunter2@db/x', API_PORT: '99999', LOG_LEVEL: 'loud' });
+      loadConfig({ ...VALID, DATABASE_URL: 'mysql://root:hunter2@db/x', API_PORT: '99999', LOG_LEVEL: 'loud' });
       expect.unreachable('loadConfig should have thrown');
     } catch (error) {
       expect(error).toBeInstanceOf(ConfigError);

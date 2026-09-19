@@ -15,7 +15,12 @@ import { join } from 'node:path';
 import EmbeddedPostgres from 'embedded-postgres';
 import pg from 'pg';
 
-import { bootstrapDatabase } from '../../src/db/bootstrap.js';
+import { resolve } from 'node:path';
+
+import { bootstrapDatabase, installContextKey } from '../../src/db/bootstrap.js';
+import { migrate } from '../../src/db/migrate.js';
+
+export const MIGRATIONS_DIR = resolve(import.meta.dirname, '../../../../infra/migrations');
 
 export interface TestCluster {
   superuserUrl: string;
@@ -27,6 +32,10 @@ export interface TestDatabase {
   superuserUrl: string;
   ownerUrl: string;
   appUrl: string;
+  /** Superuser connection string for *this* database — seeding only (bypasses RLS). */
+  seedUrl: string;
+  /** The request-context key installed in this database. */
+  contextKey: Buffer;
   drop(): Promise<void>;
 }
 
@@ -71,6 +80,7 @@ export async function startCluster(): Promise<TestCluster> {
   };
 }
 
+/** A fresh database with every migration applied and a fresh context key installed. */
 export async function createTestDatabase(cluster: TestCluster): Promise<TestDatabase> {
   const database = `fasal_test_${randomBytes(4).toString('hex')}`;
   const urls = await bootstrapDatabase(cluster.superuserUrl, {
@@ -78,11 +88,18 @@ export async function createTestDatabase(cluster: TestCluster): Promise<TestData
     ownerPassword: randomBytes(24).toString('base64url'),
     appPassword: randomBytes(24).toString('base64url'),
   });
+  await migrate(urls.ownerUrl, MIGRATIONS_DIR);
+  const contextKey = randomBytes(32);
+  await installContextKey(urls.ownerUrl, contextKey.toString('hex'));
+  const seed = new URL(cluster.superuserUrl);
+  seed.pathname = `/${database}`;
   return {
     database,
     superuserUrl: cluster.superuserUrl,
     ownerUrl: urls.ownerUrl,
     appUrl: urls.appUrl,
+    seedUrl: seed.toString(),
+    contextKey,
     drop: async () => {
       const admin = new pg.Client({ connectionString: cluster.superuserUrl });
       await admin.connect();

@@ -13,7 +13,7 @@ import { join, resolve } from 'node:path';
 import pg from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
-import { withActor } from '../src/db/actor.js';
+import { withActor, type Database } from '../src/db/actor.js';
 import { assertLeastPrivilege, PrivilegeError } from '../src/db/guard.js';
 import { migrate, MigrationError } from '../src/db/migrate.js';
 import { createPool, type Pool } from '../src/db/pool.js';
@@ -26,11 +26,11 @@ const FARMER_B = '22222222-2222-4222-8222-222222222222';
 let cluster: TestCluster;
 let db: TestDatabase;
 let appPool: Pool;
+let appDb: Database;
 
 beforeAll(async () => {
   cluster = await startCluster();
   db = await createTestDatabase(cluster);
-  await migrate(db.ownerUrl, MIGRATIONS);
 
   // A scratch table shaped like every P3 table: owned by fasal_owner, RLS forced, one policy
   // keyed on the request context. Created in this throwaway database only.
@@ -52,6 +52,7 @@ beforeAll(async () => {
     await owner.end();
   }
   appPool = createPool(db.appUrl, { max: 1 });
+  appDb = { pool: appPool, contextKey: db.contextKey };
 }, 180_000);
 
 afterAll(async () => {
@@ -96,7 +97,7 @@ describe('ARCH-03 · the application role cannot step around row-level security'
   });
 
   it('sees only the acting farmer’s rows inside withActor', async () => {
-    const rows = await withActor(appPool, { userId: FARMER_A, role: 'farmer' }, async (client) =>
+    const rows = await withActor(appDb, { userId: FARMER_A, role: 'farmer' }, async (client) =>
       (await client.query<{ phone: string }>('SELECT phone FROM app.scratch_contacts')).rows,
     );
     expect(rows).toEqual([{ phone: 'phone-of-a' }]);
@@ -109,14 +110,14 @@ describe('ARCH-03 · the application role cannot step around row-level security'
 
   it('cannot write a row on behalf of another farmer', async () => {
     await expect(
-      withActor(appPool, { userId: FARMER_A, role: 'farmer' }, (client) =>
+      withActor(appDb, { userId: FARMER_A, role: 'farmer' }, (client) =>
         client.query(`INSERT INTO app.scratch_contacts VALUES ('${FARMER_B}', 'forged')`),
       ),
     ).rejects.toThrow(/row-level security/);
   });
 
   it('discards the request context at commit, so a pooled connection carries nothing forward', async () => {
-    await withActor(appPool, { userId: FARMER_B, role: 'farmer' }, async () => undefined);
+    await withActor(appDb, { userId: FARMER_B, role: 'farmer' }, async () => undefined);
     // Same single pooled connection, next "request", no withActor:
     const { rows } = await appPool.query<{ id: string | null; role: string | null }>('SELECT app.actor_id() AS id, app.actor_role() AS role');
     expect(rows[0]).toEqual({ id: null, role: null });
@@ -124,7 +125,7 @@ describe('ARCH-03 · the application role cannot step around row-level security'
 
   it('discards the request context on rollback too', async () => {
     await expect(
-      withActor(appPool, { userId: FARMER_A, role: 'farmer' }, async () => {
+      withActor(appDb, { userId: FARMER_A, role: 'farmer' }, async () => {
         throw new Error('handler failed');
       }),
     ).rejects.toThrow('handler failed');
@@ -133,15 +134,15 @@ describe('ARCH-03 · the application role cannot step around row-level security'
   });
 
   it('rejects a malformed identity before it reaches the database', async () => {
-    await expect(withActor(appPool, { userId: "x' OR '1'='1", role: 'farmer' }, async () => undefined)).rejects.toThrow(/not a valid identifier/);
+    await expect(withActor(appDb, { userId: "x' OR '1'='1", role: 'farmer' }, async () => undefined)).rejects.toThrow(/not a valid identifier/);
   });
 
-  it('raises on a forged, unparseable identity set directly in the database', async () => {
+  it('raises on an identity set directly in the database without the API’s signature', async () => {
     const client = await appPool.connect();
     try {
       await client.query('BEGIN');
-      await client.query("SELECT set_config('app.current_user_id', 'not-a-uuid', true)");
-      await expect(client.query('SELECT phone FROM app.scratch_contacts')).rejects.toThrow(/uuid/i);
+      await client.query("SELECT set_config('app.current_user_id', $1, true), set_config('app.current_role', 'farmer', true)", [FARMER_A]);
+      await expect(client.query('SELECT phone FROM app.scratch_contacts')).rejects.toThrow(/signature is invalid/);
     } finally {
       await client.query('ROLLBACK');
       client.release();
@@ -153,7 +154,7 @@ describe('ARCH-05 · migrations are ordered, idempotent and immutable', () => {
   it('applies nothing the second time', async () => {
     const again = await migrate(db.ownerUrl, MIGRATIONS);
     expect(again.applied).toEqual([]);
-    expect(again.alreadyApplied).toContain('0001_baseline.sql');
+    expect(again.alreadyApplied).toEqual(['0001_baseline.sql', '0002_identity.sql', '0003_marketplace.sql', '0004_public_data.sql']);
   });
 
   it('stops when an applied migration has been edited', async () => {

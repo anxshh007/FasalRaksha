@@ -81,3 +81,22 @@ export async function bootstrapDatabase(superuserUrl: string, options: Bootstrap
     appUrl: urlFor(base, APP_ROLE, options.appPassword, database),
   };
 }
+
+/**
+ * Install (or rotate) the request-context key in the database, as the owner. Run after
+ * migrations. The same key must be in the API's DB_CONTEXT_KEY; until it is installed, every
+ * signed request fails closed.
+ */
+export async function installContextKey(ownerUrl: string, keyHex: string): Promise<void> {
+  if (!/^[0-9a-f]{64,}$/i.test(keyHex)) throw new Error('The context key must be at least 32 bytes of hex.');
+  const client = new pg.Client({ connectionString: ownerUrl, application_name: 'fasal-bootstrap' });
+  await client.connect();
+  try {
+    await client.query(
+      "INSERT INTO app_private.context_key (id, key) VALUES (1, decode($1, 'hex')) ON CONFLICT (id) DO UPDATE SET key = EXCLUDED.key",
+      [keyHex],
+    );
+  } finally {
+    await client.end();
+  }
+}

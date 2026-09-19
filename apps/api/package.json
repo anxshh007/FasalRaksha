@@ -19,10 +19,16 @@
     "db:local": "tsx --conditions=source scripts/local-db.ts",
     "test": "vitest run --project unit",
     "test:db": "vitest run --project db",
+    "test:security": "vitest run test/security",
     "bootstrap": "tsx --conditions=source scripts/bootstrap.ts"
   },
   "dependencies": {
     "@fasal/shared": "workspace:*",
+    "@fastify/cookie": "^11.1.2",
+    "@fastify/cors": "^11.3.0",
+    "@fastify/helmet": "^13.1.1",
+    "@fastify/rate-limit": "^11.2.0",
+    "@node-rs/argon2": "^2.2.1",
     "fastify": "^5.12.5",
     "pg": "^8.23.0",
     "pino": "^10.3.1",
