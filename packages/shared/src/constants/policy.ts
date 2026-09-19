@@ -80,7 +80,9 @@ export const AGREEMENT_MIN: PolicyConstant<number> = {
   source: 'RAKSHA-QAD design parameter (GR-4)',
   note:
     'Agreement is the winning bucket’s share of measured skill weight, in [1/3, 1]. 0.6 requires the winning ' +
-    'direction to hold a clear majority of the evidence. To be re-calibrated in P6 against precision on "wait".',
+    'direction to hold a clear majority of the evidence. P6 checked it against held-out precision on "wait" ' +
+    '(0.61–0.86 across every published crop × horizon of the synthetic run) and left it unchanged: synthetic ' +
+    'data can confirm the gate works, not justify moving it. Re-check on real data.',
   value: 0.6,
 };
 

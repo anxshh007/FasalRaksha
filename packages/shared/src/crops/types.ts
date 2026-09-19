@@ -21,6 +21,8 @@ export interface CropProfile {
   bagKg?: number;
   mspKey: string | null;
   synonyms: string[];
+  /** 0–1: how strongly an unseasonal-rain anomaly moves this crop's price (RK-4). */
+  weatherSensitivity?: number;
 }
 
 export interface VarietySubstitution {

@@ -27,3 +27,9 @@ HORIZONS_DAYS = (7, 14)
 #: Thin-series thresholds (PROMPT §4.3). Below either, the forecast is withheld.
 MIN_SERIES = 400
 MIN_SEASONS = 2
+
+#: Mirrors of @fasal/shared design constants the pipeline also needs when *scoring* its own wait
+#: signal (AGREEMENT_MIN, CONFIDENCE_FLOOR in packages/shared/src/constants/policy.ts). They are
+#: not a second source of truth: test_parity.py fails if they ever differ from the TypeScript.
+AGREEMENT_MIN = 0.6
+CONFIDENCE_FLOOR = 0.25

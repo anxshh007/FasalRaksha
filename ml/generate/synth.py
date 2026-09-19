@@ -8,7 +8,8 @@ A structural price process, not hand-crafted numbers:
              − β · (log arrivals(t) − log norm)          arrival pressure (same-day, as in real markets)
              + δ · rainfall anomaly (previous week)      weather pressure on perishables
              + u(t),  u AR(1) with φ ≈ 0.97              persistent level deviations
-             + shocks                                     policy / trade shocks that decay
+             + regimes                                    policy / trade regimes (export ban, stock
+                                                          limit): on and off without warning
 
 Then every defect class in PROMPT §4.2 is injected on purpose, and a manifest of exactly what was
 injected is written beside the data, so the cleaner's counters can be checked against truth.
@@ -50,8 +51,8 @@ class Series:
     beta: float  # arrival-pressure response
     delta: float  # rain response
     vol: float  # daily innovation of the AR(1) level
-    shock_rate: float  # shocks per year
-    shock_size: float
+    shock_rate: float  # regime onsets per year
+    shock_size: float  # sd of the level a regime imposes (log units)
     source: str = "agmarknet"
     start: str = "2021-01-01"
     variety: str = "FAQ"
@@ -159,6 +160,7 @@ def simulate_series(s: Series, days: list[date], weather: pd.DataFrame, rng: np.
     rows: list[dict] = []
     u = 0.0
     shock = 0.0
+    regime_left = 0.0  # calendar days until the current policy regime lifts
     arrival_noise = 0.0
     start = date.fromisoformat(s.start)
     years = 0.0
@@ -176,9 +178,15 @@ def simulate_series(s: Series, days: list[date], weather: pd.DataFrame, rng: np.
         arrival_noise = 0.6 * arrival_noise + rng.normal(0, 0.25)
         arrivals = s.base_arrivals * season * float(np.exp(arrival_noise))
         u = (0.97 ** gap) * u + rng.normal(0, s.vol) * np.sqrt(gap)
-        shock *= 0.5 ** (gap / 30.0)
-        if rng.random() < s.shock_rate / 300.0:
-            shock += rng.normal(0, s.shock_size)
+        # A policy regime switches the level on and off without warning, and how long it lasts is
+        # unknowable — unlike a decaying shock, nothing in the past says when it will lift.
+        if regime_left > 0:
+            regime_left -= gap
+            if regime_left <= 0:
+                shock = 0.0
+        elif rng.random() < s.shock_rate / 300.0:
+            shock = rng.normal(0, s.shock_size)
+            regime_left = 10.0 + rng.exponential(45.0)
         window = [(d - timedelta(days=k)).isoformat() for k in range(1, 8)]
         recent = float(np.mean([rain.get(w, 0.0) for w in window]))
         anomaly = (recent - float(clim.get(f"{d.month:02d}", 0.0))) / 10.0

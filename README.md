@@ -19,8 +19,11 @@ farmers* · Government of Maharashtra, Maharashtra State Innovation Society · T
 
 ## Status
 
-Built phase by phase, stopping at every gate (PROMPT PART XV). **Current: P1 — foundation.**
-The repository is scaffolded and its foundations are tested. **There is no product surface yet:** no screens, no prices, no recommendations.
+Built phase by phase, each gate proven and committed (PROMPT PART XV). **Current: P6 — RAKSHA,
+server side.** Done so far: the foundation, the shared domain engine, the schema with row-level
+security and authentication, the nine adapters, the synthetic dataset with its cleaner, and the
+forecast pipeline with its validation table (`pnpm ml:pipeline`). **There is no product surface
+yet:** no screens and no recommendations reach a farmer.
 `REQUIREMENTS.csv` is the source of truth for what is real. Run `pnpm requirements` to see it.
 
 ## Quick start
@@ -66,7 +69,24 @@ Individually: `pnpm typecheck` · `pnpm build` · `pnpm test` · `pnpm test:db` 
   generates a structural price process and deliberately injects every defect class the cleaner
   must repair (PROMPT §4.4). Its metrics prove the pipeline is sound. They prove nothing about
   real Nashik onion prices.
-- **Volatile crops will look worse, on purpose.** Onion, tomato and chilli are regime-switching,
-  and policy shocks such as export bans or stock limits cannot be forecast. Expect lower skill,
-  wider bands and more refusals on exactly these crops. That is the honest result and will not
-  be tuned away.
+- **Volatile crops look worse where it matters, and the table says where they do not.** Onion,
+  tomato and chilli are regime-switching, and policy shocks such as export bans or stock limits
+  cannot be forecast. On the synthetic run their calibrated bands are 3–4× wider than the grains'
+  (log width 0.35–0.52 against 0.11–0.15), and that width is what drives refusals. Their skill
+  against naive is **not** visibly lower (+0.05 to +0.28, grains +0.18 to +0.35). The generator
+  gives perishables a strong, fast-reverting response to arrival gluts, and that part of the
+  price is forecastable by construction. None of this has been tuned away, and none of it predicts
+  what real onion data will show.
+- **Where the skill comes from.** The shipped layer weights are measured out of fold:
+  - arrival pressure (RK-3) and persistence (RK-1) carry most of it;
+  - the seasonal layer (RK-2) contributes mainly at 14 days for the grains;
+  - the weather layer (RK-4) earns roughly zero weight, because the generator couples rain to price
+    only weakly. RK-8 therefore gives it no vote.
+
+  A skill of +0.2 against "no change" on a daily modal price is mostly the model seeing through
+  day-to-day noise. It is not the model foreseeing events.
+- **Every validation number is held out.** Folds are forward-chaining and purged. Seasonal
+  profiles, arrival norms and weather climatology use earlier years only, and tests fail if
+  truncating the future moves any past feature. The band widening, layer weights and wait
+  threshold are learned only from earlier folds when scoring a later one. The first run, before
+  these fixes, looked better. It was leaking.

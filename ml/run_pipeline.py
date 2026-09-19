@@ -2,6 +2,7 @@
 
     python -m ml.run_pipeline --stage generate   # synthetic dataset (only because none was supplied)
     python -m ml.run_pipeline --stage ingest     # resolve columns, clean, print the INGEST REPORT
+    python -m ml.run_pipeline --stage raksha     # RK-1…RK-6, RK-8, forward chaining, conformal, validation table
     python -m ml.run_pipeline                    # everything
 
 `--as-of` fixes the pipeline's "today" (default: today in India). Two runs with the same as-of
@@ -15,6 +16,7 @@ from datetime import date, datetime, timedelta, timezone
 
 from ml import config
 from ml.clean.clean import clean, format_report, write_outputs
+from ml.evaluate.validate import format_validation, run_raksha
 from ml.generate.synth import generate, load_holidays
 from ml.ingest.columns import UnresolvedColumns
 from ml.ingest.load import load_raw, print_mappings
@@ -26,7 +28,7 @@ def today_in_india() -> date:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--stage", choices=["generate", "ingest", "all"], default="all")
+    parser.add_argument("--stage", choices=["generate", "ingest", "raksha", "all"], default="all")
     parser.add_argument("--as-of", type=date.fromisoformat, default=None)
     args = parser.parse_args(argv)
     as_of: date = args.as_of or today_in_india()
@@ -47,6 +49,10 @@ def main(argv: list[str] | None = None) -> int:
         result = clean(loaded, as_of, load_holidays(config.REFERENCE_DIR / "market_holidays.csv"))
         write_outputs(result)
         print(format_report(result.report))
+
+    if args.stage in ("raksha", "all"):
+        print()
+        print(format_validation(run_raksha()))
     return 0
 
 
