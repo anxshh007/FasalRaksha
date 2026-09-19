@@ -28,6 +28,8 @@
     "ml:generate": "node tools/py.mjs -m ml.run_pipeline --stage generate",
     "ml:ingest": "node tools/py.mjs -m ml.run_pipeline --stage ingest",
     "ml:pipeline": "node tools/py.mjs -m ml.run_pipeline",
+    "ml:vision": "node tools/py.mjs -m ml.vision.train && node tools/py.mjs -m ml.vision.golden",
+    "fixtures:camera": "node tools/py.mjs -m ml.vision.scenes && node tools/fixtures/camera.mjs",
     "bundles:publish": "pnpm --filter @fasal/api run bundles"
   },
   "devDependencies": {

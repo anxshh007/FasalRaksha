@@ -16,6 +16,7 @@ import Fastify, { type FastifyReply, type FastifyRequest } from 'fastify';
 import { z } from 'zod';
 
 import type { MessagingAdapter } from '../adapters/messaging/index.js';
+import type { PhotoStore, ScanAdapter } from '../adapters/photos/photos.js';
 import type { SpeechAdapter } from '../adapters/speech/speech.js';
 import type { BuyerRegistryAdapter, FarmerRegistryAdapter } from '../adapters/registry/types.js';
 import type { Config } from '../config.js';
@@ -25,10 +26,12 @@ import { refreshSession, requestOtp, revokeSession, verifyOtp, type AuthDeps, ty
 import { cropBundle, currentManifest, sharedBundle, type ServedDocument } from '../modules/bundles/store.js';
 import { listMine } from '../modules/listings/service.js';
 import { getMe } from '../modules/me/service.js';
+import { appendChunk, openUpload, PHOTO_LIMITS, readPhoto, type PhotoDeps } from '../modules/photos/service.js';
 import { parseOutboxEntry } from '../modules/outbox/schema.js';
 import { deliverOutboxEntry } from '../modules/outbox/service.js';
 import { verifyBuyer, verifyFarmer } from '../modules/verify/service.js';
 import type { KeyRing } from '../security/keys.js';
+import { signPhotoUrl } from '../security/signed-url.js';
 import { verifyAccessToken } from '../security/tokens.js';
 import { DomainError, toDomainError } from './errors.js';
 
@@ -46,6 +49,8 @@ export interface AppDependencies {
   farmerRegistry?: FarmerRegistryAdapter;
   buyerRegistry?: BuyerRegistryAdapter;
   speech?: SpeechAdapter;
+  /** Where photographs are spooled and stored, and what scans them (§8.6). */
+  photos?: { store: PhotoStore; scanner: ScanAdapter };
   now?: () => Date;
 }
 
@@ -109,7 +114,7 @@ export function buildApp(deps: AppDependencies) {
     strictTransportSecurity: { maxAge: 31_536_000, includeSubDomains: true },
     referrerPolicy: { policy: 'no-referrer' },
   });
-  void app.register(cors, { origin: deps.config.CORS_ORIGINS, credentials: true, methods: ['GET', 'POST', 'PATCH'] });
+  void app.register(cors, { origin: deps.config.CORS_ORIGINS, credentials: true, methods: ['GET', 'POST', 'PATCH', 'PUT'] });
   void app.register(cookie);
   void app.register(rateLimit, { global: true, max: 300, timeWindow: '1 minute' });
 
@@ -225,7 +230,35 @@ export function buildApp(deps: AppDependencies) {
 
   // The drain endpoint for a phone's offline outbox: one entry per request, idempotent under
   // its key. Deal transitions cannot be queued (compile-time) and are refused here too (SEC-09).
-  app.get('/api/listings/mine', async (request) => ({ listings: await listMine(requireDb(), requireActor(request)) }));
+  app.get('/api/listings/mine', async (request) => {
+    const actor = requireActor(request);
+    const keys = deps.keys;
+    const sign = keys === undefined ? undefined : (storageKey: string) => signPhotoUrl(keys, storageKey, actor.userId, Math.floor(now().getTime() / 1000));
+    return { listings: await listMine(requireDb(), actor, sign) };
+  });
+
+  // Photographs (PROMPT §7.8, §8.6): resumable chunked uploads, hardened on arrival, served only
+  // through URLs signed for one viewer. A chunk is raw bytes, capped per request.
+  const photoDeps = (): PhotoDeps => {
+    if (deps.photos === undefined || deps.keys === undefined) throw new DomainError(503, 'PHOTOS_UNAVAILABLE', 'Photographs cannot be received by this server. They stay on your phone.');
+    return { db: requireDb(), store: deps.photos.store, scanner: deps.photos.scanner, keys: deps.keys, now, log: deps.logger };
+  };
+  app.addContentTypeParser('application/octet-stream', { parseAs: 'buffer', bodyLimit: PHOTO_LIMITS.chunkBytes }, (_request, body, done) => done(null, body));
+  app.post('/api/photos/uploads', { config: { rateLimit: { max: 60, timeWindow: '10 minutes' } } }, async (request) => openUpload(photoDeps(), requireActor(request), request.body));
+  app.put('/api/photos/uploads/:id', { config: { rateLimit: { max: 600, timeWindow: '10 minutes' } } }, async (request) => {
+    const { id } = request.params as { id: string };
+    return appendChunk(photoDeps(), requireActor(request), id, request.headers['upload-offset'], request.body);
+  });
+  app.get('/api/photos/:storageKey', async (request, reply) => {
+    const { storageKey } = request.params as { storageKey: string };
+    const photo = await readPhoto(photoDeps(), requireActor(request), storageKey, request.query);
+    return reply
+      .header('content-type', 'image/jpeg')
+      .header('content-disposition', 'attachment; filename="photo.jpg"')
+      .header('x-content-type-options', 'nosniff')
+      .header('cache-control', 'private, max-age=300')
+      .send(photo.bytes);
+  });
 
   // Offline, a farmer's spoken listing is recorded on the phone; on reconnection it is transcribed
   // here to enrich the record (PROMPT §10.2). Raw audio in, text out; nothing is stored.

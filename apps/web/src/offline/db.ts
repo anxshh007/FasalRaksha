@@ -114,6 +114,25 @@ export interface Recording {
   transcript: string | null;
 }
 
+/**
+ * A photograph of a lot, kept on the phone as a Blob until the server has it (CAM-12). The bytes
+ * never live in the outbox entry; the entry names this record.
+ */
+export interface StoredPhoto {
+  /** The outbox entry's idempotency key. */
+  key: string;
+  userId: string;
+  listingClientId: string;
+  blob: Blob;
+  width: number;
+  height: number;
+  byteLength: number;
+  contentHash: string;
+  /** Bytes the server has confirmed, for the per-photo state on screen. */
+  sentBytes: number;
+  createdAt: number;
+}
+
 export interface Setting {
   key: string;
   value: unknown;
@@ -129,6 +148,7 @@ export class DeviceStore extends Dexie {
   settings!: Table<Setting, string>;
   listings!: Table<LocalListing, string>;
   recordings!: Table<Recording, string>;
+  photos!: Table<StoredPhoto, string>;
 
   constructor(name = 'fasal-raksha') {
     super(name);
@@ -145,6 +165,10 @@ export class DeviceStore extends Dexie {
     this.version(2).stores({
       listings: 'clientId, userId, createdAt',
       recordings: 'id, userId, status, listingClientId',
+    });
+    // v3 (P12): photographs of lots, waiting for the network.
+    this.version(3).stores({
+      photos: 'key, userId, listingClientId',
     });
   }
 }

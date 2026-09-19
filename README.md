@@ -19,8 +19,8 @@ farmers* · Government of Maharashtra, Maharashtra State Innovation Society · T
 
 ## Status
 
-Built phase by phase, each gate proven and committed (PROMPT PART XV). **Current: P11 — selling, in
-three languages.** Done so far:
+Built phase by phase, each gate proven and committed (PROMPT PART XV). **Current: P12 — the
+camera.** Done so far:
 - the foundation, and the shared domain engine;
 - the schema with row-level security, and authentication;
 - the nine adapters;
@@ -41,12 +41,16 @@ three languages.** Done so far:
   anything unclear (above all: ₹2,500 per quintal, per kilo, or for the whole lot?), and saved
   as a listing that goes through the outbox, offline or not. Offline, the mic records, and the
   recording is written down when the network returns.
+- a photograph of the lot: the viewfinder guides in the farmer's words (too dark, move closer,
+  hold steady…), the shutter waits until the frame is right, five views are graded on the phone
+  (ONNX Runtime Web, an INT8 model per crop family) into a grade and a confidence band, and the
+  farmer confirms, changes or skips it. The photo is queued with the listing and uploads in
+  resumable pieces; the server strips it of all metadata and keeps it behind signed links.
 
 A farmer can choose a language, sign in, verify a PM-KISAN record and see their district's prices
 and a sell/wait decision computed on the phone, with the reasons laid out, then list a crop by
-speaking or typing. All of it keeps working with the API killed or the network gone. The camera
-and the buyer shortlist come next (P12–P13). The shortlist half of Gate A is proven when the
-shortlist exists (P13).
+speaking or typing, with a graded photograph. All of it keeps working with the API killed or the
+network gone. The buyer shortlist comes next (P13), and with it the shortlist half of Gate A.
 
 `REQUIREMENTS.csv` is the source of truth for what is real. Run `pnpm requirements` to see it.
 

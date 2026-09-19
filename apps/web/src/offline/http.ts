@@ -31,7 +31,7 @@ export function hasAccessToken(): boolean {
 }
 
 export interface RequestOptions {
-  method?: 'GET' | 'POST' | 'PATCH';
+  method?: 'GET' | 'POST' | 'PATCH' | 'PUT';
   body?: unknown;
   headers?: Record<string, string>;
   timeoutMs?: number;
@@ -39,7 +39,7 @@ export interface RequestOptions {
   auth?: boolean;
   /** Return the raw text instead of parsed JSON (bundles: the bytes are what is verified). */
   raw?: boolean;
-  /** Send bytes as they are (a recording), with the Blob's own content type. */
+  /** Send bytes as they are (a recording, a piece of a photograph), with the Blob's own content type. */
   blob?: Blob;
 }
 

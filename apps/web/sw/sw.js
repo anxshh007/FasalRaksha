@@ -109,5 +109,8 @@ sw.addEventListener('fetch', (event) => {
     return;
   }
   if (url.pathname.startsWith('/api/')) return; // identity, health, outbox: never cached
+  // The grading runtime and models: fetched by the camera, checked against pinned hashes and
+  // kept in IndexedDB by the camera itself (camera/runtime.ts). Not the service worker's business.
+  if (url.pathname.startsWith('/ort/') || url.pathname.startsWith('/models/')) return;
   event.respondWith(shell(request));
 });

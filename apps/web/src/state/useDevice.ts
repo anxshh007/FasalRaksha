@@ -5,13 +5,16 @@
  * computed from what the phone holds, and the network only ever refreshes what the phone holds.
  */
 import type { ListingDraft, OutboxEntry } from '@fasal/shared';
+
+import type { AttachedPhoto } from '../camera/CameraSheet';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { Locale } from '../i18n/strings';
 import { computeHome, DEFAULT_CONTEXT, type DecisionContext, type HomeBriefing } from '../offline/compute';
 import { request } from '../offline/http';
-import { store, type LocalListing, type QueueState } from '../offline/db';
+import { store, type LocalListing, type QueueState, type StoredPhoto } from '../offline/db';
 import { drain, enqueue, queueSummary, type QueueSummary } from '../offline/outbox';
+import { photoKey } from '../offline/photos';
 import { attachRecording, saveRecording, transcribePending } from '../offline/recordings';
 import { effectiveType, probe, type Reachability } from '../offline/reach';
 import { adoptSession, refreshProfile, restoreSession, signOut as endSession, type SessionState } from '../offline/session';
@@ -40,7 +43,7 @@ export interface Device {
   selectCrop: (crop: string) => void;
   /** The farmer's listings on this phone, with where each is on its way to the server. */
   listings: ListingState[];
-  createListing: (draft: ListingDraft, said: string, recordingId: string | null) => Promise<void>;
+  createListing: (draft: ListingDraft, said: string, recordingId: string | null, photo?: AttachedPhoto | null) => Promise<void>;
   keepRecording: (blob: Blob) => Promise<string | null>;
   /** After an OTP sign-in or a verification, adopt the new state. */
   adopt: (accessToken: string) => Promise<void>;
@@ -53,6 +56,16 @@ export interface ListingState {
   listing: LocalListing;
   state: 'saved-here' | 'waiting' | 'sent' | 'rejected';
   error: string | null;
+  /** The listing's photograph and where it is on its way to the server (CAM-13: per-item state). */
+  photo: { stored: StoredPhoto; state: 'saved-here' | 'waiting' | 'sending' | 'sent' | 'rejected'; error: string | null } | null;
+}
+
+function photoState(stored: StoredPhoto, outboxState: QueueState | undefined): NonNullable<ListingState['photo']>['state'] {
+  if (outboxState === undefined) return 'saved-here';
+  if (outboxState === 'sent') return 'sent';
+  if (outboxState === 'rejected') return 'rejected';
+  if (outboxState === 'sending' || (stored.sentBytes > 0 && stored.sentBytes < stored.byteLength)) return 'sending';
+  return 'waiting';
 }
 
 function listingState(outboxState: QueueState | undefined): ListingState['state'] {
@@ -90,7 +103,10 @@ export function useDevice(initial: Preferences): Device {
     setQueue(await queueSummary(state.profile.userId));
     const mine = await store().listings.where('userId').equals(state.profile.userId).reverse().sortBy('createdAt');
     const entries = await store().outbox.bulkGet(mine.map((l) => `listing-${l.clientId}`));
-    setListings(mine.map((listing, i) => ({ listing, state: listingState(entries[i]?.state), error: entries[i]?.lastError ?? null })));
+    const photos = await store().photos.where('userId').equals(state.profile.userId).toArray();
+    const photoEntries = await store().outbox.bulkGet(photos.map((p) => p.key));
+    const photoOf = new Map(photos.map((stored, i) => [stored.listingClientId, { stored, state: photoState(stored, photoEntries[i]?.state), error: photoEntries[i]?.lastError ?? null }]));
+    setListings(mine.map((listing, i) => ({ listing, state: listingState(entries[i]?.state), error: entries[i]?.lastError ?? null, photo: photoOf.get(listing.clientId) ?? null })));
   }, []);
 
   /**
@@ -231,13 +247,25 @@ export function useDevice(initial: Preferences): Device {
   );
 
   const createListing = useCallback(
-    async (draft: ListingDraft, said: string, recordingId: string | null) => {
+    async (draft: ListingDraft, said: string, recordingId: string | null, photo: AttachedPhoto | null = null) => {
       const state = sessionRef.current;
       if (state === null || state.status === 'signed-out') return;
       const now = Date.now();
-      await store().listings.put({ clientId: draft.clientId, userId: state.profile.userId, draft, said, createdAt: now });
+      const userId = state.profile.userId;
+      await store().listings.put({ clientId: draft.clientId, userId, draft, said, createdAt: now });
       if (recordingId !== null) await attachRecording(recordingId, draft.clientId);
-      await enqueue({ kind: 'listing.create', idempotencyKey: `listing-${draft.clientId}`, createdAt: new Date(now).toISOString(), attempts: 0, listing: draft }, state.profile.userId, now);
+      await enqueue({ kind: 'listing.create', idempotencyKey: `listing-${draft.clientId}`, createdAt: new Date(now).toISOString(), attempts: 0, listing: draft }, userId, now);
+      if (photo !== null) {
+        // The photograph is saved as a Blob and queued behind its listing; the listing never waits for it (CAM-12).
+        const key = photoKey(draft.clientId, photo.contentHash);
+        const byteLength = photo.blob.size;
+        await store().photos.put({ key, userId, listingClientId: draft.clientId, blob: photo.blob, width: photo.width, height: photo.height, byteLength, contentHash: photo.contentHash, sentBytes: 0, createdAt: now });
+        await enqueue(
+          { kind: 'photo.upload', idempotencyKey: key, createdAt: new Date(now).toISOString(), attempts: 0, listingClientId: draft.clientId, contentHash: photo.contentHash, blobKey: key, byteLength, proposal: photo.proposal },
+          userId,
+          now,
+        );
+      }
       await recompute(state);
       void tick();
     },
@@ -264,10 +292,18 @@ export function useDevice(initial: Preferences): Device {
   return { locale, setLocale, theme, setTheme, themeOffer, dismissThemeOffer, session, reach, briefing, queue, listings, createListing, keepRecording, context, setQuantity, selectedCrop, selectCrop, adopt, reloadProfile, queueAction, signOut };
 }
 
-/** Thin wrappers over the identity endpoints for the sign-in screens. */
+/**
+ * Thin wrappers over the identity endpoints for the sign-in screens. Signing in needs the network
+ * anyway, so these wait longer than the default: on 2G, or against a server that has just started,
+ * a sign-in round trip can take well over six seconds, and giving up early would tell the farmer
+ * there is no network when there is.
+ */
+const SIGN_IN_TIMEOUT_MS = 20_000;
+
 export const identity = {
-  requestCode: (phone: string) => request<{ challengeId: string; expiresInSeconds: number; devCode?: string }>('/api/auth/otp/request', { method: 'POST', body: { phone }, auth: false }),
+  requestCode: (phone: string) =>
+    request<{ challengeId: string; expiresInSeconds: number; devCode?: string }>('/api/auth/otp/request', { method: 'POST', body: { phone }, auth: false, timeoutMs: SIGN_IN_TIMEOUT_MS }),
   verifyCode: (phone: string, code: string, displayName: string, locale: Locale) =>
-    request<{ accessToken: string }>('/api/auth/otp/verify', { method: 'POST', body: { phone, code, signup: { kind: 'farmer', displayName, locale } }, auth: false }),
-  verifyFarmer: (id: string) => request<{ district: string; village: string | null }>('/api/verify/farmer', { method: 'POST', body: { registry: 'pm-kisan', id } }),
+    request<{ accessToken: string }>('/api/auth/otp/verify', { method: 'POST', body: { phone, code, signup: { kind: 'farmer', displayName, locale } }, auth: false, timeoutMs: SIGN_IN_TIMEOUT_MS }),
+  verifyFarmer: (id: string) => request<{ district: string; village: string | null }>('/api/verify/farmer', { method: 'POST', body: { registry: 'pm-kisan', id }, timeoutMs: SIGN_IN_TIMEOUT_MS }),
 };

@@ -111,3 +111,59 @@ median FCP from cache < 1.5 s, a paint with the network gone, and zero third-par
 
 **To close.** `npx lighthouse http://127.0.0.1:4179 --preset=perf --throttling-method=devtools`
 against `pnpm e2e`'s preview server gives the same numbers in Lighthouse's format.
+
+## C-06 · The grader was trained on rendered lots, not on field photographs
+
+**What.** §7.3 asks for a MobileNetV3-Small or EfficientNet-Lite0 class model per crop family.
+The models in `apps/web/public/models` are a fixed descriptor stage (colour signatures, blemish
+and texture energy) with a small INT8 classifier, trained on lots rendered by
+`ml/vision/render.py`. They have never seen a real onion.
+
+**Why.** This build has no field-labelled grading photographs and no deep-learning framework
+(ARCHITECTURE G-3). Training a CNN on a laboratory corpus would report near-perfect accuracy that
+means nothing in a mandi yard (§7.6), which is worse than a small model that says what it is.
+
+**What exists instead.** The full pipeline around the model is real and tested: quality gate,
+out-of-distribution rejection, five-view aggregation into a grade and a band, farmer
+confirmation with provenance, the proposal stored beside the photo for the learning loop, ONNX
+Runtime Web running the INT8 graph on the phone, and parity with Python. Every artefact says
+`fieldValidated: false`; the held-out figures on rendered lots are in
+`data/models/report.json`, internal only, never shown as an accuracy. The farmer always
+confirms, changes or skips the proposal.
+
+**To close.** Collect photograph + proposal + farmer grade + buyer grade at pickup (P16) into a
+field set; train MobileNetV3-Small on it; export `image` [N,3,224,224] → `grade_probs` [N,3]
+to ONNX and replace the files named in `apps/web/src/camera/models.json`. No device code changes.
+
+## C-07 · Colour-signature priors and gate thresholds are set from descriptions and rendered scenes
+
+**What.** The crop-family colour boxes (`packages/shared/src/vision/signatures.ts`) and the
+§7.1/§7.2 thresholds were written from descriptions of the produce and calibrated on the
+rendered camera scenes in `data/fixtures/camera`, not on field photographs.
+
+**Why.** The same reason as C-06: there are no field photographs to fit them to.
+
+**What exists instead.** Every threshold is a named constant with a test pinning its behaviour
+on each scene (`apps/api/test/vision.scenes.test.ts`): lots pass for their family; a wall, a
+ceiling, a face, a shoe and a bucket are rejected for all seven families; each viewfinder message
+fires on the scene it exists for. Priors are deliberately wider than the renderer's palettes.
+
+**To close.** Re-fit the boxes and floors on the field set C-06 collects, and add its hard cases
+(tarpaulin under a lot, dusk, shade netting) to the scene tests.
+
+## C-08 · Photographs are stored on local disk and scanned for a test signature only
+
+**What.** §8.6 serves photographs "from object storage" and puts a virus scan behind an adapter.
+Here the `PhotoStore` is the local disk (`PHOTO_STORE_DIR`), and the `ScanAdapter` is a signature
+scanner that recognises the EICAR test file.
+
+**Why.** No object store or scanning service is configured for this build, and a fake "live"
+adapter would claim a protection that is not there.
+
+**What exists instead.** Both are interfaces the upload path already calls: storage keys are
+server-generated UUIDs only, photos are served only through signed, expiring, per-viewer URLs as
+nosniff attachments, and every image is re-encoded by sharp, which destroys embedded payloads
+whatever a scanner says. The scan hook runs on every upload and its refusal path is tested.
+
+**To close.** An S3-compatible `PhotoStore` and a ClamAV (or cloud) `ScanAdapter` behind the same
+interfaces, selected by configuration.

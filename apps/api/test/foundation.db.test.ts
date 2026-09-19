@@ -155,7 +155,7 @@ describe('ARCH-05 · migrations are ordered, idempotent and immutable', () => {
     const again = await migrate(db.ownerUrl, MIGRATIONS);
     expect(again.applied).toEqual([]);
     const all = (await loadMigrations(MIGRATIONS)).map((m) => m.file);
-    expect(all.slice(0, 6)).toEqual(['0001_baseline.sql', '0002_identity.sql', '0003_marketplace.sql', '0004_public_data.sql', '0005_bundle_releases.sql', '0006_price_alerts.sql']);
+    expect(all.slice(0, 7)).toEqual(['0001_baseline.sql', '0002_identity.sql', '0003_marketplace.sql', '0004_public_data.sql', '0005_bundle_releases.sql', '0006_price_alerts.sql', '0007_photo_uploads.sql']);
     expect(again.alreadyApplied).toEqual(all); // every migration in the repository, in order, and nothing else
   });
 

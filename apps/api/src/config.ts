@@ -84,6 +84,11 @@ const BaseSchema = z.object({
   TRANSPORT_ADAPTER: adapterMode,
   LOGISTICS_GATEWAY_URL: optionalUrl,
   LOGISTICS_GATEWAY_KEY: optionalSecret,
+  /**
+   * Where photographs are spooled and stored (repository-relative or absolute). The local disk
+   * is the demonstration store; an object store implements the same PhotoStore interface.
+   */
+  PHOTO_STORE_DIR: z.string().trim().min(1).default('data/uploads'),
   /** Strict CORS allowlist, comma-separated origins. */
   CORS_ORIGINS: z
     .string()

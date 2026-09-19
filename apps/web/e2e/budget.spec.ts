@@ -1,7 +1,9 @@
 /**
  * P9 gate · P1-12 · §9.10 — the performance budget, measured and printed:
  *
- *   JS < 200 KB gzipped (the ONNX runtime, lazy and camera-only, arrives in P12 and is excluded)
+ *   JS < 200 KB gzipped: every script in the build, the lazily loaded camera, its worker and
+ *     ONNX Runtime's JavaScript included. The runtime's 14 MB WebAssembly engine and the models
+ *     are not scripts in /assets: fetched only when the camera opens, verified, kept in IndexedDB
  *   FCP from cache < 1.5 s on a throttled phone (4× CPU slowdown, 2G network)
  *   fonts self-hosted: no request leaves this origin
  *   zero blocking network requests to render: with the network gone, the page still paints

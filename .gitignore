@@ -31,3 +31,6 @@ Thumbs.db
 
 # Derived by the pipeline from data/raw; reproducible, not committed.
 data/clean/
+
+# Intermediate PNG camera scenes; the committed fixtures are the JPEGs made from them.
+data/fixtures/camera/png/

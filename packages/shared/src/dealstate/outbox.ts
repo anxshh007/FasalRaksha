@@ -12,6 +12,17 @@ import type { Money, Quantity } from '../units/units.js';
 
 export type GradeProvenance = 'farmer-declared' | 'farmer-declared-ai-assisted';
 
+/**
+ * What the on-device grader proposed for a photograph, kept beside it on the server (§7.6): with
+ * the farmer's declared grade and, at pickup, the buyer's, it becomes a field-labelled example.
+ */
+export interface PhotoProposal {
+  grade: Grade;
+  band: 'high' | 'moderate' | 'low';
+  views: number;
+  modelVersion: string;
+}
+
 /** A listing as the farmer composed it. District and identity come from the verified account on the server. */
 export interface ListingDraft {
   /** Client-generated id, stable across retries. */
@@ -68,6 +79,8 @@ export interface PhotoUpload extends OutboxBase {
   /** Key of the Blob in the device's photo store; the bytes never live in this record. */
   blobKey: string;
   byteLength: number;
+  /** Null when nothing was proposed (no grader on the phone, or the farmer skipped grading). */
+  proposal: PhotoProposal | null;
 }
 
 export type OutboxEntry = ListingCreate | ListingUpdate | ListingRenewal | PriceAlert | PhotoUpload;

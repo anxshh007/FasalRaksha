@@ -18,14 +18,21 @@ import { deferOnSlowNetwork, drainOrder, nextBackoffMs, type OutboxEntry } from 
 
 import { store, type QueuedEntry } from './db.js';
 import { request, type HttpResult } from './http.js';
+import { sendPhoto } from './photos.js';
 
 export type Sender = (entry: OutboxEntry) => Promise<HttpResult<Record<string, unknown>>>;
 
-/** Refusals that mean "not yet", not "no": an update that overtook its own listing, for one. */
-const RETRY_LATER = new Set(['LISTING_NOT_YET_RECEIVED']);
+/**
+ * Refusals that mean "not yet", not "no": an update or a photograph that overtook its own
+ * listing, or photographs over the hourly allowance.
+ */
+const RETRY_LATER = new Set(['LISTING_NOT_YET_RECEIVED', 'PHOTO_RATE_LIMIT']);
 
+/** Text goes to /api/outbox; a photograph goes in resumable pieces to /api/photos/uploads. */
 export const sendToServer: Sender = (entry) =>
-  request<Record<string, unknown>>('/api/outbox', { method: 'POST', body: entry, headers: { 'idempotency-key': entry.idempotencyKey } });
+  entry.kind === 'photo.upload'
+    ? sendPhoto(entry)
+    : request<Record<string, unknown>>('/api/outbox', { method: 'POST', body: entry, headers: { 'idempotency-key': entry.idempotencyKey } });
 
 export interface DrainResult {
   sent: number;

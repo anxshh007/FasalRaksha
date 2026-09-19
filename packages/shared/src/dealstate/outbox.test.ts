@@ -84,7 +84,7 @@ describe('FR-10 · the drain policy', () => {
     const base = { idempotencyKey: key, createdAt, attempts: 0 };
     switch (kind) {
       case 'photo.upload':
-        return { entry: { ...base, kind, listingClientId: 'l1', contentHash: 'h', blobKey: 'b', byteLength: 300_000 } };
+        return { entry: { ...base, kind, listingClientId: 'l1', contentHash: 'h', blobKey: 'b', byteLength: 300_000, proposal: null } };
       case 'listing.renew':
         return { entry: { ...base, kind, listingClientId: 'l1', availableUntil: '2026-09-30' } };
       case 'listing.update':

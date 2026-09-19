@@ -186,6 +186,24 @@ worth committing.
 | Hash routes (`#/sell`, `#/deals`) | Back button and reload work, and one service-worker shell serves every place. |
 | Known limit: native date inputs follow the browser's own locale, not the app's | Recorded rather than replaced with a custom picker; the stored value is always ISO. |
 
+### Decisions taken in P12
+
+| Decision | Reason |
+|---|---|
+| The grader is a fixed descriptor stage (soft colour-signature assignment against 16 learned prototypes, their patchiness, blemish, texture and Laplacian energy at two scales, colour moments) plus a two-layer classifier with **INT8 per-channel weights** dequantised in-graph, one per vision family, about 4.9 KB each | G-3: no PyTorch here and no field photographs. Its contract is a MobileNetV3-Small drop-in (`image` float32 [N,3,224,224] in, `grade_probs` [N,3] out), so trained CNN weights replace one file, not the device code. |
+| Trained on **procedurally rendered lots** (`ml/vision/render.py`): packed bulbs, fruit, kernels and bolls on gunny, tarpaulin, concrete or soil, with rot, sprouting, greening, spots, cracks, foreign matter, chaff, mould and pest holes; the grade label is computed from the rendered defect fraction | A laboratory leaf corpus would give near-perfect, meaningless accuracy (§7.6). Held-out figures on rendered lots (exact 0.62–0.86, within one grade ≥ 0.97, INT8 = float ≥ 0.988, accuracy rising with the band) stay in `data/models/report.json`, internal only. `fieldValidated: false` everywhere (CUTS C-06). |
+| **ONNX Runtime Web actually runs it**, in the camera's worker, fed the engine bytes the app verified (`env.wasm.wasmBinary`), single-threaded | §7.3, and V-2 left the runtime unwired. `parity.test.ts` proves the phone's own session code reproduces Python's ONNX Runtime numbers on a golden input for all seven models. |
+| The 14 MB engine (2.4 MB brotli) and the models load **only when the camera opens**, are pinned by SHA-256 values compiled into the app, cached in IndexedDB after a hash check, never precached, never fetched on 2G | A farmer who never photographs a lot never pays for grading. A corrupt cache is evicted and fetched once more; bytes that do not match the pin are never run (CAM-09). |
+| Coverage is measured against the family's **colour signature, block by block** (colour share and texture per 8×8 block), not against the border colour | §7.1 describes a border comparison; a lot that correctly fills the frame has no border. Priors are written from descriptions of the produce (CUTS C-07). |
+| Message order kept as §7.1 lists it, with TOO BRIGHT added after TOO DARK; sharpness is gated only when some crop is in view | A washed-out frame is outside the brightness range §7.1 requires; calling it "too dark" would be false. A blank wall reads NO CROP DETECTED, never HOLD STEADY. |
+| A capture whose views all fail **for want of crop** (too far, too little, none) is the out-of-distribution outcome; views that fail on **image quality** (dark, bright, blurred) are CAM-10 | §7.2's copy is about coverage ("doesn't show enough of the crop"); a wall, face or shoe chosen from the gallery must get that path and no band, not "no grade: no crop was seen". |
+| The band is worded **Confidence / खात्री / भरोसा**: High, Moderate or Low, never a percentage; one view can never be High; an exact tie goes to the lower grade | §7.4's own mock-up; Constitution §8 bans "confidence interval" and numbers, and the interface scan enforces it. |
+| The farmer's decision writes the listing (`farmer-declared-ai-assisted` on CONFIRM, `farmer-declared` on CHANGE or a grade given without a proposal); the proposal is stored beside the photo (grade, band, views, model version) | §7.5, and the §7.6 learning loop: photograph + proposal + declaration + (P16) buyer's grade at pickup is one field-labelled example. |
+| Photographs upload in **64 KB pieces** to `/api/photos/uploads` (open → PUT at the agreed offset), not through `/api/outbox` | CAM-13 "resumable": on 2G a dropped connection resumes from the server's byte count; the session is keyed by (farmer, listing, content hash), so a retry never makes a second photo. |
+| Server hardening (§8.6): magic bytes, 8 MB cap enforced as bytes arrive, header-dimension bomb guard before decode, decoder/sniff agreement, sharp re-encode to JPEG 1280 px q82 with no metadata, SHA-256 check against the phone's fingerprint, a virus-scan hook, server UUID keys, signed-URL serving as a nosniff attachment, 30 sessions an hour, 5 per listing, 200 per account | The phone's EXIF stripping is convenience; the server strips again. G-8: sharp's prebuilt binaries work on this Windows machine. |
+| HEIC: the phone converts it where the browser decodes HEIC (Safari) and otherwise refuses it in plain words; the server refuses an undecodable HEIC as `IMAGE_UNDECODABLE` | G-6: no 1 MB WASM decoder. Both are allowed by CAM-07; the prebuilt sharp has no HEVC decoder (patents). |
+| The camera is a step inside Sell (`#/sell/photo`), opened only by a tap; a reload lands on Sell with the camera closed | The back button closes it; every way out (close, back, route, hidden tab, closed tab, a stream granted after close) stops every track. |
+
 ## 4 · Environment (measured 2026-09-19)
 
 Windows 11 · Node 24.19 · pnpm 10.34.5 · Python 3.12.6 (`.venv`, pinned `ml/requirements.txt`) ·
@@ -198,12 +216,12 @@ TensorFlow, Playwright browsers (not yet attempted).
 |---|---|---|---|
 | G-1 | No real market dataset | §4.4 synthetic structural process with every §4.2 defect injected; header-tolerant ingest so a real file drops in; labelled synthetic everywhere | P5 |
 | G-2 | Policy constants (MSP 2025-26, storage tariffs, e-NWR pledge rate, freight tariffs, spoilage curves) have no machine-readable source here | One `constants` module in `@fasal/shared`, each value with its named source and a `verified` flag; **I will ask you to confirm the values** (§0.4) | P2, P18 |
-| G-3 | No PyTorch/TensorFlow; no field-labelled grading images | Decide at P12 between a CPU PyTorch MobileNetV3-Small trained on a clearly-labelled proxy set, and a smaller trained model on image descriptors — either exported to ONNX and **actually run by ONNX Runtime Web** (V-2 left the runtime unwired; v3 requires it). `fieldValidated: false` in every case | P12 |
+| G-3 | No PyTorch/TensorFlow; no field-labelled grading images | **Closed in P12:** a descriptor model with an INT8 classifier per family, trained on rendered lots, exported to ONNX and run by ONNX Runtime Web in the camera's worker (parity-tested against Python). `fieldValidated: false`; CUTS C-06 | P12 |
 | G-4 | Playwright browsers not installed | **Closed in P8:** Playwright drives the installed Microsoft Edge (`channel: 'msedge'`); no browser download needed | P8 |
 | G-5 | Marathi copy must be culturally natural, not machine-translated | I will write it deliberately and flag it for a native-speaker review by the team before the demo | P11 |
-| G-6 | HEIC decode on the client needs a WASM decoder (~1 MB) | Either lazy-load it only on a HEIC file, or reject clearly (both allowed by CAM-07); decide by size | P12 |
+| G-6 | HEIC decode on the client needs a WASM decoder (~1 MB) | **Closed in P12:** converted on the phone where the browser decodes HEIC, refused in plain words elsewhere; no decoder shipped | P12 |
 | G-7 | Argon2id needs a native module | Try `@node-rs/argon2` (prebuilt, no compiler); V-2 fell back to scrypt | P3 |
-| G-8 | `sharp` on Windows | Prebuilt binaries expected; verify at P12 | P12 |
+| G-8 | `sharp` on Windows | **Closed in P12:** sharp 0.35 prebuilt binaries install and run here (libvips, mozjpeg, libheif without HEVC) | P12 |
 | G-9 | Live adapters cannot be exercised without credentials | `Live*` implementations written against the documented request/response shapes and run in the contract suite against recorded fixtures; Judge Mode reports mock vs live | P4 |
 | G-10 | Onion is the demo crop and the least forecastable | Feature it: the guardrail is expected to refuse more often on onion. Not tuned away (§5.7, §16.1) | P6, P21 |
 

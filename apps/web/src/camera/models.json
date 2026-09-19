@@ -1,0 +1,85 @@
+{
+  "version": "2026-09-19.1",
+  "fieldValidated": false,
+  "trainedOn": "procedurally rendered lots (ml/vision/render.py); no field photographs",
+  "contract": {
+    "input": "image float32 [N,3,224,224] RGB 0-1",
+    "output": "grade_probs float32 [N,3] (A,B,C)"
+  },
+  "families": {
+    "tuber_bulb": {
+      "path": "/models/tuber_bulb.98b55c50.onnx",
+      "sha256": "98b55c50e48b05306d70a6c83ddc95ba57b7d188066c70105177c1e72167481f",
+      "bytes": 4880,
+      "assesses": [
+        "rot",
+        "sprouting",
+        "greening",
+        "surface-damage"
+      ]
+    },
+    "solanaceous_fruit": {
+      "path": "/models/solanaceous_fruit.6fdafaaf.onnx",
+      "sha256": "6fdafaaf614dd328834b938b1d0a5c78787c6120be6419e012175ce5c98188fa",
+      "bytes": 4887,
+      "assesses": [
+        "ripeness",
+        "cracks",
+        "spots"
+      ]
+    },
+    "tropical_fruit": {
+      "path": "/models/tropical_fruit.ff8691f2.onnx",
+      "sha256": "ff8691f278848975980eefd48865ec110c96e1bc116c2e0de7983494b45c07b3",
+      "bytes": 4884,
+      "assesses": [
+        "ripeness",
+        "spots",
+        "bruising"
+      ]
+    },
+    "grain_lot": {
+      "path": "/models/grain_lot.167d0239.onnx",
+      "sha256": "167d02390a632f92cc906943e3da1840cd880c2b57ec825e92b8f2538c478fc2",
+      "bytes": 4879,
+      "assesses": [
+        "foreign-matter",
+        "chaff",
+        "mould",
+        "pest-damage"
+      ]
+    },
+    "legume_lot": {
+      "path": "/models/legume_lot.afb3e431.onnx",
+      "sha256": "afb3e43185e90612aa3f9de53eff19e4a04148793be4af8f35574deef49a964b",
+      "bytes": 4880,
+      "assesses": [
+        "foreign-matter",
+        "split-grains",
+        "pest-damage",
+        "discolouration"
+      ]
+    },
+    "oilseed_lot": {
+      "path": "/models/oilseed_lot.a58507f3.onnx",
+      "sha256": "a58507f30830f7054b30d54d29c6275acee8fa7226a364db2ba99e8fd8c07cb0",
+      "bytes": 4881,
+      "assesses": [
+        "foreign-matter",
+        "seed-stain",
+        "split-seeds",
+        "discolouration"
+      ]
+    },
+    "fibre_lot": {
+      "path": "/models/fibre_lot.4174ce12.onnx",
+      "sha256": "4174ce12e3a2fd2ed03e56288454ed483a918c09b049674a88047901a83b7914",
+      "bytes": 4879,
+      "assesses": [
+        "trash",
+        "yellowing",
+        "stains"
+      ]
+    }
+  }
+}

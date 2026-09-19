@@ -32,3 +32,4 @@ export * from './dealstate/dealstate.js';
 export * from './dealstate/outbox.js';
 export * from './parser/lexicon.js';
 export * from './parser/parse.js';
+export * from './vision/index.js';

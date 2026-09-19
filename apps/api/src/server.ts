@@ -7,6 +7,7 @@ import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 import { createAdapters, describeAdapters } from './adapters/index.js';
+import { LocalPhotoStore, SignatureScanAdapter } from './adapters/photos/photos.js';
 import { loadConfig } from './config.js';
 import { assertLeastPrivilege } from './db/guard.js';
 import { createPool } from './db/pool.js';
@@ -20,7 +21,8 @@ if (existsSync(envFile)) process.loadEnvFile(envFile);
 async function main(): Promise<void> {
   const config = loadConfig(process.env);
   const logger = createLogger({ level: config.LOG_LEVEL });
-  const adapters = createAdapters(config, resolve(import.meta.dirname, '../../..'));
+  const repoRoot = resolve(import.meta.dirname, '../../..');
+  const adapters = createAdapters(config, repoRoot);
   logger.info({ adapters: describeAdapters(adapters) }, 'adapters configured');
   const pool = createPool(config.DATABASE_URL);
   const privileges = await assertLeastPrivilege(pool);
@@ -36,6 +38,7 @@ async function main(): Promise<void> {
     farmerRegistry: adapters.farmerRegistry,
     buyerRegistry: adapters.buyerRegistry,
     speech: adapters.speech,
+    photos: { store: new LocalPhotoStore(resolve(repoRoot, config.PHOTO_STORE_DIR)), scanner: new SignatureScanAdapter() },
   });
   const shutdown = async (signal: string): Promise<void> => {
     logger.info({ signal }, 'shutting down');

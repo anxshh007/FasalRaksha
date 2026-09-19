@@ -7,8 +7,8 @@
  * response and changes nothing. The same key sent with different content is refused, because
  * that is a client bug or a replay attack, not a retry.
  *
- * Photographs (P12) are answered with 501 until the image pipeline lands,
- * which the phone treats as "keep it and try later". They are never silently accepted.
+ * Photographs carry bytes, so they do not travel here: a queued photo.upload is sent in chunks to
+ * /api/photos/uploads (modules/photos). One posted here is refused rather than silently accepted.
  */
 import { createHash } from 'node:crypto';
 
@@ -43,8 +43,8 @@ async function applyPriceAlert(client: PoolClient, actor: Actor, entry: Extract<
   return { status: 201, body: { kind: entry.kind, id: inserted.rows[0]?.id ?? null, district, thresholdPerQuintal: perQuintal.value.amount } };
 }
 
-function notYet(entry: OutboxEntry): never {
-  throw new DomainError(501, 'NOT_AVAILABLE_YET', `This server does not accept "${entry.kind}" yet. It stays on your phone and will be sent later.`);
+function photosElsewhere(): never {
+  throw new DomainError(422, 'PHOTO_UPLOADS_ARE_CHUNKED', 'Photographs are sent in pieces to /api/photos/uploads, not through the outbox endpoint.');
 }
 
 export async function deliverOutboxEntry(db: Database, actor: Actor, entry: OutboxEntry, headerKey: string | undefined): Promise<OutboxResponse> {
@@ -73,7 +73,7 @@ export async function deliverOutboxEntry(db: Database, actor: Actor, entry: Outb
         result = await applyListing(client, actor, entry);
         break;
       case 'photo.upload':
-        notYet(entry);
+        photosElsewhere();
     }
     await client.query('INSERT INTO app.idempotency_keys (actor_id, key, request_hash, status_code, response) VALUES ($1, $2, $3, $4, $5)', [
       actor.userId, entry.idempotencyKey, requestHash, result.status, JSON.stringify(result.body),

@@ -14,10 +14,12 @@
  */
 import { spawn, type ChildProcess } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
+import { mkdtempSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { connect } from 'node:net';
 import { createRequire } from 'node:module';
-import { resolve } from 'node:path';
+import { tmpdir } from 'node:os';
+import { join, resolve } from 'node:path';
 
 import { createTestDatabase, startCluster } from '../test/support/cluster.js';
 import { latestPipelineVersion, publish } from './lib/release.js';
@@ -42,6 +44,8 @@ const env: NodeJS.ProcessEnv = {
   API_HOST: '127.0.0.1',
   API_PORT: String(API_PORT),
   LOG_LEVEL: 'warn',
+  // Each run's photographs go to a throwaway folder, not the demo's store.
+  PHOTO_STORE_DIR: mkdtempSync(join(tmpdir(), 'fasal-e2e-photos-')),
 };
 
 let api: ChildProcess | null = null;
@@ -68,7 +72,7 @@ async function startApi(): Promise<void> {
   api.once('exit', () => {
     api = null;
   });
-  await waitFor(() => portOpen(API_PORT), 30_000);
+  await waitFor(() => portOpen(API_PORT), 60_000); // a cold start loads tsx and sharp's native image library
 }
 
 async function stopApi(): Promise<void> {

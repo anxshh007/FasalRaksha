@@ -7,17 +7,28 @@
  *
  * The benchmark stays in view whenever a price is named (§9.7). A listing is saved on the phone
  * and sent through the outbox; nothing here needs a network.
+ *
+ * A photograph of the lot is optional and never holds the listing up (PART VII, CAM-12). The
+ * camera, its worker and the grading runtime are a separate chunk, loaded only when the farmer
+ * taps to take a photo.
  */
 import { addDays, buildLexicon, computeBenchmark, parseListingIntent, type CropProfile } from '@fasal/shared';
-import { useMemo, useState, type FormEvent } from 'react';
+import { lazy, Suspense, useMemo, useState, type FormEvent } from 'react';
+
+import type { AttachedPhoto } from '../camera/CameraSheet';
 
 import { Glyph } from '../design/Glyph';
 import { t } from '../i18n/strings';
 import { todayInIndia } from '../offline/compute';
+import { effectiveType } from '../offline/reach';
+import { useCameraRoute } from '../state/route';
 import type { Device } from '../state/useDevice';
 import { ConfirmCard } from './ConfirmCard';
 import { resolve, toListingDraft, type Answers } from './draft';
 import { MicButton } from './MicButton';
+import { PhotoPanel } from './PhotoPanel';
+
+const CameraSheet = lazy(() => import('../camera/CameraSheet').then((m) => ({ default: m.CameraSheet })));
 
 export function SellScreen({ device, onListed }: { device: Device; onListed: () => void }) {
   const { locale, briefing, reach, session } = device;
@@ -30,6 +41,8 @@ export function SellScreen({ device, onListed }: { device: Device; onListed: () 
   const [pool, setPool] = useState(false);
   const [note, setNote] = useState('');
   const [pending, setPending] = useState(false);
+  const [photo, setPhoto] = useState<AttachedPhoto | null>(null);
+  const [cameraOpen, setCameraOpen] = useCameraRoute();
 
   const dictionary = briefing?.dictionary ?? null;
   const registry = briefing?.registry ?? null;
@@ -60,12 +73,35 @@ export function SellScreen({ device, onListed }: { device: Device; onListed: () 
   const profile = resolved.crop === null ? null : (dictionary.crops.find((c) => c.id === resolved.crop) ?? null);
   const online = reach?.reachable === true;
 
+  if (cameraOpen) {
+    return (
+      <Suspense fallback={<p className="muted">{t(locale, 'camera.starting')}</p>}>
+        <CameraSheet
+          locale={locale}
+          crop={profile}
+          effectiveType={effectiveType()}
+          onUse={(attached) => {
+            setPhoto(attached);
+            setCameraOpen(false);
+          }}
+          onClose={() => setCameraOpen(false)}
+        />
+      </Suspense>
+    );
+  }
+
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     if (!resolved.ready) return;
     setPending(true);
     const draft = toListingDraft(resolved, { clientId: `listing-${crypto.randomUUID()}`.slice(0, 64), availableFrom: from, availableUntil: until < from ? from : until, poolOptIn: pool, note });
-    await device.createListing(draft, text, recordingId);
+    // The grade is the farmer's, as they settled it on the camera screen (§7.5); never the model's alone.
+    if (photo !== null && photo.grade !== null && photo.provenance !== null) {
+      draft.grade = photo.grade;
+      draft.gradeProvenance = photo.provenance;
+    }
+    await device.createListing(draft, text, recordingId, photo);
+    setPhoto(null);
     setPending(false);
     onListed();
   };
@@ -102,6 +138,8 @@ export function SellScreen({ device, onListed }: { device: Device; onListed: () 
         marketName={marketName}
         profile={profile}
       />
+
+      <PhotoPanel locale={locale} photo={photo} onOpen={() => setCameraOpen(true)} onRemove={() => setPhoto(null)} />
 
       <section className="panel" aria-labelledby="review-title">
         <h2 id="review-title" className="panel__title">

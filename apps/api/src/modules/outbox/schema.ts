@@ -52,6 +52,9 @@ const OutboxEntrySchema = z.discriminatedUnion('kind', [
     contentHash: z.string().regex(/^[0-9a-f]{64}$/),
     blobKey: z.string().min(1).max(128),
     byteLength: z.number().int().positive().max(8 * 1024 * 1024),
+    proposal: z
+      .object({ grade: z.enum(['A', 'B', 'C']), band: z.enum(['high', 'moderate', 'low']), views: z.number().int().min(1).max(5), modelVersion: z.string().min(1).max(40) })
+      .nullable(),
   }),
 ]);
 

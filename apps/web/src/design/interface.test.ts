@@ -42,7 +42,9 @@ describe('P1-07 · no security signalling, no emoji', () => {
   });
 
   it('no padlock, shield, "runs locally", "secure" or "verified" badge text anywhere in the interface', () => {
-    const offences = ui.filter((f) => /🔒|🛡|runs locally|demo build|secure|encrypted|✅/i.test(code(read(f)))).map(rel);
+    // `isSecureContext` is the browser's name for "may use the camera" (HTTPS or localhost): an API
+    // the camera must ask about, never text a farmer sees. It is the one identifier excused.
+    const offences = ui.filter((f) => /🔒|🛡|runs locally|demo build|secure|encrypted|✅/i.test(code(read(f)).replaceAll('isSecureContext', ''))).map(rel);
     expect(offences).toEqual([]);
   });
 

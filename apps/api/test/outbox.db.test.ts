@@ -1,8 +1,8 @@
 /**
  * FR-10 · SEC-09 — the outbox drain endpoint against a real PostgreSQL. A 2G retry of the same
  * queued action changes nothing, a reused key with different content is refused, a deal
- * transition is refused before the database, and a kind whose feature is not built yet is kept
- * on the phone (501), never swallowed.
+ * transition is refused before the database, and a photograph (bytes) posted here is refused:
+ * it travels in chunks to /api/photos/uploads.
  */
 import { randomBytes, randomUUID } from 'node:crypto';
 
@@ -128,14 +128,15 @@ describe('SEC-09 · FR-10 · what the outbox refuses, and what it keeps for late
     expect(response.json()).toMatchObject({ error: { code: 'NOT_AN_OFFLINE_ACTION' } });
   });
 
-  it('answers 501 for a kind whose feature is not built yet, so the phone keeps it', async () => {
+  it('refuses a photograph sent as an outbox entry: its bytes go in chunks to /api/photos/uploads', async () => {
     const key = `photo-${randomUUID()}`;
     const response = await app.inject({
       method: 'POST', url: '/api/outbox', headers: { ...bearer(world.farmerA, 'farmer'), 'idempotency-key': key },
-      payload: { kind: 'photo.upload', idempotencyKey: key, createdAt: '2026-09-18T06:30:00.000Z', attempts: 0, listingClientId: 'client-listing-1', contentHash: 'a'.repeat(64), blobKey: 'blob-1', byteLength: 250_000 },
+      payload: { kind: 'photo.upload', idempotencyKey: key, createdAt: '2026-09-18T06:30:00.000Z', attempts: 0, listingClientId: 'client-listing-1', contentHash: 'a'.repeat(64), blobKey: 'blob-1', byteLength: 250_000, proposal: null },
     });
-    expect(response.statusCode).toBe(501);
-    expect(await count('SELECT count(*) AS n FROM app.idempotency_keys WHERE key = $1', [key])).toBe(0); // nothing recorded: a later retry will be applied
+    expect(response.statusCode).toBe(422);
+    expect(response.json()).toMatchObject({ error: { code: 'PHOTO_UPLOADS_ARE_CHUNKED' } });
+    expect(await count('SELECT count(*) AS n FROM app.idempotency_keys WHERE key = $1', [key])).toBe(0);
   });
 
   it('requires a signed-in actor', async () => {

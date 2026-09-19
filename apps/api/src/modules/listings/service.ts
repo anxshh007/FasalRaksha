@@ -100,6 +100,13 @@ export async function applyListing(client: PoolClient, actor: Actor, entry: List
   return { status: 200, body: { kind: entry.kind, id, changed: sets.length } };
 }
 
+export interface ListingPhotoView {
+  /** Short-lived, signed for this viewer (§8.6). */
+  url: string;
+  width: number;
+  height: number;
+}
+
 export interface ListingView {
   id: string;
   clientId: string;
@@ -111,19 +118,26 @@ export interface ListingView {
   availableUntil: string;
   poolOptIn: boolean;
   status: string;
+  grade: string | null;
+  gradeProvenance: string | null;
+  photos: ListingPhotoView[];
   createdAt: string;
 }
 
-export async function listMine(db: Database, actor: Actor): Promise<ListingView[]> {
+export async function listMine(db: Database, actor: Actor, sign?: (storageKey: string) => string): Promise<ListingView[]> {
   farmerOnly(actor);
   return withActor(db, actor, async (client) => {
     const { rows } = await client.query<{
       id: string; client_id: string; crop: string; qty: string; qty_unit: string; asking_price: string | null; asking_unit: string | null;
-      district: string; available_from: string; available_until: string; pool_opt_in: boolean; status: string; created_at: Date;
+      district: string; available_from: string; available_until: string; pool_opt_in: boolean; status: string; grade: string | null; grade_provenance: string | null; created_at: Date;
     }>(
       // Dates as text: node-pg turns a DATE into local midnight, which is the previous day in UTC.
-      `SELECT id, client_id, crop, qty, qty_unit, asking_price, asking_unit, district, available_from::text, available_until::text, pool_opt_in, status, created_at
+      `SELECT id, client_id, crop, qty, qty_unit, asking_price, asking_unit, district, available_from::text, available_until::text, pool_opt_in, status, grade, grade_provenance, created_at
          FROM app.listings WHERE farmer_id = $1 ORDER BY created_at DESC LIMIT 100`,
+      [actor.userId],
+    );
+    const photos = await client.query<{ listing_id: string; storage_key: string; width: number; height: number }>(
+      'SELECT listing_id, storage_key, width, height FROM app.listing_photos WHERE farmer_id = $1 ORDER BY created_at',
       [actor.userId],
     );
     return rows.map((r) => ({
@@ -137,6 +151,9 @@ export async function listMine(db: Database, actor: Actor): Promise<ListingView[
       availableUntil: r.available_until,
       poolOptIn: r.pool_opt_in,
       status: r.status,
+      grade: r.grade,
+      gradeProvenance: r.grade_provenance,
+      photos: sign === undefined ? [] : photos.rows.filter((p) => p.listing_id === r.id).map((p) => ({ url: sign(p.storage_key), width: p.width, height: p.height })),
       createdAt: r.created_at.toISOString(),
     }));
   });

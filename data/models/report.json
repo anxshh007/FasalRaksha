@@ -1,0 +1,266 @@
+{
+  "version": "2026-09-19.1",
+  "fieldValidated": false,
+  "note": "Held-out synthetic lots only. Not a field accuracy and never shown as one.",
+  "families": [
+    {
+      "family": "tuber_bulb",
+      "crops": [
+        "onion",
+        "potato"
+      ],
+      "heldOutLots": 500,
+      "gradeCounts": {
+        "A": 166,
+        "B": 164,
+        "C": 170
+      },
+      "accuracy": 0.648,
+      "withinOneGrade": 0.984,
+      "int8AgreesWithFloat": 0.988,
+      "accuracyWhenTop>=0.75": 0.757,
+      "shareTop>=0.75": 0.444,
+      "accuracyWhenTop<0.55": 0.489,
+      "confusion[true][predicted]": [
+        [
+          114,
+          48,
+          4
+        ],
+        [
+          36,
+          92,
+          36
+        ],
+        [
+          4,
+          48,
+          118
+        ]
+      ],
+      "maxWeightQuantisationError": 0.00902
+    },
+    {
+      "family": "solanaceous_fruit",
+      "crops": [
+        "tomato",
+        "chilli"
+      ],
+      "heldOutLots": 500,
+      "gradeCounts": {
+        "A": 154,
+        "B": 151,
+        "C": 195
+      },
+      "accuracy": 0.742,
+      "withinOneGrade": 0.994,
+      "int8AgreesWithFloat": 0.998,
+      "accuracyWhenTop>=0.75": 0.801,
+      "shareTop>=0.75": 0.664,
+      "accuracyWhenTop<0.55": 0.545,
+      "confusion[true][predicted]": [
+        [
+          127,
+          27,
+          0
+        ],
+        [
+          39,
+          81,
+          31
+        ],
+        [
+          3,
+          29,
+          163
+        ]
+      ],
+      "maxWeightQuantisationError": 0.00635
+    },
+    {
+      "family": "tropical_fruit",
+      "crops": [
+        "banana",
+        "mango"
+      ],
+      "heldOutLots": 500,
+      "gradeCounts": {
+        "A": 151,
+        "B": 176,
+        "C": 173
+      },
+      "accuracy": 0.688,
+      "withinOneGrade": 0.99,
+      "int8AgreesWithFloat": 0.99,
+      "accuracyWhenTop>=0.75": 0.804,
+      "shareTop>=0.75": 0.652,
+      "accuracyWhenTop<0.55": 0.22,
+      "confusion[true][predicted]": [
+        [
+          121,
+          27,
+          3
+        ],
+        [
+          55,
+          88,
+          33
+        ],
+        [
+          2,
+          36,
+          135
+        ]
+      ],
+      "maxWeightQuantisationError": 0.00799
+    },
+    {
+      "family": "grain_lot",
+      "crops": [
+        "wheat",
+        "maize",
+        "jowar",
+        "paddy"
+      ],
+      "heldOutLots": 500,
+      "gradeCounts": {
+        "A": 148,
+        "B": 163,
+        "C": 189
+      },
+      "accuracy": 0.796,
+      "withinOneGrade": 1.0,
+      "int8AgreesWithFloat": 0.99,
+      "accuracyWhenTop>=0.75": 0.864,
+      "shareTop>=0.75": 0.782,
+      "accuracyWhenTop<0.55": 0.552,
+      "confusion[true][predicted]": [
+        [
+          120,
+          28,
+          0
+        ],
+        [
+          26,
+          115,
+          22
+        ],
+        [
+          0,
+          26,
+          163
+        ]
+      ],
+      "maxWeightQuantisationError": 0.00836
+    },
+    {
+      "family": "legume_lot",
+      "crops": [
+        "tur",
+        "gram"
+      ],
+      "heldOutLots": 500,
+      "gradeCounts": {
+        "A": 146,
+        "B": 169,
+        "C": 185
+      },
+      "accuracy": 0.756,
+      "withinOneGrade": 1.0,
+      "int8AgreesWithFloat": 0.988,
+      "accuracyWhenTop>=0.75": 0.829,
+      "shareTop>=0.75": 0.77,
+      "accuracyWhenTop<0.55": 0.545,
+      "confusion[true][predicted]": [
+        [
+          101,
+          45,
+          0
+        ],
+        [
+          35,
+          119,
+          15
+        ],
+        [
+          0,
+          27,
+          158
+        ]
+      ],
+      "maxWeightQuantisationError": 0.00788
+    },
+    {
+      "family": "oilseed_lot",
+      "crops": [
+        "soybean"
+      ],
+      "heldOutLots": 500,
+      "gradeCounts": {
+        "A": 150,
+        "B": 170,
+        "C": 180
+      },
+      "accuracy": 0.858,
+      "withinOneGrade": 1.0,
+      "int8AgreesWithFloat": 0.992,
+      "accuracyWhenTop>=0.75": 0.905,
+      "shareTop>=0.75": 0.8,
+      "accuracyWhenTop<0.55": 0.63,
+      "confusion[true][predicted]": [
+        [
+          132,
+          18,
+          0
+        ],
+        [
+          28,
+          133,
+          9
+        ],
+        [
+          0,
+          16,
+          164
+        ]
+      ],
+      "maxWeightQuantisationError": 0.0082
+    },
+    {
+      "family": "fibre_lot",
+      "crops": [
+        "cotton"
+      ],
+      "heldOutLots": 500,
+      "gradeCounts": {
+        "A": 149,
+        "B": 160,
+        "C": 191
+      },
+      "accuracy": 0.618,
+      "withinOneGrade": 0.968,
+      "int8AgreesWithFloat": 0.988,
+      "accuracyWhenTop>=0.75": 0.761,
+      "shareTop>=0.75": 0.402,
+      "accuracyWhenTop<0.55": 0.459,
+      "confusion[true][predicted]": [
+        [
+          94,
+          48,
+          7
+        ],
+        [
+          45,
+          77,
+          38
+        ],
+        [
+          9,
+          44,
+          138
+        ]
+      ],
+      "maxWeightQuantisationError": 0.009
+    }
+  ]
+}
