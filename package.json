@@ -22,7 +22,10 @@
     "ml:test": "node tools/py.mjs -m pytest ml -q",
     "requirements": "node tools/requirements/audit.mjs",
     "audit:deps": "pnpm audit --audit-level high",
-    "verify": "node tools/verify.mjs"
+    "verify": "node tools/verify.mjs",
+    "ml:generate": "node tools/py.mjs -m ml.run_pipeline --stage generate",
+    "ml:ingest": "node tools/py.mjs -m ml.run_pipeline --stage ingest",
+    "ml:pipeline": "node tools/py.mjs -m ml.run_pipeline"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

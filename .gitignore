@@ -28,3 +28,6 @@ test-results/
 *.log
 .DS_Store
 Thumbs.db
+
+# Derived by the pipeline from data/raw; reproducible, not committed.
+data/clean/

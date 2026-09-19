@@ -1,0 +1,31 @@
+raw_name,crop_id,note
+Onion,onion,Agmarknet
+ONION,onion,upper-case variant seen across markets
+Onion(Red),onion,variety folded into the name
+Kanda,onion,local name used by some APMCs
+कांदा,onion,Marathi (MSAMB)
+Soyabean,soybean,Agmarknet spelling
+Soybean,soybean,
+सोयाबीन,soybean,Marathi (MSAMB)
+Arhar (Tur/Red Gram)(Whole),tur,Agmarknet commodity name
+Tur,tur,
+तूर,tur,Marathi (MSAMB)
+Bengal Gram(Gram)(Whole),gram,Agmarknet commodity name
+Gram,gram,
+हरभरा,gram,Marathi (MSAMB)
+Tomato,tomato,
+टोमॅटो,tomato,Marathi (MSAMB)
+Potato,potato,
+Banana,banana,
+Banana - Green,banana,raw banana traded as the same crop
+Orange,orange,
+Santra,orange,local name (Nagpur)
+Pomegranate,pomegranate,
+Grapes,grapes,
+Wheat,wheat,
+Maize,maize,
+Jowar(Sorghum),jowar,Agmarknet commodity name
+Cotton,cotton,
+Paddy(Dhan)(Common),paddy,Agmarknet commodity name
+Green Chilli,chilli,Agmarknet commodity name
+Mango,mango,
