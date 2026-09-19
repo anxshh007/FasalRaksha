@@ -49,6 +49,15 @@ exists (P13).
 
 Requires Node ≥ 20.11, pnpm 10 and Python 3.11+.
 
+The fastest way to see it: `pnpm install`, then `pnpm demo`, then open **http://127.0.0.1:4173**.
+That one command starts PostgreSQL with the committed price release, the API, and the production
+PWA with its service worker. Sign in with any mobile number: this is a test build, so the one-time
+code is shown on screen and no SMS is sent. Use a sample PM-KISAN number such as
+`PMK-MH-2003-11562` (Lasalgaon, Nashik) or `PMK-MH-2211-07314` (Ausa, Latur). To see field mode,
+stop the API or switch the network off: the app keeps calculating from the phone.
+
+Or run the pieces separately:
+
 ```bash
 pnpm install
 pnpm db:start          # real PostgreSQL 18 (no Docker needed); writes .env; Ctrl+C stops it
