@@ -160,6 +160,18 @@ worth committing.
 | Interface rules enforced by a source scan (`interface.test.ts`) | Security chips, emoji, model terminology, external fonts, stray colours, radii > 4px, blur, gradients and sub-13px text fail the build rather than a review. |
 | Visual snapshots at 360 and 1440 in both themes under a fixed clock | A design change is always deliberate (`--update-snapshots`); wall-clock readouts are masked. |
 
+### Decisions taken in P10
+
+| Decision | Reason |
+|---|---|
+| The briefing leads with **one crop** (remembered choice, else the first with current prices); the rest are compact rows | §9.7: "the farmer's crop is the most important object on the screen". |
+| Evidence ledger is a **pure function** (`briefing/evidence.ts`) of bundle + evaluation | Nine rows, each testable; stances are relative to where the evidence as a whole leans, so "arrivals ↑ supporting" can mean arrivals are falling. |
+| RK-7 row uses the device's own downside rule, in rupees on the whole lot | The farmer's inputs never leave the phone; the row states the loss against the limit they can bear. |
+| Anything ahead rounded to **₹10**; today's rate to the rupee | §9.8: no fake decimal precision on a forecast. |
+| `<Tx>` sets only inserted values in DM Mono | A Marathi sentence in a monospace face spaces every word; figures stay tabular. Dates use tabular digits in the interface face. |
+| Range bar and sparkline are hand-drawn SVG (1px strokes, `vector-effect: non-scaling-stroke`) with HTML labels | No chart library (§9.9-2); labels never stretch with a responsive band. |
+| Lot size is remembered on the phone and recomputes RK-7/GR-7 with **no request** (asserted in the P10 gate) | Constitution §4: farmer inputs are joined to market data only on the device. |
+
 ## 4 · Environment (measured 2026-09-19)
 
 Windows 11 · Node 24.19 · pnpm 10.34.5 · Python 3.12.6 (`.venv`, pinned `ml/requirements.txt`) ·

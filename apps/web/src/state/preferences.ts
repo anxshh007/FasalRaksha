@@ -18,20 +18,27 @@ export interface Preferences {
   themeChosen: boolean;
   /** Whether a bright-light suggestion has already been made. */
   lightSuggested: boolean;
+  /** The farmer's usual lot size, remembered on this phone only. */
+  quantityQtl?: number;
+  /** The crop the briefing leads with. */
+  selectedCrop?: string;
 }
 
 export const DEFAULT_PREFERENCES: Preferences = { locale: 'mr', theme: 'night', themeChosen: false, lightSuggested: false };
 
 export async function loadPreferences(): Promise<Preferences> {
   try {
-    const rows = await store().settings.bulkGet(['locale', 'theme', 'themeChosen', 'lightSuggested']);
-    const [locale, theme, chosen, suggested] = rows.map((r) => r?.value);
-    return {
+    const rows = await store().settings.bulkGet(['locale', 'theme', 'themeChosen', 'lightSuggested', 'quantityQtl', 'selectedCrop']);
+    const [locale, theme, chosen, suggested, quantity, crop] = rows.map((r) => r?.value);
+    const preferences: Preferences = {
       locale: locale === 'en' || locale === 'mr' ? locale : DEFAULT_PREFERENCES.locale,
       theme: theme === 'field' || theme === 'night' ? theme : DEFAULT_PREFERENCES.theme,
       themeChosen: chosen === true,
       lightSuggested: suggested === true,
     };
+    if (typeof quantity === 'number' && quantity > 0) preferences.quantityQtl = quantity;
+    if (typeof crop === 'string') preferences.selectedCrop = crop;
+    return preferences;
   } catch {
     // Private mode or a blocked store: the defaults still render.
     return DEFAULT_PREFERENCES;

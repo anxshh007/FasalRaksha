@@ -87,6 +87,11 @@ button {
   color: var(--text-muted);
 }
 
+/* Tabular digits in the interface face: dates and mixed text, where a monospace word would jar. */
+.num {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
 h1,
 h2,
 h3 {
@@ -624,59 +629,411 @@ button.spine__item:hover {
   }
 }
 
-/* ── home (functional until P10) ──────────────────────────────────────────────────────── */
+/* ── the morning briefing (§9.7–§9.9) ───────────────────────────────────────────────────── */
 
-.crops {
+.brief {
   display: grid;
-  gap: var(--space-4);
+  gap: var(--space-5);
 }
-.crop {
-  background: var(--surface);
-  border: var(--hairline);
-  border-radius: var(--radius);
-  padding: var(--space-5);
+@media (min-width: 960px) {
+  .brief {
+    grid-template-columns: 3fr 2fr;
+    align-items: start;
+  }
+  .brief__side {
+    position: sticky;
+    top: var(--space-4);
+  }
 }
-.crop__head {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: var(--space-3);
-  flex-wrap: wrap;
+.brief__main {
+  display: grid;
+  gap: var(--space-5);
 }
-.crop__rate {
-  display: flex;
-  align-items: baseline;
-  gap: var(--space-2);
-  flex-wrap: wrap;
-  margin: var(--space-3) 0 var(--space-1);
-}
-.crop__rate .figure {
-  font-size: var(--size-h1);
-  line-height: 1.1;
-}
-.crop__range {
-  font-size: var(--size-small);
-  color: var(--text-muted);
-  margin: 0 0 var(--space-4);
-}
-.verdict__headline {
-  font-family: var(--font-display);
-  font-size: var(--size-lead);
-  font-weight: 800;
+
+/* The benchmark strip: the largest object on the screen. */
+.benchmark__head {
+  color: var(--accent);
   margin: 0;
 }
-.verdict__headline:lang(mr) {
-  font-family: var(--font-deva);
-  font-weight: 600;
+.benchmark .label {
+  margin: 0;
 }
-.verdict--sell .verdict__headline,
-.verdict--wait .verdict__headline {
+.benchmark__figure {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: var(--space-1) 0 var(--space-3);
+}
+.benchmark__figure .figure {
+  font-size: var(--size-h1);
+  line-height: 1.05;
+  letter-spacing: -1px;
+}
+@media (min-width: 700px) {
+  .benchmark__figure .figure {
+    font-size: var(--size-figure);
+  }
+}
+.benchmark__unit {
+  color: var(--text-muted);
+  font-size: var(--size-lead);
+}
+.benchmark__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  padding: var(--space-3) 0;
+  border-top: var(--hairline);
+  border-bottom: var(--hairline);
+}
+.benchmark__facts p {
+  margin: 0;
+}
+.benchmark__delta {
+  font-size: var(--size-body);
+  color: var(--text);
+}
+.benchmark__delta.is-up {
   color: var(--accent);
 }
+.benchmark__delta.is-down {
+  color: var(--refuse);
+}
+.benchmark__msp {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 var(--space-1);
+  font-size: var(--size-small);
+}
+.benchmark__season {
+  margin: 0;
+  font-size: var(--size-small);
+}
+
+.sparkline {
+  flex-shrink: 0;
+  overflow: visible;
+}
+.sparkline__line {
+  fill: none;
+  stroke: var(--text);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.sparkline__msp {
+  stroke: var(--text-faint);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+.sparkline__gap {
+  stroke: var(--text-faint);
+  stroke-width: 1;
+}
+.sparkline__end {
+  fill: var(--accent);
+}
+
+/* The RAKSHA instrument. */
+.raksha {
+  display: grid;
+  gap: var(--space-3);
+}
+.raksha__headline {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--size-h3);
+  font-weight: 800;
+  line-height: 1.2;
+}
+.raksha__headline:lang(mr) {
+  font-family: var(--font-deva);
+  font-weight: 600;
+  line-height: 1.4;
+}
+.raksha--sell .raksha__headline,
+.raksha--wait .raksha__headline {
+  color: var(--accent);
+}
+.raksha__lean {
+  margin: 0;
+  font-size: var(--size-lead);
+}
+.raksha__net {
+  margin: 0;
+  font-size: var(--size-small);
+  color: var(--text-muted);
+}
+.outlook {
+  padding: var(--space-4);
+  border: var(--hairline);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.outlook .label {
+  margin: 0 0 var(--space-2);
+}
+.outlook__facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3) var(--space-4);
+  margin: var(--space-3) 0 0;
+}
+.outlook__facts dt {
+  margin-bottom: 2px;
+}
+.outlook__facts dd {
+  margin: 0;
+}
+.outlook__direction {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-weight: 700;
+}
+.outlook__note {
+  margin: var(--space-3) 0 0;
+  font-size: var(--size-small);
+}
+.rangebar-wrap {
+  position: relative;
+  padding-top: 22px;
+}
+.rangebar {
+  display: block;
+  overflow: visible;
+}
+.rangebar__axis {
+  stroke: var(--rule-strong);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.rangebar__band {
+  fill: var(--accent-tint);
+  stroke: var(--accent);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.rangebar__mid {
+  stroke: var(--accent);
+  stroke-width: 3;
+  vector-effect: non-scaling-stroke;
+}
+.rangebar__today {
+  stroke: var(--text);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.rangebar__label {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  color: var(--text-muted);
+  font-size: var(--size-label);
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+/* The farmer's lot. */
+.lot {
+  padding-top: var(--space-4);
+  border-top: var(--hairline);
+}
+.lot .label {
+  margin: 0 0 var(--space-2);
+}
+.lot__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+.lot__step {
+  width: var(--touch);
+  height: var(--touch);
+  border: 1px solid var(--text-faint);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font-size: var(--size-lead);
+  cursor: pointer;
+}
+.lot__step:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.lot__qty input {
+  width: 5.5em;
+  height: var(--touch);
+  padding: 0 var(--space-2);
+  border: 1px solid var(--text-faint);
+  border-radius: var(--radius-input);
+  background: var(--surface);
+  color: var(--text);
+  font-size: var(--size-lead);
+  text-align: center;
+}
+.lot__unit {
+  color: var(--text-muted);
+}
+.lot__value {
+  margin-left: var(--space-2);
+  font-size: var(--size-small);
+}
+.lot__storage {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 var(--space-1);
+  font-size: var(--size-small);
+}
+.lot__note {
+  margin: 0;
+  font-size: var(--size-small);
+}
+
+/* "Why this signal?": the understanding card, grown into a ledger. */
+.evidence {
+  padding: var(--space-5);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  background: var(--accent-tint);
+}
+.evidence__title {
+  font-size: var(--size-lead);
+  margin: 0 0 var(--space-3);
+}
+.ledger {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.ledger__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px var(--space-3);
+  padding: var(--space-2) 0;
+  border-bottom: var(--hairline);
+  font-size: var(--size-small);
+}
+.ledger__name {
+  font-weight: 600;
+}
+.ledger__meaning {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  justify-self: end;
+  text-align: right;
+  color: var(--text-muted);
+}
+.ledger__row--wide .ledger__meaning {
+  grid-column: 1 / -1;
+  justify-self: start;
+  text-align: left;
+}
+.ledger__row--supporting .ledger__meaning {
+  color: var(--accent);
+}
+.ledger__row--against .ledger__meaning,
+.ledger__row--fail .ledger__meaning {
+  color: var(--refuse);
+}
+.meter {
+  grid-column: 1 / -1;
+  position: relative;
+  height: 4px;
+  border-bottom: 1px solid var(--rule-strong);
+}
+.meter__tick {
+  position: absolute;
+  bottom: -1px;
+  width: 3px;
+  height: 4px;
+  background: var(--text);
+}
+.checks {
+  list-style: none;
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-1);
+  font-size: var(--size-small);
+}
+.checks__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.checks__item span:last-child {
+  margin-left: auto;
+}
+.checks__item--fail .glyph {
+  color: var(--refuse);
+}
+.checks__item--pass .glyph {
+  color: var(--accent);
+}
+.evidence__foot {
+  margin: var(--space-3) 0 0;
+}
+.technical {
+  margin-top: var(--space-2);
+  padding: var(--space-3);
+  border: var(--hairline);
+  background: var(--surface);
+  font-size: var(--size-label);
+  overflow-wrap: anywhere;
+}
+.technical p {
+  margin: 0 0 var(--space-1);
+}
+
+/* The district's other crops. */
+.others {
+  list-style: none;
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  border-top: var(--hairline);
+}
+.other__button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px var(--space-3);
+  width: 100%;
+  min-height: 56px;
+  padding: var(--space-3) 0;
+  background: none;
+  border: none;
+  border-bottom: var(--hairline);
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+.other__button .figure {
+  font-size: var(--size-lead);
+  justify-self: end;
+}
+.other__name {
+  font-weight: 600;
+}
+.other__verdict {
+  grid-column: 1 / -1;
+  font-size: var(--size-small);
+  color: var(--text-muted);
+}
+.other__verdict--sell,
+.other__verdict--wait {
+  color: var(--accent);
+}
+
 .computed {
   font-family: var(--font-mono);
   font-size: var(--size-label);
   color: var(--text-muted);
+  margin: 0;
 }
 
 .stack {

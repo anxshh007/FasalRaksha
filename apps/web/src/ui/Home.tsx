@@ -1,65 +1,39 @@
 /**
- * Home on the design system (P9). Every figure is computed on this phone from verified bundles
- * at the moment of rendering, and the line under the list says when. P10 turns this into the
- * morning field briefing (§9.7): the benchmark strip with its sparkline and MSP rule, the RAKSHA
- * instrument with its band, and the evidence panel. Until then the price is the largest object
- * on the screen, and a refusal already reads as a considered answer, not an error.
+ * Home is a morning field briefing, not a dashboard (PROMPT §9.7). Before the farmer is asked to
+ * type anything they see what their crop is worth: the benchmark first and largest, then the
+ * RAKSHA answer with its band, then their own lot. The evidence sits beside it on a wide screen
+ * and below it on a phone. The district's other crops follow in compact rows.
+ *
+ * Every figure is computed on this phone from verified bundles at the moment of rendering. The
+ * line under the briefing says when, and a reload recomputes it (Gate A).
  */
-import { useState, type FormEvent } from 'react';
+import { useRef, useState, type FormEvent } from 'react';
 
+import { BenchmarkStrip } from '../briefing/BenchmarkStrip';
+import { EvidencePanel } from '../briefing/EvidencePanel';
+import { LotControl } from '../briefing/LotControl';
+import { RakshaCard } from '../briefing/RakshaCard';
 import { Glyph } from '../design/Glyph';
-import { clock, day, headlineKey, number, refusalKey, rupees, t, type Locale } from '../i18n/strings';
-import { DEFAULT_CONTEXT, type CropBriefing } from '../offline/compute';
+import { clock, headlineKey, rupees, t, type Locale } from '../i18n/strings';
+import type { CropBriefing } from '../offline/compute';
 import type { Device } from '../state/useDevice';
 
-function CropCard({ locale, item, quantity }: { locale: Locale; item: CropBriefing; quantity: number }) {
-  const { benchmark, evaluation } = item;
-  const name = locale === 'mr' ? item.names.mr : item.names.en;
+const cropName = (locale: Locale, item: CropBriefing) => (locale === 'mr' ? item.names.mr : item.names.en);
+
+function OtherCrop({ locale, item, onChoose }: { locale: Locale; item: CropBriefing; onChoose: () => void }) {
+  const verdict = item.evaluation.suppressed ? 'suppressed' : item.evaluation.verdict;
   return (
-    <article className="crop" data-testid={`crop-${item.crop}`} aria-labelledby={`crop-${item.crop}-name`}>
-      <header className="crop__head">
-        <h3 id={`crop-${item.crop}-name`}>{name}</h3>
-        <span className="label">{t(locale, 'home.asOf', { date: day(locale, benchmark.asOf) })}</span>
-      </header>
-      <p className="crop__rate">
-        <span className="visually-hidden">{t(locale, 'home.rate')}</span>
-        <strong className="figure" data-testid={`modal-${item.crop}`} data-value={benchmark.modal.amount}>
-          {rupees(locale, benchmark.modal.amount)}
+    <li className="other" data-testid={`crop-${item.crop}`}>
+      <button type="button" className="other__button" onClick={onChoose}>
+        <span className="other__name">{cropName(locale, item)}</span>
+        <strong className="figure" data-testid={`modal-${item.crop}`} data-value={item.benchmark.modal.amount}>
+          {rupees(locale, item.benchmark.modal.amount)}
         </strong>
-        <span className="muted">/ {t(locale, 'home.perQtl')}</span>
-      </p>
-      <p className="crop__range">
-        <span className="figure">{t(locale, 'home.range', { min: rupees(locale, benchmark.min.amount), max: rupees(locale, benchmark.max.amount) })}</span>
-        {benchmark.mspFloor !== null && (
-          <>
-            {' · '}
-            <span className="figure">{t(locale, 'home.msp', { amount: rupees(locale, benchmark.mspFloor.price.amount), season: benchmark.mspFloor.season })}</span>
-          </>
-        )}
-      </p>
-      {evaluation.suppressed ? (
-        <div className="refusal" data-testid={`verdict-${item.crop}`} data-verdict="suppressed">
-          <p className="refusal__sentence">{t(locale, 'home.stale')}</p>
-        </div>
-      ) : evaluation.verdict === 'refuse' ? (
-        <div className="refusal" data-testid={`verdict-${item.crop}`} data-verdict={evaluation.verdict}>
-          <p className="refusal__sentence">{t(locale, headlineKey(evaluation.headline))}</p>
-          {evaluation.failedConditions.map((c) => (
-            <p key={c} className="refusal__condition">
-              {t(locale, refusalKey(c))}
-            </p>
-          ))}
-          <p className="refusal__condition">{t(locale, 'home.lot', { qty: number(locale, quantity) })}</p>
-        </div>
-      ) : (
-        <div className={`verdict verdict--${evaluation.verdict}`} data-testid={`verdict-${item.crop}`} data-verdict={evaluation.verdict}>
-          <p className="verdict__headline">{t(locale, headlineKey(evaluation.headline))}</p>
-          <p className="muted" style={{ margin: 0, fontSize: 'var(--size-small)' }}>
-            {t(locale, 'home.lot', { qty: number(locale, quantity) })}
-          </p>
-        </div>
-      )}
-    </article>
+        <span className={`other__verdict other__verdict--${verdict}`} data-testid={`verdict-${item.crop}`} data-verdict={verdict}>
+          {item.evaluation.suppressed ? t(locale, 'home.stale') : t(locale, headlineKey(item.evaluation.headline))}
+        </span>
+      </button>
+    </li>
   );
 }
 
@@ -86,13 +60,12 @@ function PriceAlert({ device, crops }: { device: Device; crops: CropBriefing[] }
   };
 
   const selected = crops.find((c) => c.crop === crop);
-  const cropName = selected === undefined ? '' : locale === 'mr' ? selected.names.mr : selected.names.en;
   return (
     <section className="panel" aria-labelledby="alert-title">
       <h2 id="alert-title" className="panel__title">
         {t(locale, 'alert.title')}
       </h2>
-      <form onSubmit={(e) => void submit(e)}>
+      <form onSubmit={(e) => void submit(e)} className="alert-form">
         <label className="field">
           <span className="field__label-row">
             <span className="label">{t(locale, 'alert.crop')}</span>
@@ -100,14 +73,14 @@ function PriceAlert({ device, crops }: { device: Device; crops: CropBriefing[] }
           <select name="crop" value={crop} onChange={(e) => setCrop(e.target.value)}>
             {crops.map((c) => (
               <option key={c.crop} value={c.crop}>
-                {locale === 'mr' ? c.names.mr : c.names.en}
+                {cropName(locale, c)}
               </option>
             ))}
           </select>
         </label>
         <label className="field">
           <span className="field__label-row">
-            <span className="label">{t(locale, 'alert.explain', { crop: cropName })}</span>
+            <span className="label">{t(locale, 'alert.explain', { crop: selected === undefined ? '' : cropName(locale, selected) })}</span>
           </span>
           <input name="threshold" className="figure" inputMode="numeric" required value={amount} onChange={(e) => setAmount(e.target.value)} />
         </label>
@@ -132,38 +105,76 @@ function PriceAlert({ device, crops }: { device: Device; crops: CropBriefing[] }
 }
 
 export function Home({ device }: { device: Device }) {
-  const { locale, briefing } = device;
+  const { locale, briefing, context } = device;
+  const evidenceRef = useRef<HTMLDivElement>(null);
+  const [evidenceOpen, setEvidenceOpen] = useState(false);
   if (briefing === null) return null;
-  const quantity = DEFAULT_CONTEXT.quantityQtl;
   const district = briefing.districtNames === null ? briefing.district : locale === 'mr' ? briefing.districtNames.mr : briefing.districtNames.en;
+
+  if (briefing.crops.length === 0) {
+    return (
+      <p className="empty-state" data-testid="home-empty">
+        {t(locale, 'home.empty')}
+      </p>
+    );
+  }
+
+  const lead = briefing.crops.find((c) => c.crop === device.selectedCrop) ?? briefing.crops[0];
+  if (lead === undefined) return null;
+  const others = briefing.crops.filter((c) => c !== lead);
+  const verdict = lead.evaluation.suppressed ? 'suppressed' : lead.evaluation.verdict;
+  const why = () => {
+    setEvidenceOpen(true);
+    evidenceRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    evidenceRef.current?.querySelector<HTMLElement>('h2')?.focus();
+  };
+
   return (
-    <div className="stack">
-      <section aria-labelledby="home-title" className="stack">
-        <h1 id="home-title" className="display" style={{ fontSize: 'var(--size-h2)' }}>
-          {t(locale, 'home.title', { district })}
-        </h1>
-        {briefing.crops.length === 0 ? (
-          <p className="empty-state" data-testid="home-empty">
-            {t(locale, 'home.empty')}
-          </p>
-        ) : (
-          <div className="crops">
-            {briefing.crops.map((item) => (
-              <CropCard key={item.crop} locale={locale} item={item} quantity={quantity} />
-            ))}
+    <div className="stack" data-testid="briefing">
+      <div className="brief">
+        <article className="brief__main" data-testid={`crop-${lead.crop}`} aria-label={cropName(locale, lead)}>
+          <BenchmarkStrip locale={locale} cropName={cropName(locale, lead)} districtName={district} benchmark={lead.benchmark} bundle={lead.bundle} />
+          <div data-testid={`verdict-${lead.crop}`} data-verdict={verdict}>
+            <RakshaCard locale={locale} evaluation={lead.evaluation} today={lead.benchmark.modal.amount} onWhy={why} />
           </div>
-        )}
-        <p className="computed" data-testid="computed-at" data-computed-at={briefing.computedAt} data-release={briefing.release ?? ''}>
-          {t(locale, 'home.computed', { time: clock(locale, briefing.computedAt) })}
+          <LotControl
+            locale={locale}
+            quantity={context.quantityQtl}
+            onQuantity={device.setQuantity}
+            price={lead.benchmark.modal.amount}
+            storage={lead.storage}
+            location={briefing.location}
+            marketName={briefing.locationNames === null ? null : locale === 'mr' ? briefing.locationNames.mr : briefing.locationNames.en}
+          />
+        </article>
+        <div className="brief__side" ref={evidenceRef}>
+          <EvidencePanel locale={locale} bundle={lead.bundle} evaluation={lead.evaluation} open={evidenceOpen} />
+        </div>
+      </div>
+
+      {others.length > 0 && (
+        <section aria-labelledby="others-title">
+          <h2 id="others-title" className="label">
+            {t(locale, 'brief.otherCrops', { district })}
+          </h2>
+          <ul className="others">
+            {others.map((item) => (
+              <OtherCrop key={item.crop} locale={locale} item={item} onChoose={() => device.selectCrop(item.crop)} />
+            ))}
+          </ul>
+        </section>
+      )}
+
+      <p className="computed" data-testid="computed-at" data-computed-at={briefing.computedAt} data-release={briefing.release ?? ''}>
+        {t(locale, 'home.computed', { time: clock(locale, briefing.computedAt) })}
+      </p>
+      {briefing.dataSource === 'synthetic' && (
+        <p className="notice notice--caution">
+          <Glyph name="caution" />
+          <span>{t(locale, 'home.synthetic')}</span>
         </p>
-        {briefing.dataSource === 'synthetic' && (
-          <p className="notice notice--caution">
-            <Glyph name="caution" />
-            <span>{t(locale, 'home.synthetic')}</span>
-          </p>
-        )}
-      </section>
-      {briefing.crops.length > 0 && <PriceAlert device={device} crops={briefing.crops} />}
+      )}
+      <PriceAlert device={device} crops={briefing.crops} />
     </div>
   );
 }

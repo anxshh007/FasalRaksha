@@ -15,6 +15,7 @@ import {
   locateFarmer,
   TOLERABLE_LOSS_FRACTION_DEFAULT,
   type Benchmark,
+  type CropBundle,
   type CropProfile,
   type DistrictRegistry,
   type FarmerLocation,
@@ -42,6 +43,8 @@ export const DEFAULT_CONTEXT: DecisionContext = {
 
 export interface CropBriefing {
   crop: string;
+  /** The verified bundle this briefing was computed from (for the evidence ledger). */
+  bundle: CropBundle;
   names: { en: string; mr: string; hi?: string };
   benchmark: Benchmark;
   evaluation: WaitEvaluation;
@@ -53,6 +56,8 @@ export interface HomeBriefing {
   district: string;
   /** The district's names from the registry, or null before the registry has synced. */
   districtNames: { en: string; mr: string; hi: string } | null;
+  /** The market town the farmer is placed at, when the village names one. */
+  locationNames: { en: string; mr: string } | null;
   location: FarmerLocation | null;
   crops: CropBriefing[];
   /** Epoch ms: when this briefing was computed on this phone. */
@@ -95,10 +100,11 @@ export async function computeHome(profile: StoredProfile, context: DecisionConte
         today,
       });
       const profileEntry = dictionary.find((c) => c.id === bundle.crop);
-      return { crop: bundle.crop, names: profileEntry?.names ?? { en: bundle.crop, mr: bundle.crop }, benchmark, evaluation, storage, release: bundle.version };
+      return { crop: bundle.crop, bundle, names: profileEntry?.names ?? { en: bundle.crop, mr: bundle.crop }, benchmark, evaluation, storage, release: bundle.version };
     })
     // Crops with current prices first, stale ones last; otherwise alphabetical, so no ranking is implied.
     .sort((a, b) => Number(a.benchmark.adviceSuppressed) - Number(b.benchmark.adviceSuppressed) || a.crop.localeCompare(b.crop));
 
-  return { district: profile.district, districtNames: district?.names ?? null, location, crops, computedAt: now, release: manifest?.version ?? null, dataSource: manifest?.dataSource ?? null };
+  const market = location?.marketId === null || location === null ? null : (district?.markets.find((m) => m.id === location.marketId) ?? null);
+  return { district: profile.district, districtNames: district?.names ?? null, locationNames: market?.names ?? null, location, crops, computedAt: now, release: manifest?.version ?? null, dataSource: manifest?.dataSource ?? null };
 }

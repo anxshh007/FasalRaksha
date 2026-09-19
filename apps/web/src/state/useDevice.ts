@@ -8,7 +8,7 @@ import type { OutboxEntry } from '@fasal/shared';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { Locale } from '../i18n/strings';
-import { computeHome, DEFAULT_CONTEXT, type HomeBriefing } from '../offline/compute';
+import { computeHome, DEFAULT_CONTEXT, type DecisionContext, type HomeBriefing } from '../offline/compute';
 import { request } from '../offline/http';
 import { drain, enqueue, queueSummary, type QueueSummary } from '../offline/outbox';
 import { effectiveType, probe, type Reachability } from '../offline/reach';
@@ -30,6 +30,12 @@ export interface Device {
   reach: Reachability | null;
   briefing: HomeBriefing | null;
   queue: QueueSummary | null;
+  /** The farmer's own decision inputs: joined to market data on this phone only. */
+  context: DecisionContext;
+  setQuantity: (quintals: number) => void;
+  /** The crop the briefing leads with. */
+  selectedCrop: string | null;
+  selectCrop: (crop: string) => void;
   /** After an OTP sign-in or a verification, adopt the new state. */
   adopt: (accessToken: string) => Promise<void>;
   reloadProfile: () => Promise<void>;
@@ -45,6 +51,10 @@ export function useDevice(initial: Preferences): Device {
   const [reach, setReach] = useState<Reachability | null>(null);
   const [briefing, setBriefing] = useState<HomeBriefing | null>(null);
   const [queue, setQueue] = useState<QueueSummary | null>(null);
+  const [context, setContext] = useState<DecisionContext>({ ...DEFAULT_CONTEXT, quantityQtl: initial.quantityQtl ?? DEFAULT_CONTEXT.quantityQtl });
+  const [selectedCrop, setSelectedCrop] = useState<string | null>(initial.selectedCrop ?? null);
+  const contextRef = useRef(context);
+  contextRef.current = context;
   const sessionRef = useRef<SessionState | null>(null);
   sessionRef.current = session;
   const busy = useRef(false);
@@ -55,7 +65,7 @@ export function useDevice(initial: Preferences): Device {
       setQueue(null);
       return;
     }
-    setBriefing(await computeHome(state.profile, DEFAULT_CONTEXT));
+    setBriefing(await computeHome(state.profile, contextRef.current));
     setQueue(await queueSummary(state.profile.userId));
   }, []);
 
@@ -136,6 +146,23 @@ export function useDevice(initial: Preferences): Device {
     void savePreference('themeChosen', true);
   }, []);
 
+  const setQuantity = useCallback(
+    (quintals: number) => {
+      if (!(quintals > 0) || quintals > 10_000) return;
+      const next = { ...contextRef.current, quantityQtl: Math.round(quintals * 10) / 10 };
+      contextRef.current = next;
+      setContext(next);
+      void savePreference('quantityQtl', next.quantityQtl);
+      void recompute(sessionRef.current);
+    },
+    [recompute],
+  );
+
+  const selectCrop = useCallback((crop: string) => {
+    setSelectedCrop(crop);
+    void savePreference('selectedCrop', crop);
+  }, []);
+
   const adopt = useCallback(
     async (accessToken: string) => {
       const next = await adoptSession(accessToken);
@@ -175,7 +202,7 @@ export function useDevice(initial: Preferences): Device {
     await recompute(next);
   }, [recompute]);
 
-  return { locale, setLocale, theme, setTheme, themeOffer, dismissThemeOffer, session, reach, briefing, queue, adopt, reloadProfile, queueAction, signOut };
+  return { locale, setLocale, theme, setTheme, themeOffer, dismissThemeOffer, session, reach, briefing, queue, context, setQuantity, selectedCrop, selectCrop, adopt, reloadProfile, queueAction, signOut };
 }
 
 /** Thin wrappers over the identity endpoints for the sign-in screens. */
