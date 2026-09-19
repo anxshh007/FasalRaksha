@@ -165,6 +165,25 @@ export const MAX_DEFAULT_PROBABILITY: PolicyConstant<number> = {
   value: 0.15,
 };
 
+// ─── Storage economics (feed RK-7 through the storage registry) ─────────────────────────────
+
+export type StorageKind = 'dry-warehouse' | 'ventilated-chawl' | 'cold-store';
+
+export const STORAGE_SPOILAGE_PER_MONTH: PolicyConstant<Readonly<Record<StorageKind, Readonly<Record<string, number>>>>> = {
+  kind: 'policy',
+  verified: false,
+  source:
+    'Storage-stage loss shares in NABCONS "Study to determine post-harvest losses of agri produces in India" (MoFPI, 2022) and ICAR-CIPHET storage guidance; per-month figures are the build’s reading of them',
+  note:
+    'Expected fraction of the lot lost per month of storage (weight loss, rot, sprouting, pests), by storage type and crop. ' +
+    'A crop missing from a storage type is not stored there. To be confirmed with the team before any figure is presented as authoritative.',
+  value: {
+    'dry-warehouse': { soybean: 0.003, tur: 0.003, wheat: 0.002, gram: 0.003, maize: 0.004, jowar: 0.003, paddy: 0.003, cotton: 0.002 },
+    'ventilated-chawl': { onion: 0.03, potato: 0.04 },
+    'cold-store': { potato: 0.01, onion: 0.015, tomato: 0.12, banana: 0.1, orange: 0.06, pomegranate: 0.04, grapes: 0.05, chilli: 0.08, mango: 0.09 },
+  },
+};
+
 /** Every constant above, for Judge Mode and the policy review sheet. */
 export const ALL_POLICY_CONSTANTS: Readonly<Record<string, PolicyConstant<unknown>>> = {
   MSP_TABLE,
@@ -180,4 +199,5 @@ export const ALL_POLICY_CONSTANTS: Readonly<Record<string, PolicyConstant<unknow
   DEFAULT_RISK_PRIOR,
   PAYMENT_DAYS_PRIOR,
   MAX_DEFAULT_PROBABILITY,
+  STORAGE_SPOILAGE_PER_MONTH,
 };

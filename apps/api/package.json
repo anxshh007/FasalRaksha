@@ -23,6 +23,7 @@
     "bootstrap": "tsx --conditions=source scripts/bootstrap.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.127.0",
     "@fasal/shared": "workspace:*",
     "@fastify/cookie": "^11.1.2",
     "@fastify/cors": "^11.3.0",

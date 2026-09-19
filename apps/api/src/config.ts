@@ -17,7 +17,34 @@ const postgresUrl = z
     message: 'must be a postgres:// or postgresql:// connection string',
   });
 
-const EnvSchema = z.object({
+const adapterMode = z.enum(['mock', 'live']).default('mock');
+const optionalSecret = z
+  .string()
+  .trim()
+  .optional()
+  .transform((value) => (value === '' ? undefined : value));
+const optionalUrl = z
+  .string()
+  .trim()
+  .optional()
+  .transform((value) => (value === '' ? undefined : value))
+  .pipe(z.url().optional());
+
+/**
+ * A live adapter with a missing credential is a configuration error, reported at boot — never a
+ * silent fall back to the mock, and never a screen that claims a live connection (Constitution §15).
+ */
+const LIVE_REQUIREMENTS: ReadonlyArray<readonly [string, readonly string[]]> = [
+  ['MARKET_ADAPTER', ['MARKET_API_KEY']],
+  ['REGISTRY_ADAPTER', ['REGISTRY_GATEWAY_URL', 'REGISTRY_GATEWAY_KEY']],
+  ['MESSAGING_ADAPTER', ['SMS_GATEWAY_URL', 'SMS_GATEWAY_KEY', 'SMS_TEMPLATE_ID']],
+  ['SPEECH_ADAPTER', ['BHASHINI_URL', 'BHASHINI_KEY', 'BHASHINI_SERVICE_IDS']],
+  ['MODEL_FALLBACK_ADAPTER', ['ANTHROPIC_API_KEY']],
+  ['STORAGE_ADAPTER', ['LOGISTICS_GATEWAY_URL', 'LOGISTICS_GATEWAY_KEY']],
+  ['TRANSPORT_ADAPTER', ['LOGISTICS_GATEWAY_URL', 'LOGISTICS_GATEWAY_KEY']],
+];
+
+const BaseSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   API_HOST: z.string().trim().min(1).default('127.0.0.1'),
   API_PORT: z.coerce.number().int().min(1).max(65_535).default(8787),
@@ -31,8 +58,32 @@ const EnvSchema = z.object({
   DB_CONTEXT_KEY: z.string().regex(/^[0-9a-f]{64,}$/i, 'must be at least 32 bytes of hex'),
   /** The API's own secret: token signing, phone and registry-id hashing, row MACs. 32 bytes, hex. */
   AUTH_SECRET: z.string().regex(/^[0-9a-f]{64,}$/i, 'must be at least 32 bytes of hex'),
-  /** Where registry lookups go. `live` needs the gateway variables of the live adapters (P4). */
-  REGISTRY_ADAPTER: z.enum(['mock', 'live']).default('mock'),
+  // ── Adapters (PROMPT §3.4): mock | live, switched here and nowhere else. ────────────────
+  MARKET_ADAPTER: adapterMode,
+  MARKET_API_KEY: optionalSecret,
+  /** OGD resource id of the daily mandi price dataset (not a secret). */
+  MARKET_RESOURCE_ID: z.string().trim().default('9ef84268-d588-465a-a308-a864a43d0070'),
+  /** The synthetic Agmarknet-shaped file the mock serves (repository-relative). */
+  MARKET_MOCK_FILE: z.string().trim().default('data/raw/agmarknet_synthetic.csv'),
+  WEATHER_ADAPTER: adapterMode,
+  REGISTRY_ADAPTER: adapterMode,
+  REGISTRY_GATEWAY_URL: optionalUrl,
+  REGISTRY_GATEWAY_KEY: optionalSecret,
+  MESSAGING_ADAPTER: adapterMode,
+  SMS_GATEWAY_URL: optionalUrl,
+  SMS_GATEWAY_KEY: optionalSecret,
+  SMS_TEMPLATE_ID: optionalSecret,
+  SPEECH_ADAPTER: adapterMode,
+  BHASHINI_URL: optionalUrl,
+  BHASHINI_KEY: optionalSecret,
+  /** JSON map of locale → Bhashini ASR service id, e.g. {"mr":"…","hi":"…"}. */
+  BHASHINI_SERVICE_IDS: optionalSecret,
+  MODEL_FALLBACK_ADAPTER: adapterMode,
+  ANTHROPIC_API_KEY: optionalSecret,
+  STORAGE_ADAPTER: adapterMode,
+  TRANSPORT_ADAPTER: adapterMode,
+  LOGISTICS_GATEWAY_URL: optionalUrl,
+  LOGISTICS_GATEWAY_KEY: optionalSecret,
   /** Strict CORS allowlist, comma-separated origins. */
   CORS_ORIGINS: z
     .string()
@@ -44,6 +95,16 @@ const EnvSchema = z.object({
         .filter((origin) => origin.length > 0),
     )
     .pipe(z.array(z.string().regex(/^https?:\/\/[^\s/]+$/, 'must be an origin like https://host:port, with no path'))),
+});
+
+const EnvSchema = BaseSchema.superRefine((env, ctx) => {
+  const record = env as unknown as Record<string, unknown>;
+  for (const [modeKey, required] of LIVE_REQUIREMENTS) {
+    if (record[modeKey] !== 'live') continue;
+    for (const key of required) {
+      if (record[key] === undefined) ctx.addIssue({ code: 'custom', path: [key], message: `is required when ${modeKey}=live` });
+    }
+  }
 });
 
 export type Config = z.infer<typeof EnvSchema>;

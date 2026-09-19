@@ -6,9 +6,8 @@
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-import { MockMessagingAdapter } from './adapters/messaging/index.js';
-import { MockBuyerRegistryAdapter, MockFarmerRegistryAdapter } from './adapters/registry/mock.js';
-import { ConfigError, loadConfig } from './config.js';
+import { createAdapters, describeAdapters } from './adapters/index.js';
+import { loadConfig } from './config.js';
 import { assertLeastPrivilege } from './db/guard.js';
 import { createPool } from './db/pool.js';
 import { buildApp } from './http/app.js';
@@ -21,9 +20,8 @@ if (existsSync(envFile)) process.loadEnvFile(envFile);
 async function main(): Promise<void> {
   const config = loadConfig(process.env);
   const logger = createLogger({ level: config.LOG_LEVEL });
-  if (config.REGISTRY_ADAPTER === 'live') {
-    throw new ConfigError(['REGISTRY_ADAPTER=live needs the live registry gateway, which arrives with the adapter phase (P4)']);
-  }
+  const adapters = createAdapters(config, resolve(import.meta.dirname, '../../..'));
+  logger.info({ adapters: describeAdapters(adapters) }, 'adapters configured');
   const pool = createPool(config.DATABASE_URL);
   const privileges = await assertLeastPrivilege(pool);
   logger.info({ role: privileges.role }, 'database role is least-privilege');
@@ -34,9 +32,9 @@ async function main(): Promise<void> {
     logger,
     db: { pool, contextKey: keys.contextKey },
     keys,
-    messaging: new MockMessagingAdapter(),
-    farmerRegistry: new MockFarmerRegistryAdapter(),
-    buyerRegistry: new MockBuyerRegistryAdapter(),
+    messaging: adapters.messaging,
+    farmerRegistry: adapters.farmerRegistry,
+    buyerRegistry: adapters.buyerRegistry,
   });
   const shutdown = async (signal: string): Promise<void> => {
     logger.info({ signal }, 'shutting down');
