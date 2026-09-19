@@ -56,6 +56,10 @@ class Series:
     source: str = "agmarknet"
     start: str = "2021-01-01"
     variety: str = "FAQ"
+    #: sd of the day-to-day market noise on top of the process (quality mix, trader mix). An
+    #: order-of-magnitude assumption, not a measurement: stored grains trade near 1 % a day,
+    #: fruit a few per cent, onion and tomato the most.
+    day_noise: float = 0.012
 
 
 ONION: MONTHLY = (1.3, 1.1, 1.3, 1.5, 1.4, 1.0, 0.7, 0.6, 0.6, 0.8, 1.1, 1.4)
@@ -74,13 +78,13 @@ SERIES: tuple[Series, ...] = (
         Market("Lasalgaon", "Nashik", 0.55, 0.0, "Onion"),
         Market("Pimpalgaon Baswant", "Nashik", 0.30, -0.02, "ONION"),
         Market("Nashik", "Nashik", 0.15, 0.03, "Onion"),
-    ), 1450, 2400, ONION, 0.55, 0.35, 0.8, 0.028, 1.2, 0.30),
+    ), 1450, 2400, ONION, 0.55, 0.35, 0.8, 0.028, 1.2, 0.30, day_noise=0.02),
     Series("onion", "ahilyanagar", (
         Market("Rahuri", "Ahilyanagar", 1.0, 0.0, "Onion(Red)"),
-    ), 1380, 700, ONION, 0.55, 0.35, 0.8, 0.028, 1.2, 0.30),
-    Series("soybean", "latur", (Market("Latur", "Latur", 1.0, 0.0, "सोयाबीन"),), 4200, 3000, SOY, 0.18, 0.08, 0.1, 0.009, 0.4, 0.10, source="msamb"),
-    Series("tur", "latur", (Market("Latur", "Latur", 1.0, 0.0, "तूर"),), 6300, 900, TUR, 0.20, 0.10, 0.1, 0.011, 0.5, 0.12, source="msamb"),
-    Series("gram", "latur", (Market("Latur", "Latur", 1.0, 0.0, "हरभरा"),), 4700, 800, GRAM, 0.16, 0.08, 0.1, 0.008, 0.3, 0.08, source="msamb"),
+    ), 1380, 700, ONION, 0.55, 0.35, 0.8, 0.028, 1.2, 0.30, day_noise=0.02),
+    Series("soybean", "latur", (Market("Latur", "Latur", 1.0, 0.0, "सोयाबीन"),), 4200, 3000, SOY, 0.18, 0.08, 0.1, 0.009, 0.4, 0.10, source="msamb", day_noise=0.006),
+    Series("tur", "latur", (Market("Latur", "Latur", 1.0, 0.0, "तूर"),), 6300, 900, TUR, 0.20, 0.10, 0.1, 0.011, 0.5, 0.12, source="msamb", day_noise=0.006),
+    Series("gram", "latur", (Market("Latur", "Latur", 1.0, 0.0, "हरभरा"),), 4700, 800, GRAM, 0.16, 0.08, 0.1, 0.008, 0.3, 0.08, source="msamb", day_noise=0.006),
     Series("banana", "jalgaon", (
         Market("Jalgaon", "Jalgaon", 0.4, 0.0, "Banana"),
         Market("Raver", "Jalgaon", 0.6, -0.04, "Banana - Green"),
@@ -89,9 +93,9 @@ SERIES: tuple[Series, ...] = (
     Series("tomato", "pune", (
         Market("Narayangaon", "Pune", 0.6, 0.0, "Tomato"),
         Market("Manchar", "Pune", 0.4, 0.02, "Tomato"),
-    ), 1250, 900, TOMATO, 0.60, 0.45, 1.0, 0.040, 1.5, 0.35),
-    Series("tomato", "nashik", (Market("Nashik", "Nashik", 1.0, 0.0, "Tomato"),), 1150, 500, TOMATO, 0.60, 0.45, 1.0, 0.040, 1.5, 0.35),
-    Series("potato", "pune", (Market("Manchar", "Pune", 1.0, 0.0, "Potato"),), 1350, 700, POTATO, 0.35, 0.25, 0.4, 0.020, 0.6, 0.20),
+    ), 1250, 900, TOMATO, 0.60, 0.45, 1.0, 0.040, 1.5, 0.35, day_noise=0.025),
+    Series("tomato", "nashik", (Market("Nashik", "Nashik", 1.0, 0.0, "Tomato"),), 1150, 500, TOMATO, 0.60, 0.45, 1.0, 0.040, 1.5, 0.35, day_noise=0.025),
+    Series("potato", "pune", (Market("Manchar", "Pune", 1.0, 0.0, "Potato"),), 1350, 700, POTATO, 0.35, 0.25, 0.4, 0.020, 0.6, 0.20, day_noise=0.015),
     Series("pomegranate", "ahilyanagar", (Market("Rahuri", "Ahilyanagar", 1.0, 0.0, "Pomegranate"),), 5200, 250, POMEGRANATE, 0.25, 0.15, 0.4, 0.018, 0.4, 0.15),
     # Deliberately thin: two short seasons of trading — the "insufficient" path must be exercised.
     Series("grapes", "nashik", (Market("Nashik", "Nashik", 1.0, 0.0, "Grapes"),), 3200, 400, GRAPES, 0.30, 0.20, 0.5, 0.020, 0.3, 0.15, start="2025-01-01"),
@@ -175,7 +179,7 @@ def simulate_series(s: Series, days: list[date], weather: pd.DataFrame, rng: np.
         gap = 1 if prev is None else (d - prev).days
         prev = d
         years = (d - start).days / 365.25
-        arrival_noise = 0.6 * arrival_noise + rng.normal(0, 0.25)
+        arrival_noise = 0.6 * arrival_noise + rng.normal(0, 0.18)
         arrivals = s.base_arrivals * season * float(np.exp(arrival_noise))
         u = (0.97 ** gap) * u + rng.normal(0, s.vol) * np.sqrt(gap)
         # A policy regime switches the level on and off without warning, and how long it lasts is
@@ -200,7 +204,7 @@ def simulate_series(s: Series, days: list[date], weather: pd.DataFrame, rng: np.
             + shock
         )
         for m in s.markets:
-            market_noise = rng.normal(0, 0.015)
+            market_noise = rng.normal(0, s.day_noise)
             modal = float(np.exp(log_p + m.price_offset + market_noise))
             lo = modal * float(np.exp(-abs(rng.normal(0.12, 0.04))))
             hi = modal * float(np.exp(abs(rng.normal(0.10, 0.04))))

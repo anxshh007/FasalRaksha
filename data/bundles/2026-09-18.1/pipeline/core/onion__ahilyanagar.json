@@ -1,0 +1,117 @@
+{
+ "schemaVersion": 3,
+ "version": "2026-09-18.1",
+ "generatedAt": "2026-09-18T20:30:00Z",
+ "asOf": "2026-09-18",
+ "district": "ahilyanagar",
+ "crop": "onion",
+ "market": "rahuri",
+ "benchmark": {
+  "modal": 2843.0,
+  "min": 2441.0,
+  "max": 3078.0,
+  "unit": "quintal"
+ },
+ "trend": [
+  {
+   "date": "2026-09-12",
+   "modal": 2750.0
+  },
+  {
+   "date": "2026-09-13",
+   "modal": null
+  },
+  {
+   "date": "2026-09-14",
+   "modal": 2600.0
+  },
+  {
+   "date": "2026-09-15",
+   "modal": 2732.0
+  },
+  {
+   "date": "2026-09-16",
+   "modal": 3099.0
+  },
+  {
+   "date": "2026-09-17",
+   "modal": 2772.0
+  },
+  {
+   "date": "2026-09-18",
+   "modal": 2843.0
+  }
+ ],
+ "seasonal": {
+  "woyMedian": 2375.26,
+  "woyIQR": [
+   2244.61,
+   2736.3
+  ],
+  "position": "above"
+ },
+ "arrivalsRatio": 0.743,
+ "forecast": {
+  "h7": {
+   "q10": 2168.43,
+   "q50": 2570.63,
+   "q90": 3178.58,
+   "direction": "down",
+   "agreement": 0.7374,
+   "skill": 0.1229,
+   "skillSeasonal": 0.2869,
+   "coverage": 0.7917,
+   "bandKappa": 0.0643,
+   "confidenceMin": 0.1
+  },
+  "h14": {
+   "q10": 1974.26,
+   "q50": 2580.68,
+   "q90": 3070.11,
+   "direction": "down",
+   "agreement": 0.8956,
+   "skill": 0.2053,
+   "skillSeasonal": 0.3139,
+   "coverage": 0.8012,
+   "bandKappa": 0.0614,
+   "confidenceMin": 0.1
+  }
+ },
+ "raksha": {
+  "layers": {
+   "RK-1": {
+    "bucket": "flat",
+    "weight": 0.0351,
+    "value": 0.017
+   },
+   "RK-2": {
+    "bucket": "down",
+    "weight": 0.0013,
+    "value": -0.0659
+   },
+   "RK-3": {
+    "bucket": "down",
+    "weight": 0.0564,
+    "value": -0.2391
+   },
+   "RK-4": {
+    "bucket": "up",
+    "weight": 0.0,
+    "value": -0.8885
+   },
+   "RK-5": {
+    "bucket": "flat",
+    "weight": 0.0292,
+    "value": 0.4319
+   },
+   "RK-6": {
+    "bucket": "down",
+    "weight": 0.1229,
+    "value": -0.1007
+   }
+  }
+ },
+ "stalenessLimitDays": 7,
+ "status": "published",
+ "integrity": "sha256-11164dfe041d1f108b9a56b2696712c7ae4a023a840317d161e7fd3787da7423"
+}

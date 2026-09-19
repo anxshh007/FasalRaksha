@@ -25,7 +25,8 @@
     "verify": "node tools/verify.mjs",
     "ml:generate": "node tools/py.mjs -m ml.run_pipeline --stage generate",
     "ml:ingest": "node tools/py.mjs -m ml.run_pipeline --stage ingest",
-    "ml:pipeline": "node tools/py.mjs -m ml.run_pipeline"
+    "ml:pipeline": "node tools/py.mjs -m ml.run_pipeline",
+    "bundles:publish": "pnpm --filter @fasal/api run bundles"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

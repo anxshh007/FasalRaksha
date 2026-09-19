@@ -21,6 +21,7 @@ import EmbeddedPostgres from 'embedded-postgres';
 import { bootstrapDatabase, installContextKey } from '../src/db/bootstrap.js';
 import { migrate } from '../src/db/migrate.js';
 import { upsertEnv } from './lib/envfile.js';
+import { latestPipelineVersion, publish } from './lib/release.js';
 import { ENV_FILE, LOCAL_PG_DIR, MIGRATIONS_DIR } from './lib/paths.js';
 
 const PORT = Number(process.env['LOCAL_PG_PORT'] ?? 54329);
@@ -78,10 +79,19 @@ upsertEnv(ENV_FILE, {
   AUTH_SECRET: creds.authSecret,
 });
 
+// Serve the newest committed bundle release, so the API has prices from the first start.
+const latest = latestPipelineVersion();
+let bundles = 'no bundle release found (run `pnpm ml:pipeline`, then `pnpm bundles:publish`)';
+if (latest !== null) {
+  const { release } = await publish(latest, { ownerUrl: urls.ownerUrl, env: process.env });
+  bundles = `bundle release ${release.version} loaded (${release.bundles.length} crop × district bundles, ${release.dataSource} data)`;
+}
+
 process.stdout.write(
   `PostgreSQL is running on 127.0.0.1:${PORT} (database "fasal").\n` +
     `  migrations: ${result.applied.length} applied, ${result.alreadyApplied.length} already applied\n` +
     '  request-context key installed; credentials and keys are in .env\n' +
+    `  ${bundles}\n` +
     'Ctrl+C to stop.\n',
 );
 

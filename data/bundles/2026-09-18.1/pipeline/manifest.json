@@ -1,0 +1,145 @@
+{
+ "schemaVersion": 3,
+ "kind": "pipeline-manifest",
+ "version": "2026-09-18.1",
+ "generatedAt": "2026-09-18T20:30:00Z",
+ "asOf": "2026-09-18",
+ "dataSource": "synthetic",
+ "cores": [
+  {
+   "crop": "banana",
+   "district": "jalgaon",
+   "file": "core/banana__jalgaon.json",
+   "status": "published",
+   "integrity": "sha256-efe523f748f785ea62042a1e6c25af57dd0ef9fb1462f0a26020899b0f85f5c5",
+   "bytes": 1942
+  },
+  {
+   "crop": "gram",
+   "district": "latur",
+   "file": "core/gram__latur.json",
+   "status": "published",
+   "integrity": "sha256-238c83e2da69cf1ceca4a6b5205d9dfc6efe8aedd19b4ac3fe4aefdb49bc1c0d",
+   "bytes": 1950
+  },
+  {
+   "crop": "grapes",
+   "district": "nashik",
+   "file": "core/grapes__nashik.json",
+   "status": "insufficient",
+   "integrity": "sha256-2c80a6a82014947b58a3b906791245e22052db15894dd0713540ab1c898f52df",
+   "bytes": 1431
+  },
+  {
+   "crop": "onion",
+   "district": "ahilyanagar",
+   "file": "core/onion__ahilyanagar.json",
+   "status": "published",
+   "integrity": "sha256-11164dfe041d1f108b9a56b2696712c7ae4a023a840317d161e7fd3787da7423",
+   "bytes": 1956
+  },
+  {
+   "crop": "onion",
+   "district": "nashik",
+   "file": "core/onion__nashik.json",
+   "status": "published",
+   "integrity": "sha256-288f14295f3775a6f47a340ef3ba069acd39a7aabe11e3e34f9e4a59ab1af17c",
+   "bytes": 1950
+  },
+  {
+   "crop": "orange",
+   "district": "nagpur",
+   "file": "core/orange__nagpur.json",
+   "status": "published",
+   "integrity": "sha256-15734df4e6145331ecdaddedcaffdb0f096d3d3f0e3900dd826d4a927f526898",
+   "bytes": 1956
+  },
+  {
+   "crop": "pomegranate",
+   "district": "ahilyanagar",
+   "file": "core/pomegranate__ahilyanagar.json",
+   "status": "published",
+   "integrity": "sha256-59bb83db4415559fe53296161b4d48ebe3e9d7d8c016d0bb6611178c1f9fc9f1",
+   "bytes": 1736
+  },
+  {
+   "crop": "potato",
+   "district": "pune",
+   "file": "core/potato__pune.json",
+   "status": "published",
+   "integrity": "sha256-9ccf2dfa147a7841c911740eaaee8cc7d4f0e01d91eec632c77c051e16634d9e",
+   "bytes": 1963
+  },
+  {
+   "crop": "soybean",
+   "district": "latur",
+   "file": "core/soybean__latur.json",
+   "status": "published",
+   "integrity": "sha256-7f2143f57d534e8899377590b9ae0ada8183855c084e7c06caf494fa65137f00",
+   "bytes": 1952
+  },
+  {
+   "crop": "tomato",
+   "district": "nashik",
+   "file": "core/tomato__nashik.json",
+   "status": "published",
+   "integrity": "sha256-f3b7c6c7e7ebd4efdcc1e1a067f6a63454aa4086d61d60bb07bba53ddb6132a6",
+   "bytes": 1973
+  },
+  {
+   "crop": "tomato",
+   "district": "pune",
+   "file": "core/tomato__pune.json",
+   "status": "published",
+   "integrity": "sha256-da9734dbccf408edba0d88474ed5b6d5b9a98d95ddd76daea253674d9ba3040f",
+   "bytes": 1970
+  },
+  {
+   "crop": "tur",
+   "district": "latur",
+   "file": "core/tur__latur.json",
+   "status": "published",
+   "integrity": "sha256-3763abca9bbc41e7cb7927663736dd8d89d019899888523f6658ef1801e467e6",
+   "bytes": 1956
+  }
+ ],
+ "climatology": [
+  {
+   "district": "ahilyanagar",
+   "file": "climatology/ahilyanagar.json",
+   "integrity": "sha256-5ff43cb873b5376a971eda8da802398fd95ed453dd4e758558cf2ee0e06389c9",
+   "bytes": 4851
+  },
+  {
+   "district": "jalgaon",
+   "file": "climatology/jalgaon.json",
+   "integrity": "sha256-7bc814dbe9915f7a29451b731c0b322a271ff904b8c640441631209db44439e0",
+   "bytes": 4848
+  },
+  {
+   "district": "latur",
+   "file": "climatology/latur.json",
+   "integrity": "sha256-f3d74808b7cfddd9927542da1b7b0bf13f87c8dd32deaebf0bb4061067251ddf",
+   "bytes": 4849
+  },
+  {
+   "district": "nagpur",
+   "file": "climatology/nagpur.json",
+   "integrity": "sha256-416bd7ed6d6187146a691fc92db5ed8fabf9879a716841d04bf0f6f3e9103e1e",
+   "bytes": 4849
+  },
+  {
+   "district": "nashik",
+   "file": "climatology/nashik.json",
+   "integrity": "sha256-e4e460dad4d68a110f6626ff0b4f2eaf0e7d8eef5bd9d63d45f54524497dcbbf",
+   "bytes": 4848
+  },
+  {
+   "district": "pune",
+   "file": "climatology/pune.json",
+   "integrity": "sha256-bbff001087d4e365c294dee5d792b5b41ccf693313f90b8c3d9e71895eddfcff",
+   "bytes": 4847
+  }
+ ],
+ "integrity": "sha256-39abc3a8ec6f65a5b9a7eaaa74acd17b6d638be300be8ea6db4583329626d50b"
+}

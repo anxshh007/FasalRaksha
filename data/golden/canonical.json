@@ -1,0 +1,114 @@
+{
+ "generatedBy": "ml/export/golden.py",
+ "vectors": [
+  {
+   "name": "integers and integral floats",
+   "value": {
+    "modal": 1850.0,
+    "count": 12,
+    "zero": 0.0,
+    "negative_zero": -0.0,
+    "big": 1e+20,
+    "bigger": 1e+21
+   },
+   "canonical": "{\"big\":100000000000000000000,\"bigger\":1e+21,\"count\":12,\"modal\":1850,\"negative_zero\":0,\"zero\":0}",
+   "sha256": "9bad758348d32c22f2ae3be2798b6319a70b8b14019ac4918b00bdf725881d1f"
+  },
+  {
+   "name": "shortest round-trip decimals",
+   "value": {
+    "third": 0.3333333333333333,
+    "sum": 0.30000000000000004,
+    "tenth": 0.1,
+    "q": 3369.99,
+    "agreement": 0.6641,
+    "tiny": 1e-07,
+    "small": 1e-06,
+    "smaller": 1.5e-07
+   },
+   "canonical": "{\"agreement\":0.6641,\"q\":3369.99,\"small\":0.000001,\"smaller\":1.5e-7,\"sum\":0.30000000000000004,\"tenth\":0.1,\"third\":0.3333333333333333,\"tiny\":1e-7}",
+   "sha256": "c359fcc3ce71222db379c9135e6d02bd75ac2dd15eae516f0f1e0c76eba8a87c"
+  },
+  {
+   "name": "extremes",
+   "value": [
+    5e-324,
+    1.7976931348623157e+308,
+    -123456.789,
+    2.5e-310
+   ],
+   "canonical": "[5e-324,1.7976931348623157e+308,-123456.789,2.5e-310]",
+   "sha256": "c6b94d3170cfdd8f15572dbfcab386fecfb604287f8f4ae6e663cb7e26b3885d"
+  },
+  {
+   "name": "scripts",
+   "value": {
+    "mr": "कांदा",
+    "hi": "प्याज",
+    "bn": "পেঁয়াজ",
+    "pa": "ਪਿਆਜ਼",
+    "emoji": "🧅",
+    "nukta": "ज़"
+   },
+   "canonical": "{\"bn\":\"পেঁয়াজ\",\"emoji\":\"🧅\",\"hi\":\"प्याज\",\"mr\":\"कांदा\",\"nukta\":\"ज़\",\"pa\":\"ਪਿਆਜ਼\"}",
+   "sha256": "b4003244855f81c4ab6fef80f63a5ca70e509f65f25668f9dd3fa0182ded6743"
+  },
+  {
+   "name": "escapes",
+   "value": {
+    "quote": "say \"कांदा\"",
+    "backslash": "a\\b",
+    "newline": "a\nb",
+    "tab": "a\tb",
+    "control": "\u0001\u001f",
+    "del": "",
+    "line separator": "a b"
+   },
+   "canonical": "{\"backslash\":\"a\\\\b\",\"control\":\"\\u0001\\u001f\",\"del\":\"\",\"line separator\":\"a b\",\"newline\":\"a\\nb\",\"quote\":\"say \\\"कांदा\\\"\",\"tab\":\"a\\tb\"}",
+   "sha256": "52520613cc4515a34c0481f5efebd3bd0077d827728a5bba6edd0c4c47c0ee14"
+  },
+  {
+   "name": "key order is UTF-16 code-unit order",
+   "value": {
+    "｡": 1,
+    "😀": 2,
+    "B": 3,
+    "a": 4,
+    "_": 5,
+    "aa": 6,
+    "": 7
+   },
+   "canonical": "{\"\":7,\"B\":3,\"_\":5,\"a\":4,\"aa\":6,\"😀\":2,\"｡\":1}",
+   "sha256": "cdbd732bc76c1e3d39a67659ee1685aa468afbdf49d8ed502d7c160fdefb5c62"
+  },
+  {
+   "name": "nesting, nulls and empties",
+   "value": {
+    "z": [
+     null,
+     true,
+     false,
+     {},
+     [],
+     {
+      "b": [
+       1,
+       {
+        "d": null,
+        "c": 2.0
+       }
+      ]
+     }
+    ],
+    "a": {
+     "y": "",
+     "x": [
+      0.5
+     ]
+    }
+   },
+   "canonical": "{\"a\":{\"x\":[0.5],\"y\":\"\"},\"z\":[null,true,false,{},[],{\"b\":[1,{\"c\":2,\"d\":null}]}]}",
+   "sha256": "00689f53a55f298124811a7a74445f2e3575bc8de995ca2c961d523422908ebc"
+  }
+ ]
+}

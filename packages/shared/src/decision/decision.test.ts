@@ -80,12 +80,21 @@ describe('Gate E · any single failed condition blocks WAIT, each with its own r
   it('GR-5 · the season points the other way', () => {
     const base = onionBundle();
     const bundle = onionBundle({
-      seasonal: { ...base.seasonal, position: 'above' },
+      seasonal: { woyMedian: 1755, woyIQR: [1600, 1980], position: 'above' },
       raksha: { layers: { ...base.raksha.layers, 'RK-2': { bucket: 'down', weight: 0.3, value: -0.05 } } },
     });
     const r = only(bundle);
     expect(r.failedConditions).toEqual(['GR-5']);
     expect(r).toMatchObject({ verdict: 'refuse', primaryRefusal: 'GR-5' });
+  });
+
+  it('GR-5 · with no seasonal history there is no season to contradict the signal', () => {
+    const base = onionBundle();
+    const bundle = onionBundle({
+      seasonal: null,
+      raksha: { layers: { ...base.raksha.layers, 'RK-2': { bucket: 'down', weight: 0.3, value: -0.05 } } },
+    });
+    expect(evaluateWait(input(bundle)).conditions.find((c) => c.id === 'GR-5')?.status).toBe('pass');
   });
 
   it('GR-6 · expected upside does not cover storage and spoilage costs', () => {

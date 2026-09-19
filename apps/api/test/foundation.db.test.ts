@@ -15,7 +15,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { withActor, type Database } from '../src/db/actor.js';
 import { assertLeastPrivilege, PrivilegeError } from '../src/db/guard.js';
-import { migrate, MigrationError } from '../src/db/migrate.js';
+import { loadMigrations, migrate, MigrationError } from '../src/db/migrate.js';
 import { createPool, type Pool } from '../src/db/pool.js';
 import { createTestDatabase, startCluster, type TestCluster, type TestDatabase } from './support/cluster.js';
 
@@ -154,7 +154,9 @@ describe('ARCH-05 · migrations are ordered, idempotent and immutable', () => {
   it('applies nothing the second time', async () => {
     const again = await migrate(db.ownerUrl, MIGRATIONS);
     expect(again.applied).toEqual([]);
-    expect(again.alreadyApplied).toEqual(['0001_baseline.sql', '0002_identity.sql', '0003_marketplace.sql', '0004_public_data.sql']);
+    const all = (await loadMigrations(MIGRATIONS)).map((m) => m.file);
+    expect(all.slice(0, 5)).toEqual(['0001_baseline.sql', '0002_identity.sql', '0003_marketplace.sql', '0004_public_data.sql', '0005_bundle_releases.sql']);
+    expect(again.alreadyApplied).toEqual(all); // every migration in the repository, in order, and nothing else
   });
 
   it('stops when an applied migration has been edited', async () => {

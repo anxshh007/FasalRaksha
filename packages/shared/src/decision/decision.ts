@@ -117,11 +117,12 @@ export function gr4Agreement(forecast: HorizonForecast): ConditionResult {
 /**
  * GR-5 · the season does not strongly contradict the signal. "Strongly" means both: the
  * seasonal layer (RK-2, with measured weight) reads the opposite way, *and* today's price already
- * sits beyond the seasonal band on the side that makes reversal likely.
+ * sits beyond the seasonal band on the side that makes reversal likely. With no seasonal history
+ * there is no season to contradict the signal.
  */
 export function gr5Season(bundle: CropBundle, forecast: HorizonForecast): ConditionResult {
   const seasonal = bundle.raksha.layers['RK-2'];
-  const position = bundle.seasonal.position;
+  const position = bundle.seasonal?.position ?? null;
   const counted = seasonal.weight > 0;
   const contradicts =
     counted &&

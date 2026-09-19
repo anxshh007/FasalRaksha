@@ -351,11 +351,11 @@ def evaluate_horizon(frame: pd.DataFrame, horizon: int, crop_class: str) -> Hori
 
 
 def latest_forecast(frame: pd.DataFrame, result: HorizonResult) -> dict:
-    """Fit on everything, predict at the latest priced trading day: the forecast the bundle ships."""
+    """Fit on everything, predict at the latest *usable* trading day — a real, clean observation,
+    never an imputed day — because its modal is the benchmark p0 the device measures against."""
     train = frame[frame["target"].notna()]
     models = fit_quantiles(train)
-    priced = frame[frame["log_p"].notna()]
-    latest = priced.iloc[[-1]]
+    latest = frame[frame["usable"] & frame["log_p"].notna()].iloc[[-1]]
     band = predict_band(models, latest)[0]
     q10, q50, q90 = band[0] - result.widening, band[1], band[2] + result.widening
     layers = {layer: fit_layer(train, column) for layer, column in LAYER_SIGNALS.items()}

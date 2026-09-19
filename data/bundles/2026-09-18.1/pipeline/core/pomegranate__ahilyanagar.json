@@ -1,0 +1,106 @@
+{
+ "schemaVersion": 3,
+ "version": "2026-09-18.1",
+ "generatedAt": "2026-09-18T20:30:00Z",
+ "asOf": "2026-09-18",
+ "district": "ahilyanagar",
+ "crop": "pomegranate",
+ "market": "rahuri",
+ "benchmark": {
+  "modal": 7010.0,
+  "min": 6542.0,
+  "max": 7534.0,
+  "unit": "quintal"
+ },
+ "trend": [
+  {
+   "date": "2026-09-12",
+   "modal": 7136.0
+  },
+  {
+   "date": "2026-09-13",
+   "modal": null
+  },
+  {
+   "date": "2026-09-14",
+   "modal": 7121.0
+  },
+  {
+   "date": "2026-09-15",
+   "modal": 7178.0
+  },
+  {
+   "date": "2026-09-16",
+   "modal": 6756.0
+  },
+  {
+   "date": "2026-09-17",
+   "modal": 6801.0
+  },
+  {
+   "date": "2026-09-18",
+   "modal": 7010.0
+  }
+ ],
+ "seasonal": {
+  "woyMedian": 6647.63,
+  "woyIQR": [
+   6300.87,
+   7018.11
+  ],
+  "position": "within"
+ },
+ "arrivalsRatio": 0.775,
+ "forecast": {
+  "h7": {
+   "q10": 6348.67,
+   "q50": 6981.39,
+   "q90": 7515.9,
+   "direction": "down",
+   "agreement": 0.5611,
+   "skill": 0.0874,
+   "skillSeasonal": 0.2746,
+   "coverage": 0.8119,
+   "bandKappa": 0.0825,
+   "confidenceMin": 0.1
+  },
+  "h14": null
+ },
+ "raksha": {
+  "layers": {
+   "RK-1": {
+    "bucket": "down",
+    "weight": 0.0163,
+    "value": 0.0349
+   },
+   "RK-2": {
+    "bucket": "down",
+    "weight": 0.0,
+    "value": 0.062
+   },
+   "RK-3": {
+    "bucket": "down",
+    "weight": 0.0764,
+    "value": -0.1488
+   },
+   "RK-4": {
+    "bucket": "up",
+    "weight": 0.0032,
+    "value": -0.5553
+   },
+   "RK-5": {
+    "bucket": "down",
+    "weight": 0.0231,
+    "value": 1.436
+   },
+   "RK-6": {
+    "bucket": "flat",
+    "weight": 0.0874,
+    "value": -0.0041
+   }
+  }
+ },
+ "stalenessLimitDays": 7,
+ "status": "published",
+ "integrity": "sha256-59bb83db4415559fe53296161b4d48ebe3e9d7d8c016d0bb6611178c1f9fc9f1"
+}

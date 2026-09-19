@@ -1,0 +1,117 @@
+{
+ "schemaVersion": 3,
+ "version": "2026-09-18.1",
+ "generatedAt": "2026-09-18T20:30:00Z",
+ "asOf": "2026-09-18",
+ "district": "latur",
+ "crop": "gram",
+ "market": "latur-apmc",
+ "benchmark": {
+  "modal": 7784.0,
+  "min": 6398.0,
+  "max": 8824.0,
+  "unit": "quintal"
+ },
+ "trend": [
+  {
+   "date": "2026-09-12",
+   "modal": 7510.0
+  },
+  {
+   "date": "2026-09-13",
+   "modal": null
+  },
+  {
+   "date": "2026-09-14",
+   "modal": 7684.0
+  },
+  {
+   "date": "2026-09-15",
+   "modal": 7720.0
+  },
+  {
+   "date": "2026-09-16",
+   "modal": 7867.0
+  },
+  {
+   "date": "2026-09-17",
+   "modal": 7675.0
+  },
+  {
+   "date": "2026-09-18",
+   "modal": 7784.0
+  }
+ ],
+ "seasonal": {
+  "woyMedian": 7229.39,
+  "woyIQR": [
+   7181.14,
+   7286.54
+  ],
+  "position": "above"
+ },
+ "arrivalsRatio": 0.726,
+ "forecast": {
+  "h7": {
+   "q10": 7083.64,
+   "q50": 7643.37,
+   "q90": 8150.33,
+   "direction": "down",
+   "agreement": 0.74,
+   "skill": 0.1745,
+   "skillSeasonal": 0.2744,
+   "coverage": 0.7706,
+   "bandKappa": 0.0503,
+   "confidenceMin": 0.1
+  },
+  "h14": {
+   "q10": 7176.15,
+   "q50": 7765.63,
+   "q90": 8271.67,
+   "direction": "flat",
+   "agreement": 0.7008,
+   "skill": 0.3561,
+   "skillSeasonal": 0.3395,
+   "coverage": 0.7944,
+   "bandKappa": 0.0375,
+   "confidenceMin": 0.1
+  }
+ },
+ "raksha": {
+  "layers": {
+   "RK-1": {
+    "bucket": "up",
+    "weight": 0.0,
+    "value": -0.0319
+   },
+   "RK-2": {
+    "bucket": "flat",
+    "weight": 0.0482,
+    "value": 0.0009
+   },
+   "RK-3": {
+    "bucket": "flat",
+    "weight": 0.024,
+    "value": -0.0961
+   },
+   "RK-4": {
+    "bucket": "up",
+    "weight": 0.0011,
+    "value": -0.3639
+   },
+   "RK-5": {
+    "bucket": "down",
+    "weight": 0.034,
+    "value": 0.6331
+   },
+   "RK-6": {
+    "bucket": "down",
+    "weight": 0.1745,
+    "value": -0.0182
+   }
+  }
+ },
+ "stalenessLimitDays": 14,
+ "status": "published",
+ "integrity": "sha256-238c83e2da69cf1ceca4a6b5205d9dfc6efe8aedd19b4ac3fe4aefdb49bc1c0d"
+}

@@ -1,0 +1,117 @@
+{
+ "schemaVersion": 3,
+ "version": "2026-09-18.1",
+ "generatedAt": "2026-09-18T20:30:00Z",
+ "asOf": "2026-09-18",
+ "district": "jalgaon",
+ "crop": "banana",
+ "market": "raver",
+ "benchmark": {
+  "modal": 1234.0,
+  "min": 1039.0,
+  "max": 1291.0,
+  "unit": "quintal"
+ },
+ "trend": [
+  {
+   "date": "2026-09-12",
+   "modal": 1218.0
+  },
+  {
+   "date": "2026-09-13",
+   "modal": null
+  },
+  {
+   "date": "2026-09-14",
+   "modal": 1289.0
+  },
+  {
+   "date": "2026-09-15",
+   "modal": 1349.0
+  },
+  {
+   "date": "2026-09-16",
+   "modal": 1388.0
+  },
+  {
+   "date": "2026-09-17",
+   "modal": 1282.0
+  },
+  {
+   "date": "2026-09-18",
+   "modal": 1234.0
+  }
+ ],
+ "seasonal": {
+  "woyMedian": 1502.99,
+  "woyIQR": [
+   1369.77,
+   1534.97
+  ],
+  "position": "below"
+ },
+ "arrivalsRatio": 1.441,
+ "forecast": {
+  "h7": {
+   "q10": 1190.15,
+   "q50": 1288.6,
+   "q90": 1401.27,
+   "direction": "up",
+   "agreement": 0.6539,
+   "skill": 0.1647,
+   "skillSeasonal": 0.3006,
+   "coverage": 0.8083,
+   "bandKappa": 0.0891,
+   "confidenceMin": 0.1
+  },
+  "h14": {
+   "q10": 1171.77,
+   "q50": 1340.84,
+   "q90": 1452.27,
+   "direction": "up",
+   "agreement": 0.623,
+   "skill": 0.0936,
+   "skillSeasonal": 0.2947,
+   "coverage": 0.8048,
+   "bandKappa": 0.0642,
+   "confidenceMin": 1.0
+  }
+ },
+ "raksha": {
+  "layers": {
+   "RK-1": {
+    "bucket": "flat",
+    "weight": 0.0631,
+    "value": 0.0307
+   },
+   "RK-2": {
+    "bucket": "down",
+    "weight": 0.0,
+    "value": -0.0724
+   },
+   "RK-3": {
+    "bucket": "flat",
+    "weight": 0.0612,
+    "value": 0.0637
+   },
+   "RK-4": {
+    "bucket": "up",
+    "weight": 0.002,
+    "value": -0.2332
+   },
+   "RK-5": {
+    "bucket": "up",
+    "weight": 0.0681,
+    "value": -0.6286
+   },
+   "RK-6": {
+    "bucket": "up",
+    "weight": 0.1647,
+    "value": 0.0433
+   }
+  }
+ },
+ "stalenessLimitDays": 7,
+ "status": "published",
+ "integrity": "sha256-efe523f748f785ea62042a1e6c25af57dd0ef9fb1462f0a26020899b0f85f5c5"
+}

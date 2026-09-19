@@ -1,0 +1,92 @@
+{
+ "schemaVersion": 3,
+ "version": "2026-09-18.1",
+ "generatedAt": "2026-09-18T20:30:00Z",
+ "asOf": "2026-06-11",
+ "district": "nashik",
+ "crop": "grapes",
+ "market": "nashik-apmc",
+ "benchmark": {
+  "modal": 6452.0,
+  "min": 5722.0,
+  "max": 7401.0,
+  "unit": "quintal"
+ },
+ "trend": [
+  {
+   "date": "2026-06-05",
+   "modal": 6824.0
+  },
+  {
+   "date": "2026-06-06",
+   "modal": 7278.0
+  },
+  {
+   "date": "2026-06-07",
+   "modal": null
+  },
+  {
+   "date": "2026-06-08",
+   "modal": 7610.0
+  },
+  {
+   "date": "2026-06-09",
+   "modal": 7348.0
+  },
+  {
+   "date": "2026-06-10",
+   "modal": 7051.0
+  },
+  {
+   "date": "2026-06-11",
+   "modal": 6452.0
+  }
+ ],
+ "seasonal": {
+  "woyMedian": 6249.99,
+  "woyIQR": [
+   6170.74,
+   6402.62
+  ],
+  "position": "above"
+ },
+ "arrivalsRatio": 1.167,
+ "forecast": null,
+ "raksha": {
+  "layers": {
+   "RK-1": {
+    "bucket": null,
+    "weight": 0,
+    "value": null
+   },
+   "RK-2": {
+    "bucket": null,
+    "weight": 0,
+    "value": null
+   },
+   "RK-3": {
+    "bucket": null,
+    "weight": 0,
+    "value": null
+   },
+   "RK-4": {
+    "bucket": null,
+    "weight": 0,
+    "value": null
+   },
+   "RK-5": {
+    "bucket": null,
+    "weight": 0,
+    "value": null
+   },
+   "RK-6": {
+    "bucket": null,
+    "weight": 0,
+    "value": null
+   }
+  }
+ },
+ "stalenessLimitDays": 7,
+ "status": "insufficient",
+ "integrity": "sha256-2c80a6a82014947b58a3b906791245e22052db15894dd0713540ab1c898f52df"
+}

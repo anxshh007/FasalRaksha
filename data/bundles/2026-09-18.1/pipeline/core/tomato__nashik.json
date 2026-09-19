@@ -1,0 +1,118 @@
+{
+ "schemaVersion": 3,
+ "version": "2026-09-18.1",
+ "generatedAt": "2026-09-18T20:30:00Z",
+ "asOf": "2026-09-18",
+ "district": "nashik",
+ "crop": "tomato",
+ "market": "nashik-apmc",
+ "benchmark": {
+  "modal": 1539.0,
+  "min": 1437.0,
+  "max": 1745.0,
+  "unit": "quintal"
+ },
+ "trend": [
+  {
+   "date": "2026-09-12",
+   "modal": 1299.0
+  },
+  {
+   "date": "2026-09-13",
+   "modal": null
+  },
+  {
+   "date": "2026-09-14",
+   "modal": 1347.0
+  },
+  {
+   "date": "2026-09-15",
+   "modal": 1397.55,
+   "imputed": true
+  },
+  {
+   "date": "2026-09-16",
+   "modal": 1450.0
+  },
+  {
+   "date": "2026-09-17",
+   "modal": 1542.0
+  },
+  {
+   "date": "2026-09-18",
+   "modal": 1539.0
+  }
+ ],
+ "seasonal": {
+  "woyMedian": 1542.24,
+  "woyIQR": [
+   1407.53,
+   1879.53
+  ],
+  "position": "within"
+ },
+ "arrivalsRatio": 0.941,
+ "forecast": {
+  "h7": {
+   "q10": 1279.45,
+   "q50": 1727.52,
+   "q90": 1886.66,
+   "direction": "up",
+   "agreement": 0.5865,
+   "skill": 0.2227,
+   "skillSeasonal": 0.4179,
+   "coverage": 0.7837,
+   "bandKappa": 0.0759,
+   "confidenceMin": 0.1
+  },
+  "h14": {
+   "q10": 1191.64,
+   "q50": 1610.86,
+   "q90": 2061.55,
+   "direction": "flat",
+   "agreement": 0.7852,
+   "skill": 0.2597,
+   "skillSeasonal": 0.4753,
+   "coverage": 0.7895,
+   "bandKappa": 0.0709,
+   "confidenceMin": 0.1
+  }
+ },
+ "raksha": {
+  "layers": {
+   "RK-1": {
+    "bucket": "down",
+    "weight": 0.0575,
+    "value": 0.1141
+   },
+   "RK-2": {
+    "bucket": "flat",
+    "weight": 0.0,
+    "value": -0.0034
+   },
+   "RK-3": {
+    "bucket": "flat",
+    "weight": 0.044,
+    "value": 0.0983
+   },
+   "RK-4": {
+    "bucket": "up",
+    "weight": 0.0062,
+    "value": -1.6427
+   },
+   "RK-5": {
+    "bucket": "flat",
+    "weight": 0.06,
+    "value": -0.0629
+   },
+   "RK-6": {
+    "bucket": "up",
+    "weight": 0.2227,
+    "value": 0.1156
+   }
+  }
+ },
+ "stalenessLimitDays": 7,
+ "status": "published",
+ "integrity": "sha256-f3b7c6c7e7ebd4efdcc1e1a067f6a63454aa4086d61d60bb07bba53ddb6132a6"
+}

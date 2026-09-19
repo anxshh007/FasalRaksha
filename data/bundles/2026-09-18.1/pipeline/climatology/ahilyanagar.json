@@ -1,0 +1,322 @@
+{
+ "schemaVersion": 3,
+ "kind": "climatology",
+ "version": "2026-09-18.1",
+ "generatedAt": "2026-09-18T20:30:00Z",
+ "district": "ahilyanagar",
+ "weeks": [
+  {
+   "week": 1,
+   "rain7Mean": 0.3,
+   "rain7Sd": 1.0,
+   "humidityMean": 34.3
+  },
+  {
+   "week": 2,
+   "rain7Mean": 0.0,
+   "rain7Sd": 1.0,
+   "humidityMean": 35.1
+  },
+  {
+   "week": 3,
+   "rain7Mean": 0.0,
+   "rain7Sd": 1.0,
+   "humidityMean": 35.8
+  },
+  {
+   "week": 4,
+   "rain7Mean": 0.0,
+   "rain7Sd": 1.0,
+   "humidityMean": 36.4
+  },
+  {
+   "week": 5,
+   "rain7Mean": 0.0,
+   "rain7Sd": 1.0,
+   "humidityMean": 36.0
+  },
+  {
+   "week": 6,
+   "rain7Mean": 0.0,
+   "rain7Sd": 1.0,
+   "humidityMean": 35.9
+  },
+  {
+   "week": 7,
+   "rain7Mean": 0.0,
+   "rain7Sd": 1.0,
+   "humidityMean": 35.5
+  },
+  {
+   "week": 8,
+   "rain7Mean": 0.0,
+   "rain7Sd": 1.0,
+   "humidityMean": 36.0
+  },
+  {
+   "week": 9,
+   "rain7Mean": 0.0,
+   "rain7Sd": 1.0,
+   "humidityMean": 36.4
+  },
+  {
+   "week": 10,
+   "rain7Mean": 1.5,
+   "rain7Sd": 3.4,
+   "humidityMean": 38.1
+  },
+  {
+   "week": 11,
+   "rain7Mean": 1.8,
+   "rain7Sd": 2.5,
+   "humidityMean": 37.1
+  },
+  {
+   "week": 12,
+   "rain7Mean": 0.8,
+   "rain7Sd": 1.5,
+   "humidityMean": 37.4
+  },
+  {
+   "week": 13,
+   "rain7Mean": 1.0,
+   "rain7Sd": 1.6,
+   "humidityMean": 38.0
+  },
+  {
+   "week": 14,
+   "rain7Mean": 0.9,
+   "rain7Sd": 1.6,
+   "humidityMean": 38.2
+  },
+  {
+   "week": 15,
+   "rain7Mean": 0.9,
+   "rain7Sd": 1.4,
+   "humidityMean": 37.1
+  },
+  {
+   "week": 16,
+   "rain7Mean": 0.2,
+   "rain7Sd": 1.0,
+   "humidityMean": 38.0
+  },
+  {
+   "week": 17,
+   "rain7Mean": 0.2,
+   "rain7Sd": 1.0,
+   "humidityMean": 37.7
+  },
+  {
+   "week": 18,
+   "rain7Mean": 1.8,
+   "rain7Sd": 3.3,
+   "humidityMean": 42.6
+  },
+  {
+   "week": 19,
+   "rain7Mean": 4.8,
+   "rain7Sd": 7.2,
+   "humidityMean": 42.4
+  },
+  {
+   "week": 20,
+   "rain7Mean": 0.9,
+   "rain7Sd": 1.4,
+   "humidityMean": 43.2
+  },
+  {
+   "week": 21,
+   "rain7Mean": 1.8,
+   "rain7Sd": 3.1,
+   "humidityMean": 41.7
+  },
+  {
+   "week": 22,
+   "rain7Mean": 6.6,
+   "rain7Sd": 7.5,
+   "humidityMean": 53.7
+  },
+  {
+   "week": 23,
+   "rain7Mean": 21.4,
+   "rain7Sd": 16.4,
+   "humidityMean": 68.1
+  },
+  {
+   "week": 24,
+   "rain7Mean": 21.0,
+   "rain7Sd": 23.8,
+   "humidityMean": 67.6
+  },
+  {
+   "week": 25,
+   "rain7Mean": 29.7,
+   "rain7Sd": 23.6,
+   "humidityMean": 70.2
+  },
+  {
+   "week": 26,
+   "rain7Mean": 33.1,
+   "rain7Sd": 19.1,
+   "humidityMean": 69.6
+  },
+  {
+   "week": 27,
+   "rain7Mean": 30.0,
+   "rain7Sd": 23.0,
+   "humidityMean": 76.7
+  },
+  {
+   "week": 28,
+   "rain7Mean": 35.6,
+   "rain7Sd": 28.1,
+   "humidityMean": 76.1
+  },
+  {
+   "week": 29,
+   "rain7Mean": 44.8,
+   "rain7Sd": 32.9,
+   "humidityMean": 78.3
+  },
+  {
+   "week": 30,
+   "rain7Mean": 45.8,
+   "rain7Sd": 29.5,
+   "humidityMean": 78.2
+  },
+  {
+   "week": 31,
+   "rain7Mean": 52.5,
+   "rain7Sd": 36.1,
+   "humidityMean": 74.2
+  },
+  {
+   "week": 32,
+   "rain7Mean": 41.7,
+   "rain7Sd": 33.5,
+   "humidityMean": 75.8
+  },
+  {
+   "week": 33,
+   "rain7Mean": 26.1,
+   "rain7Sd": 15.4,
+   "humidityMean": 76.0
+  },
+  {
+   "week": 34,
+   "rain7Mean": 29.4,
+   "rain7Sd": 17.5,
+   "humidityMean": 74.4
+  },
+  {
+   "week": 35,
+   "rain7Mean": 34.6,
+   "rain7Sd": 20.4,
+   "humidityMean": 72.4
+  },
+  {
+   "week": 36,
+   "rain7Mean": 22.9,
+   "rain7Sd": 14.5,
+   "humidityMean": 64.8
+  },
+  {
+   "week": 37,
+   "rain7Mean": 22.9,
+   "rain7Sd": 17.6,
+   "humidityMean": 65.6
+  },
+  {
+   "week": 38,
+   "rain7Mean": 21.8,
+   "rain7Sd": 21.0,
+   "humidityMean": 64.0
+  },
+  {
+   "week": 39,
+   "rain7Mean": 30.2,
+   "rain7Sd": 25.0,
+   "humidityMean": 60.7
+  },
+  {
+   "week": 40,
+   "rain7Mean": 13.8,
+   "rain7Sd": 15.6,
+   "humidityMean": 46.8
+  },
+  {
+   "week": 41,
+   "rain7Mean": 2.8,
+   "rain7Sd": 4.3,
+   "humidityMean": 45.1
+  },
+  {
+   "week": 42,
+   "rain7Mean": 2.7,
+   "rain7Sd": 3.2,
+   "humidityMean": 46.6
+  },
+  {
+   "week": 43,
+   "rain7Mean": 2.3,
+   "rain7Sd": 1.9,
+   "humidityMean": 46.4
+  },
+  {
+   "week": 44,
+   "rain7Mean": 4.1,
+   "rain7Sd": 4.3,
+   "humidityMean": 43.2
+  },
+  {
+   "week": 45,
+   "rain7Mean": 0.8,
+   "rain7Sd": 2.0,
+   "humidityMean": 38.8
+  },
+  {
+   "week": 46,
+   "rain7Mean": 1.2,
+   "rain7Sd": 1.9,
+   "humidityMean": 38.6
+  },
+  {
+   "week": 47,
+   "rain7Mean": 2.6,
+   "rain7Sd": 2.7,
+   "humidityMean": 39.6
+  },
+  {
+   "week": 48,
+   "rain7Mean": 1.4,
+   "rain7Sd": 2.0,
+   "humidityMean": 38.0
+  },
+  {
+   "week": 49,
+   "rain7Mean": 0.1,
+   "rain7Sd": 1.0,
+   "humidityMean": 35.7
+  },
+  {
+   "week": 50,
+   "rain7Mean": 0.6,
+   "rain7Sd": 1.1,
+   "humidityMean": 36.1
+  },
+  {
+   "week": 51,
+   "rain7Mean": 0.2,
+   "rain7Sd": 1.0,
+   "humidityMean": 38.0
+  },
+  {
+   "week": 52,
+   "rain7Mean": 0.2,
+   "rain7Sd": 1.0,
+   "humidityMean": 37.4
+  }
+ ],
+ "integrity": "sha256-5ff43cb873b5376a971eda8da802398fd95ed453dd4e758558cf2ee0e06389c9"
+}

@@ -34,7 +34,7 @@ export interface Benchmark {
   trend7: TrendPoint[];
   /** Change from the first to the last traded day of the window, when two exist. */
   trendChange: { amount: Money; fraction: number } | null;
-  seasonalPosition: SeasonalPosition;
+  seasonalPosition: SeasonalPosition | null;
   asOf: ISODate;
   ageDays: number;
   /** Past the crop's limit: the figure is shown with its date, and no advice is attached. */
@@ -70,7 +70,7 @@ export function computeBenchmark(bundle: CropBundle, today: ISODate): Benchmark 
     vsMsp: mspFloor === null ? null : compare(bundle.benchmark.modal - mspFloor.price.amount),
     trend7,
     trendChange,
-    seasonalPosition: bundle.seasonal.position,
+    seasonalPosition: bundle.seasonal?.position ?? null,
     asOf: bundle.asOf,
     ageDays: ageDays(bundle.asOf, today),
     adviceSuppressed: isAdviceSuppressed(bundle.asOf, today, bundle.stalenessLimitDays),

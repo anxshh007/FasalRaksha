@@ -1,0 +1,118 @@
+{
+ "schemaVersion": 3,
+ "version": "2026-09-18.1",
+ "generatedAt": "2026-09-18T20:30:00Z",
+ "asOf": "2026-09-18",
+ "district": "pune",
+ "crop": "tomato",
+ "market": "narayangaon",
+ "benchmark": {
+  "modal": 1975.0,
+  "min": 1733.0,
+  "max": 2353.0,
+  "unit": "quintal"
+ },
+ "trend": [
+  {
+   "date": "2026-09-12",
+   "modal": 1746.74,
+   "imputed": true
+  },
+  {
+   "date": "2026-09-13",
+   "modal": null
+  },
+  {
+   "date": "2026-09-14",
+   "modal": 1777.0
+  },
+  {
+   "date": "2026-09-15",
+   "modal": 1701.0
+  },
+  {
+   "date": "2026-09-16",
+   "modal": 2000.0
+  },
+  {
+   "date": "2026-09-17",
+   "modal": 1837.0
+  },
+  {
+   "date": "2026-09-18",
+   "modal": 1975.0
+  }
+ ],
+ "seasonal": {
+  "woyMedian": 1484.12,
+  "woyIQR": [
+   1290.89,
+   1657.88
+  ],
+  "position": "above"
+ },
+ "arrivalsRatio": 0.878,
+ "forecast": {
+  "h7": {
+   "q10": 1469.26,
+   "q50": 1680.95,
+   "q90": 2190.29,
+   "direction": "down",
+   "agreement": 0.5858,
+   "skill": 0.1508,
+   "skillSeasonal": 0.4898,
+   "coverage": 0.8179,
+   "bandKappa": 0.112,
+   "confidenceMin": 0.1
+  },
+  "h14": {
+   "q10": 1289.39,
+   "q50": 1698.47,
+   "q90": 2039.0,
+   "direction": "down",
+   "agreement": 0.505,
+   "skill": 0.0451,
+   "skillSeasonal": 0.5027,
+   "coverage": 0.8417,
+   "bandKappa": 0.0889,
+   "confidenceMin": 0.1
+  }
+ },
+ "raksha": {
+  "layers": {
+   "RK-1": {
+    "bucket": "flat",
+    "weight": 0.0979,
+    "value": 0.059
+   },
+   "RK-2": {
+    "bucket": "flat",
+    "weight": 0.0,
+    "value": 0.0315
+   },
+   "RK-3": {
+    "bucket": "flat",
+    "weight": 0.0478,
+    "value": -0.0197
+   },
+   "RK-4": {
+    "bucket": "up",
+    "weight": 0.0,
+    "value": -1.1733
+   },
+   "RK-5": {
+    "bucket": "down",
+    "weight": 0.0554,
+    "value": 0.6158
+   },
+   "RK-6": {
+    "bucket": "down",
+    "weight": 0.1508,
+    "value": -0.1612
+   }
+  }
+ },
+ "stalenessLimitDays": 7,
+ "status": "published",
+ "integrity": "sha256-da9734dbccf408edba0d88474ed5b6d5b9a98d95ddd76daea253674d9ba3040f"
+}

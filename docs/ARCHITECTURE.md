@@ -112,6 +112,22 @@ worth committing.
 | Logs scrubbed at three points (merge object, serializers, final line) | §8.5; a detector test asserts both "redacts the seeded phone" and "leaves SHA-256 digests alone" (V-2 lesson). |
 | `/api/health` is `no-store` and reports measured DB reachability | V-2 lesson: `navigator.onLine` and cached 200s lie about connectivity. Field mode (P8) will measure. |
 
+### Decisions taken in P6–P7
+
+| Decision | Reason |
+|---|---|
+| Seasonal profiles, arrival norms and weather climatology are built from **earlier years only** | PROMPT §5.2 says leave-current-year-out. In forward-chaining validation that must also leave *later* years out, or a 2025 profile leaks into a 2023 test fold. The first P6 run did exactly this and looked better for it. |
+| Widening, layer weights and the wait threshold are **scored held out** (fold k judged by what folds before k taught) | Otherwise the coverage and wait-precision columns grade their own homework. Calibration-fold coverage is still printed, labelled "≥ nominal by construction". |
+| RK-8: a **tie for first place reads FLAT** | Evidence that splits UP/DOWN contradicts itself; it must never read as a direction. |
+| `bandKappa` **measured** from the spread of a-day price moves | The first derivation (the h14/h7 width ratio) pinned volatile onion at the floor. √(W² + R_a²) is what a band read a days late must cover. |
+| The pipeline confidence is **the device's GR-3 formula in price terms** | confidenceMin is calibrated in Python and applied on the phone; golden vectors hold the two to 1e-9. |
+| Bundle = **Python-sealed core + TypeScript publisher** | The pipeline owns what it measured; MSP, storage and transport come from the constants module and adapters. The publisher verifies every Python seal in TypeScript: parity on every real artefact, not only on vectors. |
+| Served body = **canonical JSON**, ETag = integrity | Disk, database and wire carry the same bytes; revalidation of an unchanged bundle is a bodiless 304. |
+| A **release** switches atomically (`bundle_releases` row written last) | A phone can never mix one night's forecast with another night's climatology. |
+| Bundles parsed by a **dependency-free strict parser in `@fasal/shared`**, not zod | Shared has zero runtime dependencies (ARCH-01), and the API and the device must refuse exactly the same documents. Unknown keys are errors: a new field is a new schema version. |
+| `generatedAt` is the run's **logical time** (02:00 IST after as-of) | Reruns with the same `--as-of` are byte-identical (§14.2); the wall clock would make every run a new hash. |
+| Releases are **committed** under `data/bundles/<version>/` | The app runs, and `pnpm db:start` serves prices, without the Python pipeline installed. |
+
 ## 4 · Environment (measured 2026-09-19)
 
 Windows 11 · Node 24.19 · pnpm 10.34.5 · Python 3.12.6 (`.venv`, pinned `ml/requirements.txt`) ·

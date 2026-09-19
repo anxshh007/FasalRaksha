@@ -91,7 +91,9 @@ export interface CropBundle {
   benchmark: { modal: number; min: number; max: number; unit: 'quintal' };
   msp: { amountPerQuintal: number; season: string } | null;
   trend: TrendPoint[];
-  seasonal: { woyMedian: number; woyIQR: [number, number]; position: SeasonalPosition };
+  /** This week's seasonal norm from earlier years (RK-2), or null when there is no earlier year to
+   *  build it from — a missing season is said, never invented. */
+  seasonal: { woyMedian: number; woyIQR: [number, number]; position: SeasonalPosition } | null;
   arrivalsRatio: number | null;
   forecast: { h7: HorizonForecast | null; h14: HorizonForecast | null } | null;
   raksha: { layers: Record<LayerId, LayerReading> };

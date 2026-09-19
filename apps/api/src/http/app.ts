@@ -21,6 +21,7 @@ import type { Config } from '../config.js';
 import type { Actor, Database } from '../db/actor.js';
 import type { Logger } from '../log/logger.js';
 import { refreshSession, requestOtp, revokeSession, verifyOtp, type AuthDeps, type SessionTokens } from '../modules/auth/service.js';
+import { cropBundle, currentManifest, sharedBundle, type ServedDocument } from '../modules/bundles/store.js';
 import { getMe } from '../modules/me/service.js';
 import { verifyBuyer, verifyFarmer } from '../modules/verify/service.js';
 import type { KeyRing } from '../security/keys.js';
@@ -163,6 +164,29 @@ export function buildApp(deps: AppDependencies) {
     const database = (await databaseReachable(deps.db)) ? 'up' : 'down';
     void reply.header('cache-control', 'no-store');
     return { ok: database === 'up', service: 'fasal-api', version: API_VERSION, database };
+  });
+
+  // ── Bundles (PROMPT §5.8): public market data, identical for every farmer, so no sign-in. The
+  // body is the canonical JSON the integrity was computed over and the ETag is that integrity, so
+  // a phone revalidating an unchanged bundle gets a 304 and spends no bytes.
+  const Slug = z.string().regex(/^[a-z0-9][a-z0-9-]{0,40}$/);
+  const sendDocument = (request: FastifyRequest, reply: FastifyReply, doc: ServedDocument) => {
+    void reply.header('etag', doc.etag).header('cache-control', 'no-cache').header('x-bundle-version', doc.version);
+    const tags = (request.headers['if-none-match'] ?? '').split(',').map((tag) => tag.trim().replace(/^W\//, ''));
+    if (tags.includes(doc.etag) || tags.includes('*')) return reply.status(304).send();
+    return reply.type('application/json; charset=utf-8').send(doc.body);
+  };
+
+  app.get('/api/bundles/manifest', async (request, reply) => sendDocument(request, reply, await currentManifest(requireDb())));
+  app.get('/api/bundles/shared/crops', async (request, reply) => sendDocument(request, reply, await sharedBundle(requireDb(), 'crops')));
+  app.get('/api/bundles/shared/msp', async (request, reply) => sendDocument(request, reply, await sharedBundle(requireDb(), 'msp')));
+  app.get('/api/bundles/shared/climatology/:district', async (request, reply) => {
+    const { district } = z.object({ district: Slug }).parse(request.params);
+    return sendDocument(request, reply, await sharedBundle(requireDb(), `climatology/${district}`));
+  });
+  app.get('/api/bundles/:crop/:district', async (request, reply) => {
+    const { crop, district } = z.object({ crop: Slug, district: Slug }).parse(request.params);
+    return sendDocument(request, reply, await cropBundle(requireDb(), crop, district));
   });
 
   app.post('/api/auth/otp/request', { config: { rateLimit: { max: 5, timeWindow: '10 minutes' } } }, async (request) => {

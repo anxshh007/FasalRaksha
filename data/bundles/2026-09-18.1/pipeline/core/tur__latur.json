@@ -1,0 +1,117 @@
+{
+ "schemaVersion": 3,
+ "version": "2026-09-18.1",
+ "generatedAt": "2026-09-18T20:30:00Z",
+ "asOf": "2026-09-18",
+ "district": "latur",
+ "crop": "tur",
+ "market": "latur-apmc",
+ "benchmark": {
+  "modal": 9646.0,
+  "min": 8533.0,
+  "max": 10935.0,
+  "unit": "quintal"
+ },
+ "trend": [
+  {
+   "date": "2026-09-12",
+   "modal": 9355.0
+  },
+  {
+   "date": "2026-09-13",
+   "modal": null
+  },
+  {
+   "date": "2026-09-14",
+   "modal": 9603.0
+  },
+  {
+   "date": "2026-09-15",
+   "modal": 9875.0
+  },
+  {
+   "date": "2026-09-16",
+   "modal": 9758.0
+  },
+  {
+   "date": "2026-09-17",
+   "modal": 9493.0
+  },
+  {
+   "date": "2026-09-18",
+   "modal": 9646.0
+  }
+ ],
+ "seasonal": {
+  "woyMedian": 10049.02,
+  "woyIQR": [
+   9712.32,
+   10328.83
+  ],
+  "position": "below"
+ },
+ "arrivalsRatio": 0.829,
+ "forecast": {
+  "h7": {
+   "q10": 9240.24,
+   "q50": 9613.23,
+   "q90": 10268.01,
+   "direction": "flat",
+   "agreement": 0.9089,
+   "skill": 0.1279,
+   "skillSeasonal": 0.204,
+   "coverage": 0.8125,
+   "bandKappa": 0.0738,
+   "confidenceMin": 0.1
+  },
+  "h14": {
+   "q10": 9232.16,
+   "q50": 9946.44,
+   "q90": 10629.64,
+   "direction": "up",
+   "agreement": 0.6444,
+   "skill": 0.2459,
+   "skillSeasonal": 0.214,
+   "coverage": 0.8429,
+   "bandKappa": 0.0558,
+   "confidenceMin": 0.1
+  }
+ },
+ "raksha": {
+  "layers": {
+   "RK-1": {
+    "bucket": "down",
+    "weight": 0.0034,
+    "value": 0.0193
+   },
+   "RK-2": {
+    "bucket": "flat",
+    "weight": 0.018,
+    "value": -0.0077
+   },
+   "RK-3": {
+    "bucket": "flat",
+    "weight": 0.0381,
+    "value": -0.0881
+   },
+   "RK-4": {
+    "bucket": "down",
+    "weight": 0.0,
+    "value": -0.3639
+   },
+   "RK-5": {
+    "bucket": "down",
+    "weight": 0.015,
+    "value": 0.6549
+   },
+   "RK-6": {
+    "bucket": "flat",
+    "weight": 0.1279,
+    "value": -0.0034
+   }
+  }
+ },
+ "stalenessLimitDays": 14,
+ "status": "published",
+ "integrity": "sha256-3763abca9bbc41e7cb7927663736dd8d89d019899888523f6658ef1801e467e6"
+}

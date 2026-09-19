@@ -1,0 +1,117 @@
+{
+ "schemaVersion": 3,
+ "version": "2026-09-18.1",
+ "generatedAt": "2026-09-18T20:30:00Z",
+ "asOf": "2026-09-18",
+ "district": "nashik",
+ "crop": "onion",
+ "market": "lasalgaon",
+ "benchmark": {
+  "modal": 3508.0,
+  "min": 3315.0,
+  "max": 3702.0,
+  "unit": "quintal"
+ },
+ "trend": [
+  {
+   "date": "2026-09-12",
+   "modal": 3419.0
+  },
+  {
+   "date": "2026-09-13",
+   "modal": null
+  },
+  {
+   "date": "2026-09-14",
+   "modal": 3608.0
+  },
+  {
+   "date": "2026-09-15",
+   "modal": 3745.0
+  },
+  {
+   "date": "2026-09-16",
+   "modal": 3441.0
+  },
+  {
+   "date": "2026-09-17",
+   "modal": 3215.0
+  },
+  {
+   "date": "2026-09-18",
+   "modal": 3508.0
+  }
+ ],
+ "seasonal": {
+  "woyMedian": 2665.09,
+  "woyIQR": [
+   2400.18,
+   2844.01
+  ],
+  "position": "above"
+ },
+ "arrivalsRatio": 1.029,
+ "forecast": {
+  "h7": {
+   "q10": 2965.63,
+   "q50": 3304.15,
+   "q90": 3940.32,
+   "direction": "flat",
+   "agreement": 0.6105,
+   "skill": 0.2094,
+   "skillSeasonal": 0.4301,
+   "coverage": 0.8017,
+   "bandKappa": 0.0919,
+   "confidenceMin": 0.1
+  },
+  "h14": {
+   "q10": 2705.13,
+   "q50": 3156.14,
+   "q90": 3790.53,
+   "direction": "down",
+   "agreement": 0.5499,
+   "skill": 0.1869,
+   "skillSeasonal": 0.362,
+   "coverage": 0.8014,
+   "bandKappa": 0.0743,
+   "confidenceMin": 0.1
+  }
+ },
+ "raksha": {
+  "layers": {
+   "RK-1": {
+    "bucket": "up",
+    "weight": 0.0257,
+    "value": -0.0565
+   },
+   "RK-2": {
+    "bucket": "down",
+    "weight": 0.0,
+    "value": -0.1341
+   },
+   "RK-3": {
+    "bucket": "up",
+    "weight": 0.0593,
+    "value": 0.3478
+   },
+   "RK-4": {
+    "bucket": "up",
+    "weight": 0.0076,
+    "value": -1.3142
+   },
+   "RK-5": {
+    "bucket": "down",
+    "weight": 0.0409,
+    "value": 0.997
+   },
+   "RK-6": {
+    "bucket": "flat",
+    "weight": 0.2094,
+    "value": -0.0599
+   }
+  }
+ },
+ "stalenessLimitDays": 7,
+ "status": "published",
+ "integrity": "sha256-288f14295f3775a6f47a340ef3ba069acd39a7aabe11e3e34f9e4a59ab1af17c"
+}
