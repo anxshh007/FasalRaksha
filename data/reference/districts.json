@@ -1,0 +1,68 @@
+{
+  "version": "2026-09-19.1",
+  "state": "maharashtra",
+  "note": "The district registry that replaces Phase 1's flat CITIES[] (P1-04). A farmer's district comes from their verified registry record; a district or market named in a message overrides it for that message only. Centroids are the approximate coordinates of each district headquarters town and market coordinates are approximate town centres (OpenStreetMap-level precision) — sufficient for freight estimation at district scale, to be replaced with surveyed APMC coordinates. District names follow the 2023–24 renamings (Chhatrapati Sambhajinagar, Dharashiv, Ahilyanagar); the former names remain synonyms.",
+  "districts": [
+    { "id": "nashik", "names": { "en": "Nashik", "mr": "नाशिक", "hi": "नासिक" }, "synonyms": ["nashik", "nasik", "नाशिक", "नासिक"], "centroid": { "lat": 19.9975, "lon": 73.7898 },
+      "markets": [
+        { "id": "lasalgaon", "names": { "en": "Lasalgaon", "mr": "लासलगाव" }, "synonyms": ["lasalgaon", "lasalgao", "लासलगाव", "लासलगांव"], "location": { "lat": 20.1497, "lon": 74.2330 } },
+        { "id": "pimpalgaon-baswant", "names": { "en": "Pimpalgaon Baswant", "mr": "पिंपळगाव बसवंत" }, "synonyms": ["pimpalgaon", "pimpalgaon baswant", "पिंपळगाव", "पिंपळगाव बसवंत"], "location": { "lat": 20.1667, "lon": 73.9870 } },
+        { "id": "nashik-apmc", "names": { "en": "Nashik", "mr": "नाशिक" }, "synonyms": [], "location": { "lat": 20.0050, "lon": 73.7900 } },
+        { "id": "niphad", "names": { "en": "Niphad", "mr": "निफाड" }, "synonyms": ["niphad", "निफाड"], "location": { "lat": 20.0800, "lon": 74.1100 } },
+        { "id": "manmad", "names": { "en": "Manmad", "mr": "मनमाड" }, "synonyms": ["manmad", "मनमाड"], "location": { "lat": 20.2520, "lon": 74.4390 } },
+        { "id": "yeola", "names": { "en": "Yeola", "mr": "येवला" }, "synonyms": ["yeola", "yevla", "येवला"], "location": { "lat": 20.0420, "lon": 74.4890 } }
+      ] },
+    { "id": "latur", "names": { "en": "Latur", "mr": "लातूर", "hi": "लातूर" }, "synonyms": ["latur", "लातूर", "लातुर"], "centroid": { "lat": 18.4088, "lon": 76.5604 },
+      "markets": [ { "id": "latur-apmc", "names": { "en": "Latur", "mr": "लातूर" }, "synonyms": [], "location": { "lat": 18.4050, "lon": 76.5750 } } ] },
+    { "id": "jalgaon", "names": { "en": "Jalgaon", "mr": "जळगाव", "hi": "जलगांव" }, "synonyms": ["jalgaon", "jalgao", "जळगाव", "जलगांव", "जलगाँव"], "centroid": { "lat": 21.0077, "lon": 75.5626 },
+      "markets": [
+        { "id": "jalgaon-apmc", "names": { "en": "Jalgaon", "mr": "जळगाव" }, "synonyms": [], "location": { "lat": 21.0100, "lon": 75.5600 } },
+        { "id": "raver", "names": { "en": "Raver", "mr": "रावेर" }, "synonyms": ["raver", "रावेर"], "location": { "lat": 21.2430, "lon": 76.0340 } }
+      ] },
+    { "id": "nagpur", "names": { "en": "Nagpur", "mr": "नागपूर", "hi": "नागपुर" }, "synonyms": ["nagpur", "नागपूर", "नागपुर"], "centroid": { "lat": 21.1458, "lon": 79.0882 },
+      "markets": [ { "id": "kalamna", "names": { "en": "Kalamna (Nagpur)", "mr": "कळमना" }, "synonyms": ["kalamna", "कळमना"], "location": { "lat": 21.1800, "lon": 79.1300 } } ] },
+    { "id": "pune", "names": { "en": "Pune", "mr": "पुणे", "hi": "पुणे" }, "synonyms": ["pune", "poona", "पुणे"], "centroid": { "lat": 18.5204, "lon": 73.8567 },
+      "markets": [
+        { "id": "gultekdi", "names": { "en": "Pune (Gultekdi)", "mr": "गुलटेकडी" }, "synonyms": ["gultekdi", "गुलटेकडी"], "location": { "lat": 18.4900, "lon": 73.8660 } },
+        { "id": "manchar", "names": { "en": "Manchar", "mr": "मंचर" }, "synonyms": ["manchar", "मंचर"], "location": { "lat": 19.0040, "lon": 73.9440 } },
+        { "id": "narayangaon", "names": { "en": "Narayangaon", "mr": "नारायणगाव" }, "synonyms": ["narayangaon", "narayangao", "नारायणगाव"], "location": { "lat": 19.1170, "lon": 73.9750 } }
+      ] },
+    { "id": "ahilyanagar", "names": { "en": "Ahilyanagar", "mr": "अहिल्यानगर", "hi": "अहिल्यानगर" }, "synonyms": ["ahilyanagar", "ahmednagar", "ahmadnagar", "अहिल्यानगर", "अहमदनगर"], "centroid": { "lat": 19.0948, "lon": 74.7480 },
+      "markets": [
+        { "id": "ahilyanagar-apmc", "names": { "en": "Ahilyanagar", "mr": "अहिल्यानगर" }, "synonyms": [], "location": { "lat": 19.0900, "lon": 74.7400 } },
+        { "id": "rahuri", "names": { "en": "Rahuri", "mr": "राहुरी" }, "synonyms": ["rahuri", "राहुरी"], "location": { "lat": 19.3910, "lon": 74.6490 } },
+        { "id": "sangamner", "names": { "en": "Sangamner", "mr": "संगमनेर" }, "synonyms": ["sangamner", "संगमनेर"], "location": { "lat": 19.5670, "lon": 74.2110 } }
+      ] },
+    { "id": "solapur", "names": { "en": "Solapur", "mr": "सोलापूर", "hi": "सोलापुर" }, "synonyms": ["solapur", "sholapur", "सोलापूर", "सोलापुर"], "centroid": { "lat": 17.6599, "lon": 75.9064 },
+      "markets": [ { "id": "solapur-apmc", "names": { "en": "Solapur", "mr": "सोलापूर" }, "synonyms": [], "location": { "lat": 17.6700, "lon": 75.9100 } } ] },
+    { "id": "chhatrapati-sambhajinagar", "names": { "en": "Chhatrapati Sambhajinagar", "mr": "छत्रपती संभाजीनगर", "hi": "छत्रपति संभाजीनगर" }, "synonyms": ["sambhajinagar", "chhatrapati sambhajinagar", "aurangabad", "संभाजीनगर", "छत्रपती संभाजीनगर", "औरंगाबाद"], "centroid": { "lat": 19.8762, "lon": 75.3433 }, "markets": [] },
+    { "id": "kolhapur", "names": { "en": "Kolhapur", "mr": "कोल्हापूर", "hi": "कोल्हापुर" }, "synonyms": ["kolhapur", "कोल्हापूर", "कोल्हापुर"], "centroid": { "lat": 16.7050, "lon": 74.2433 }, "markets": [] },
+    { "id": "satara", "names": { "en": "Satara", "mr": "सातारा", "hi": "सातारा" }, "synonyms": ["satara", "सातारा"], "centroid": { "lat": 17.6805, "lon": 74.0183 }, "markets": [] },
+    { "id": "sangli", "names": { "en": "Sangli", "mr": "सांगली", "hi": "सांगली" }, "synonyms": ["sangli", "सांगली"], "centroid": { "lat": 16.8524, "lon": 74.5815 }, "markets": [] },
+    { "id": "amravati", "names": { "en": "Amravati", "mr": "अमरावती", "hi": "अमरावती" }, "synonyms": ["amravati", "amaravati", "अमरावती"], "centroid": { "lat": 20.9374, "lon": 77.7796 }, "markets": [] },
+    { "id": "akola", "names": { "en": "Akola", "mr": "अकोला", "hi": "अकोला" }, "synonyms": ["akola", "अकोला"], "centroid": { "lat": 20.7002, "lon": 77.0082 }, "markets": [] },
+    { "id": "dhule", "names": { "en": "Dhule", "mr": "धुळे", "hi": "धुले" }, "synonyms": ["dhule", "dhulia", "धुळे", "धुले"], "centroid": { "lat": 20.9042, "lon": 74.7749 }, "markets": [] },
+    { "id": "nanded", "names": { "en": "Nanded", "mr": "नांदेड", "hi": "नांदेड़" }, "synonyms": ["nanded", "नांदेड", "नांदेड़"], "centroid": { "lat": 19.1383, "lon": 77.3210 }, "markets": [] },
+    { "id": "beed", "names": { "en": "Beed", "mr": "बीड", "hi": "बीड" }, "synonyms": ["beed", "bid", "बीड"], "centroid": { "lat": 18.9891, "lon": 75.7601 }, "markets": [] },
+    { "id": "dharashiv", "names": { "en": "Dharashiv", "mr": "धाराशिव", "hi": "धाराशिव" }, "synonyms": ["dharashiv", "osmanabad", "धाराशिव", "उस्मानाबाद"], "centroid": { "lat": 18.1860, "lon": 76.0419 }, "markets": [] },
+    { "id": "jalna", "names": { "en": "Jalna", "mr": "जालना", "hi": "जालना" }, "synonyms": ["jalna", "जालना"], "centroid": { "lat": 19.8410, "lon": 75.8864 }, "markets": [] },
+    { "id": "parbhani", "names": { "en": "Parbhani", "mr": "परभणी", "hi": "परभणी" }, "synonyms": ["parbhani", "परभणी"], "centroid": { "lat": 19.2608, "lon": 76.7748 }, "markets": [] },
+    { "id": "hingoli", "names": { "en": "Hingoli", "mr": "हिंगोली", "hi": "हिंगोली" }, "synonyms": ["hingoli", "हिंगोली"], "centroid": { "lat": 19.7173, "lon": 77.1494 }, "markets": [] },
+    { "id": "buldhana", "names": { "en": "Buldhana", "mr": "बुलढाणा", "hi": "बुलढाणा" }, "synonyms": ["buldhana", "buldana", "बुलढाणा", "बुलडाणा"], "centroid": { "lat": 20.5292, "lon": 76.1842 }, "markets": [] },
+    { "id": "washim", "names": { "en": "Washim", "mr": "वाशिम", "hi": "वाशिम" }, "synonyms": ["washim", "वाशिम"], "centroid": { "lat": 20.1110, "lon": 77.1330 }, "markets": [] },
+    { "id": "yavatmal", "names": { "en": "Yavatmal", "mr": "यवतमाळ", "hi": "यवतमाल" }, "synonyms": ["yavatmal", "yeotmal", "यवतमाळ", "यवतमाल"], "centroid": { "lat": 20.3888, "lon": 78.1204 }, "markets": [] },
+    { "id": "wardha", "names": { "en": "Wardha", "mr": "वर्धा", "hi": "वर्धा" }, "synonyms": ["wardha", "वर्धा"], "centroid": { "lat": 20.7453, "lon": 78.6022 }, "markets": [] },
+    { "id": "chandrapur", "names": { "en": "Chandrapur", "mr": "चंद्रपूर", "hi": "चंद्रपुर" }, "synonyms": ["chandrapur", "चंद्रपूर", "चंद्रपुर"], "centroid": { "lat": 19.9615, "lon": 79.2961 }, "markets": [] },
+    { "id": "gadchiroli", "names": { "en": "Gadchiroli", "mr": "गडचिरोली", "hi": "गढ़चिरौली" }, "synonyms": ["gadchiroli", "गडचिरोली"], "centroid": { "lat": 20.1809, "lon": 80.0037 }, "markets": [] },
+    { "id": "gondia", "names": { "en": "Gondia", "mr": "गोंदिया", "hi": "गोंदिया" }, "synonyms": ["gondia", "gondiya", "गोंदिया"], "centroid": { "lat": 21.4624, "lon": 80.1920 }, "markets": [] },
+    { "id": "bhandara", "names": { "en": "Bhandara", "mr": "भंडारा", "hi": "भंडारा" }, "synonyms": ["bhandara", "भंडारा"], "centroid": { "lat": 21.1669, "lon": 79.6508 }, "markets": [] },
+    { "id": "nandurbar", "names": { "en": "Nandurbar", "mr": "नंदुरबार", "hi": "नंदुरबार" }, "synonyms": ["nandurbar", "नंदुरबार"], "centroid": { "lat": 21.3700, "lon": 74.2400 }, "markets": [] },
+    { "id": "thane", "names": { "en": "Thane", "mr": "ठाणे", "hi": "ठाणे" }, "synonyms": ["thane", "ठाणे"], "centroid": { "lat": 19.2183, "lon": 72.9781 }, "markets": [] },
+    { "id": "palghar", "names": { "en": "Palghar", "mr": "पालघर", "hi": "पालघर" }, "synonyms": ["palghar", "पालघर"], "centroid": { "lat": 19.6967, "lon": 72.7699 }, "markets": [] },
+    { "id": "raigad", "names": { "en": "Raigad", "mr": "रायगड", "hi": "रायगढ़" }, "synonyms": ["raigad", "रायगड"], "centroid": { "lat": 18.6414, "lon": 72.8722 }, "markets": [] },
+    { "id": "ratnagiri", "names": { "en": "Ratnagiri", "mr": "रत्नागिरी", "hi": "रत्नागिरी" }, "synonyms": ["ratnagiri", "रत्नागिरी"], "centroid": { "lat": 16.9902, "lon": 73.3120 }, "markets": [] },
+    { "id": "sindhudurg", "names": { "en": "Sindhudurg", "mr": "सिंधुदुर्ग", "hi": "सिंधुदुर्ग" }, "synonyms": ["sindhudurg", "सिंधुदुर्ग"], "centroid": { "lat": 16.1100, "lon": 73.6900 }, "markets": [] },
+    { "id": "mumbai-city", "names": { "en": "Mumbai City", "mr": "मुंबई शहर", "hi": "मुंबई शहर" }, "synonyms": ["mumbai", "bombay", "mumbai city", "मुंबई", "मुंबई शहर"], "centroid": { "lat": 18.9400, "lon": 72.8300 }, "markets": [] },
+    { "id": "mumbai-suburban", "names": { "en": "Mumbai Suburban", "mr": "मुंबई उपनगर", "hi": "मुंबई उपनगर" }, "synonyms": ["mumbai suburban", "मुंबई उपनगर"], "centroid": { "lat": 19.1300, "lon": 72.8700 }, "markets": [] }
+  ]
+}

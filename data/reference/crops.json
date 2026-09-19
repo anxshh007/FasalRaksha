@@ -1,0 +1,244 @@
+{
+  "version": "2026-09-19.1",
+  "note": "The crop dictionary (PROMPT §6.1). Shipped to devices as crops.json inside the data bundle, not compiled into the app, so synonyms can be corrected without an app release. Synonyms are matched after normalisation (NFC, lower-case Latin, nukta and chandrabindu folded, zero-width joiners removed). Devanagari first — it carries both Marathi and Hindi. Crate and bag weights are trade conventions to be confirmed with the team (see unitNotes); a quantity in crates or bags for a crop without a weight is carried as stated and never silently converted.",
+  "crops": [
+    {
+      "id": "onion",
+      "names": { "en": "Onion", "mr": "कांदा", "hi": "प्याज" },
+      "class": "perishable",
+      "stalenessLimitDays": 7,
+      "visionFamily": "tuber_bulb",
+      "moistureRelevant": false,
+      "bagKg": 50,
+      "mspKey": null,
+      "synonyms": ["onion", "onions", "kanda", "kande", "kandha", "kandhe", "pyaz", "pyaaz", "piyaz", "piyaj", "pyaj", "peyaj",
+        "कांदा", "कांदे", "कांद्या", "प्याज", "पियाज", "प्याजा",
+        "পেঁয়াজ", "পিঁয়াজ", "ਪਿਆਜ਼", "ਪਿਆਜ"]
+    },
+    {
+      "id": "tomato",
+      "names": { "en": "Tomato", "mr": "टोमॅटो", "hi": "टमाटर" },
+      "class": "perishable",
+      "stalenessLimitDays": 7,
+      "visionFamily": "solanaceous_fruit",
+      "moistureRelevant": false,
+      "crateKg": 20,
+      "mspKey": null,
+      "synonyms": ["tomato", "tomatoes", "tamatar", "tamater", "tamaatar", "tometo", "tamato",
+        "टोमॅटो", "टोमाटो", "टमाटर", "टमाटा", "टोमॅटोचे",
+        "টমেটো", "ਟਮਾਟਰ"]
+    },
+    {
+      "id": "potato",
+      "names": { "en": "Potato", "mr": "बटाटा", "hi": "आलू" },
+      "class": "perishable",
+      "stalenessLimitDays": 7,
+      "visionFamily": "tuber_bulb",
+      "moistureRelevant": false,
+      "bagKg": 50,
+      "mspKey": null,
+      "synonyms": ["potato", "potatoes", "aloo", "alu", "batata", "batate",
+        "बटाटा", "बटाटे", "बटाट्या", "आलू", "आलु",
+        "আলু", "ਆਲੂ"]
+    },
+    {
+      "id": "soybean",
+      "names": { "en": "Soybean", "mr": "सोयाबीन", "hi": "सोयाबीन" },
+      "class": "grain",
+      "stalenessLimitDays": 14,
+      "visionFamily": "oilseed_lot",
+      "moistureRelevant": true,
+      "bagKg": 50,
+      "mspKey": "soybean-yellow",
+      "synonyms": ["soybean", "soybeans", "soyabean", "soyabeans", "soya", "soyabin", "soybin", "soyabeen",
+        "सोयाबीन", "सोयाबिन", "सोया",
+        "সয়াবিন", "ਸੋਇਆਬੀਨ"]
+    },
+    {
+      "id": "tur",
+      "names": { "en": "Tur (pigeon pea)", "mr": "तूर", "hi": "अरहर" },
+      "class": "grain",
+      "stalenessLimitDays": 14,
+      "visionFamily": "legume_lot",
+      "moistureRelevant": true,
+      "bagKg": 50,
+      "mspKey": "tur",
+      "synonyms": ["tur", "toor", "tuar", "arhar", "pigeon pea", "pigeonpea", "red gram", "tur dal", "toor dal",
+        "तूर", "तुर", "तुरी", "अरहर", "अरहड", "तुअर",
+        "অড়হর", "ਅਰਹਰ"]
+    },
+    {
+      "id": "wheat",
+      "names": { "en": "Wheat", "mr": "गहू", "hi": "गेहूं" },
+      "class": "grain",
+      "stalenessLimitDays": 14,
+      "visionFamily": "grain_lot",
+      "moistureRelevant": true,
+      "bagKg": 50,
+      "mspKey": "wheat",
+      "synonyms": ["wheat", "gehu", "gehun", "gehoon", "gahu", "gahoo", "kanak",
+        "गहू", "गव्हा", "गव्हाचा", "गेहूं", "गेहु",
+        "গম", "ਕਣਕ"]
+    },
+    {
+      "id": "gram",
+      "names": { "en": "Gram (chana)", "mr": "हरभरा", "hi": "चना" },
+      "class": "grain",
+      "stalenessLimitDays": 14,
+      "visionFamily": "legume_lot",
+      "moistureRelevant": true,
+      "bagKg": 50,
+      "mspKey": "gram",
+      "synonyms": ["gram", "chana", "channa", "harbhara", "harbara", "bengal gram",
+        "हरभरा", "हरभरे", "हरबरा", "चना", "चने",
+        "ছোলা", "ਛੋਲੇ"]
+    },
+    {
+      "id": "cotton",
+      "names": { "en": "Cotton", "mr": "कापूस", "hi": "कपास" },
+      "class": "grain",
+      "stalenessLimitDays": 14,
+      "visionFamily": "fibre_lot",
+      "moistureRelevant": true,
+      "mspKey": "cotton-medium",
+      "synonyms": ["cotton", "kapas", "kapus", "kaapus",
+        "कापूस", "कापसा", "कपास",
+        "তুলা", "ਕਪਾਹ", "ਨਰਮਾ"]
+    },
+    {
+      "id": "maize",
+      "names": { "en": "Maize", "mr": "मका", "hi": "मक्का" },
+      "class": "grain",
+      "stalenessLimitDays": 14,
+      "visionFamily": "grain_lot",
+      "moistureRelevant": true,
+      "bagKg": 50,
+      "mspKey": "maize",
+      "synonyms": ["maize", "corn", "makka", "makai", "maka",
+        "मका", "मक्का", "मकई",
+        "ভুট্টা", "ਮੱਕੀ"]
+    },
+    {
+      "id": "jowar",
+      "names": { "en": "Jowar (sorghum)", "mr": "ज्वारी", "hi": "ज्वार" },
+      "class": "grain",
+      "stalenessLimitDays": 14,
+      "visionFamily": "grain_lot",
+      "moistureRelevant": true,
+      "bagKg": 50,
+      "mspKey": "jowar-hybrid",
+      "synonyms": ["jowar", "jwari", "jawar", "juwar", "sorghum",
+        "ज्वारी", "ज्वार",
+        "জোয়ার", "ਜਵਾਰ"]
+    },
+    {
+      "id": "paddy",
+      "names": { "en": "Paddy", "mr": "भात", "hi": "धान" },
+      "class": "grain",
+      "stalenessLimitDays": 14,
+      "visionFamily": "grain_lot",
+      "moistureRelevant": true,
+      "bagKg": 50,
+      "mspKey": "paddy-common",
+      "synonyms": ["paddy", "dhan", "dhaan", "bhat", "bhaat",
+        "भात", "धान",
+        "ধান", "ਝੋਨਾ"]
+    },
+    {
+      "id": "banana",
+      "names": { "en": "Banana", "mr": "केळी", "hi": "केला" },
+      "class": "perishable",
+      "stalenessLimitDays": 7,
+      "visionFamily": "tropical_fruit",
+      "moistureRelevant": false,
+      "mspKey": null,
+      "synonyms": ["banana", "bananas", "keli", "kela", "kele", "keley",
+        "केळी", "केळ", "केळे", "केला", "केले",
+        "কলা", "ਕੇਲਾ"]
+    },
+    {
+      "id": "orange",
+      "names": { "en": "Orange (Nagpur)", "mr": "संत्रा", "hi": "संतरा" },
+      "class": "perishable",
+      "stalenessLimitDays": 7,
+      "visionFamily": null,
+      "moistureRelevant": false,
+      "mspKey": null,
+      "synonyms": ["orange", "oranges", "santra", "santre", "santri", "santara",
+        "संत्रा", "संत्री", "संत्रे", "संतरा", "संतरे",
+        "কমলা", "ਸੰਤਰਾ"]
+    },
+    {
+      "id": "pomegranate",
+      "names": { "en": "Pomegranate", "mr": "डाळिंब", "hi": "अनार" },
+      "class": "perishable",
+      "stalenessLimitDays": 7,
+      "visionFamily": null,
+      "moistureRelevant": false,
+      "mspKey": null,
+      "synonyms": ["pomegranate", "pomegranates", "anar", "anaar", "dalimb", "dalimba", "daalimb",
+        "डाळिंब", "डाळिंबे", "अनार",
+        "ডালিম", "ਅਨਾਰ"]
+    },
+    {
+      "id": "grapes",
+      "names": { "en": "Grapes", "mr": "द्राक्षे", "hi": "अंगूर" },
+      "class": "perishable",
+      "stalenessLimitDays": 7,
+      "visionFamily": null,
+      "moistureRelevant": false,
+      "mspKey": null,
+      "synonyms": ["grapes", "grape", "draksh", "drakshe", "draksha", "angoor", "angur",
+        "द्राक्ष", "द्राक्षे", "अंगूर",
+        "আঙুর", "ਅੰਗੂਰ"]
+    },
+    {
+      "id": "chilli",
+      "names": { "en": "Green chilli", "mr": "मिरची", "hi": "मिर्च" },
+      "class": "perishable",
+      "stalenessLimitDays": 7,
+      "visionFamily": "solanaceous_fruit",
+      "moistureRelevant": false,
+      "mspKey": null,
+      "synonyms": ["chilli", "chillies", "chili", "chilies", "green chilli", "mirchi", "mirchee", "mirch",
+        "मिरची", "मिरच्या", "मिर्च", "मिर्ची",
+        "লঙ্কা", "মরিচ", "ਮਿਰਚ"]
+    },
+    {
+      "id": "mango",
+      "names": { "en": "Mango", "mr": "आंबा", "hi": "आम" },
+      "class": "perishable",
+      "stalenessLimitDays": 7,
+      "visionFamily": "tropical_fruit",
+      "moistureRelevant": false,
+      "mspKey": null,
+      "synonyms": ["mango", "mangoes", "amba", "aamba", "aambe",
+        "आंबा", "आंबे", "आंब्या", "आम",
+        "আম", "ਅੰਬ"]
+    }
+  ],
+  "unitNotes": {
+    "crateKg": "Tomato crates in the Pune/Narayangaon trade are commonly 20 kg. Trade convention, not a statute — confirm with the team before relying on it.",
+    "bagKg": "Onion, potato and grain bags (gonpat / pote / bori) are commonly 50 kg. Trade convention — confirm with the team."
+  },
+  "varietySubstitutions": [
+    {
+      "crop": "onion",
+      "requested": "kharif",
+      "offered": "late-kharif",
+      "note": "Both are short-storage red onion traded together at Lasalgaon; always shown to the farmer as a substitution. Confirm with the trade."
+    },
+    {
+      "crop": "onion",
+      "requested": "late-kharif",
+      "offered": "kharif",
+      "note": "As above, the reverse direction."
+    },
+    {
+      "crop": "tur",
+      "requested": "red",
+      "offered": "white",
+      "note": "Red and white tur are commonly traded interchangeably for dal milling; always shown as a substitution. Confirm with the trade."
+    }
+  ]
+}

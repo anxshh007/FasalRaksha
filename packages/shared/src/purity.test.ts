@@ -16,7 +16,10 @@ const SRC = join(PKG, 'src');
 function sourceFiles(dir: string, out: string[] = []): string[] {
   for (const entry of readdirSync(dir)) {
     const path = join(dir, entry);
-    if (statSync(path).isDirectory()) sourceFiles(path, out);
+    // `testing/` holds test fixtures (excluded from the build); it is not product code.
+    if (statSync(path).isDirectory()) {
+      if (entry !== 'testing') sourceFiles(path, out);
+    }
     else if (/\.ts$/.test(entry) && !/\.test\.ts$/.test(entry)) out.push(path);
   }
   return out;
