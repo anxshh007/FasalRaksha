@@ -16,6 +16,7 @@ farmers* · Government of Maharashtra, Maharashtra State Innovation Society · T
 | [`CUTS.md`](CUTS.md) | Every scope decision and substitution, with its reason |
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | The architecture map, decisions, gaps and phase plan |
 | [`docs/PHASE1-STUDY.md`](docs/PHASE1-STUDY.md) | What carries forward from the Phase-1 build, and what changes |
+| [`docs/DEPLOY.md`](docs/DEPLOY.md) | Running it somewhere other than this laptop: database, API, PWA, and mock to live |
 
 ## Status
 

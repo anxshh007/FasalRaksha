@@ -1,0 +1,1611 @@
+[
+  {
+    "crop": "banana",
+    "district": "jalgaon",
+    "market": "raver",
+    "observations": 1683,
+    "seasons": 6,
+    "horizons": {
+      "h7": {
+        "horizon": 7,
+        "status": "published",
+        "reason": null,
+        "folds": 9,
+        "oof_rows": 1080,
+        "skill_naive": 0.16472889375851751,
+        "skill_seasonal": 0.3005944678057507,
+        "directional_accuracy": 0.6955903271692745,
+        "wait_precision": 0.75,
+        "wait_count": 108,
+        "coverage_raw": 0.6416666666666667,
+        "coverage_conformal": 0.8083333333333333,
+        "coverage_calibration": 0.8041666666666667,
+        "widening": 0.020341295718042676,
+        "layer_skill": {
+          "RK-1": 0.06306238451683654,
+          "RK-2": -0.0050699200573491865,
+          "RK-3": 0.0612069688070469,
+          "RK-4": 0.002013125090634116,
+          "RK-5": 0.06807379305377281,
+          "RK-6": 0.16472889375851751
+        },
+        "confidence_min": 0.1,
+        "epsilon": 0.03365712040993991,
+        "band_width": 0.171486696354072,
+        "band_kappa": 0.08911506041136741,
+        "latest": {
+          "date": "2026-09-18",
+          "p0": 1234.0,
+          "q10": 1190.15,
+          "q50": 1288.6,
+          "q90": 1401.27,
+          "direction": "up",
+          "agreement": 0.653928,
+          "layers": {
+            "RK-1": {
+              "bucket": "flat",
+              "weight": 0.063062,
+              "value": 0.030744
+            },
+            "RK-2": {
+              "bucket": "down",
+              "weight": 0.0,
+              "value": -0.07242
+            },
+            "RK-3": {
+              "bucket": "flat",
+              "weight": 0.061207,
+              "value": 0.063724
+            },
+            "RK-4": {
+              "bucket": "up",
+              "weight": 0.002013,
+              "value": -0.233178
+            },
+            "RK-5": {
+              "bucket": "up",
+              "weight": 0.068074,
+              "value": -0.628562
+            },
+            "RK-6": {
+              "bucket": "up",
+              "weight": 0.164729,
+              "value": 0.043298
+            }
+          }
+        }
+      },
+      "h14": {
+        "horizon": 14,
+        "status": "published",
+        "reason": null,
+        "folds": 9,
+        "oof_rows": 1080,
+        "skill_naive": 0.0936211593051699,
+        "skill_seasonal": 0.2947386955677387,
+        "directional_accuracy": 0.655425219941349,
+        "wait_precision": 0.4375,
+        "wait_count": 16,
+        "coverage_raw": 0.6314814814814815,
+        "coverage_conformal": 0.8047619047619048,
+        "coverage_calibration": 0.8041666666666667,
+        "widening": 0.03383894888406367,
+        "layer_skill": {
+          "RK-1": 0.03265403527858579,
+          "RK-2": -0.007977326032810872,
+          "RK-3": 0.051223372063304295,
+          "RK-4": -3.345424576339795e-05,
+          "RK-5": 0.04499356945488164,
+          "RK-6": 0.0936211593051699
+        },
+        "confidence_min": 1.0,
+        "epsilon": 0.03780021742461711,
+        "band_width": 0.20745975545673748,
+        "band_kappa": 0.06422602941905443,
+        "latest": {
+          "date": "2026-09-18",
+          "p0": 1234.0,
+          "q10": 1171.77,
+          "q50": 1340.84,
+          "q90": 1452.27,
+          "direction": "up",
+          "agreement": 0.62301,
+          "layers": {
+            "RK-1": {
+              "bucket": "flat",
+              "weight": 0.032654,
+              "value": 0.030744
+            },
+            "RK-2": {
+              "bucket": "down",
+              "weight": 0.0,
+              "value": -0.025395
+            },
+            "RK-3": {
+              "bucket": "flat",
+              "weight": 0.051223,
+              "value": 0.063724
+            },
+            "RK-4": {
+              "bucket": "up",
+              "weight": 0.0,
+              "value": -0.233178
+            },
+            "RK-5": {
+              "bucket": "up",
+              "weight": 0.044994,
+              "value": -0.628562
+            },
+            "RK-6": {
+              "bucket": "up",
+              "weight": 0.093621,
+              "value": 0.083035
+            }
+          }
+        }
+      }
+    },
+    "status": "published",
+    "reason": null
+  },
+  {
+    "crop": "gram",
+    "district": "latur",
+    "market": "latur-apmc",
+    "observations": 1699,
+    "seasons": 6,
+    "horizons": {
+      "h7": {
+        "horizon": 7,
+        "status": "published",
+        "reason": null,
+        "folds": 10,
+        "oof_rows": 1138,
+        "skill_naive": 0.17452288912136893,
+        "skill_seasonal": 0.27439645954250025,
+        "directional_accuracy": 0.6914893617021277,
+        "wait_precision": 0.7333333333333333,
+        "wait_count": 165,
+        "coverage_raw": 0.6572934973637962,
+        "coverage_conformal": 0.7706013363028953,
+        "coverage_calibration": 0.8089887640449438,
+        "widening": 0.023919374009818445,
+        "layer_skill": {
+          "RK-1": -0.008264014878769377,
+          "RK-2": 0.048160516177702895,
+          "RK-3": 0.024019876808973106,
+          "RK-4": 0.0010884672940999485,
+          "RK-5": 0.034028551741888124,
+          "RK-6": 0.17452288912136893
+        },
+        "confidence_min": 0.1,
+        "epsilon": 0.016359948113637536,
+        "band_width": 0.11100752787330531,
+        "band_kappa": 0.0503153980102312,
+        "latest": {
+          "date": "2026-09-18",
+          "p0": 7784.0,
+          "q10": 7083.64,
+          "q50": 7643.37,
+          "q90": 8150.33,
+          "direction": "down",
+          "agreement": 0.740016,
+          "layers": {
+            "RK-1": {
+              "bucket": "up",
+              "weight": 0.0,
+              "value": -0.031882
+            },
+            "RK-2": {
+              "bucket": "flat",
+              "weight": 0.048161,
+              "value": 0.000867
+            },
+            "RK-3": {
+              "bucket": "flat",
+              "weight": 0.02402,
+              "value": -0.096085
+            },
+            "RK-4": {
+              "bucket": "up",
+              "weight": 0.001088,
+              "value": -0.363921
+            },
+            "RK-5": {
+              "bucket": "down",
+              "weight": 0.034029,
+              "value": 0.633137
+            },
+            "RK-6": {
+              "bucket": "down",
+              "weight": 0.174523,
+              "value": -0.018232
+            }
+          }
+        }
+      },
+      "h14": {
+        "horizon": 14,
+        "status": "published",
+        "reason": null,
+        "folds": 10,
+        "oof_rows": 1130,
+        "skill_naive": 0.35614727895495835,
+        "skill_seasonal": 0.33945328485927884,
+        "directional_accuracy": 0.7681940700808625,
+        "wait_precision": 0.7276119402985075,
+        "wait_count": 268,
+        "coverage_raw": 0.595575221238938,
+        "coverage_conformal": 0.7943820224719101,
+        "coverage_calibration": 0.8058823529411765,
+        "widening": 0.03075402521091252,
+        "layer_skill": {
+          "RK-1": -0.011587779834453249,
+          "RK-2": 0.14554905370501536,
+          "RK-3": 0.02431300037486661,
+          "RK-4": -1.2031503628939788e-06,
+          "RK-5": 0.016858920290586332,
+          "RK-6": 0.35614727895495835
+        },
+        "confidence_min": 0.1,
+        "epsilon": 0.021725673471514995,
+        "band_width": 0.13055931031834941,
+        "band_kappa": 0.037489622994452174,
+        "latest": {
+          "date": "2026-09-18",
+          "p0": 7784.0,
+          "q10": 7176.15,
+          "q50": 7765.63,
+          "q90": 8271.67,
+          "direction": "flat",
+          "agreement": 0.700834,
+          "layers": {
+            "RK-1": {
+              "bucket": "up",
+              "weight": 0.0,
+              "value": -0.031882
+            },
+            "RK-2": {
+              "bucket": "down",
+              "weight": 0.145549,
+              "value": -0.019276
+            },
+            "RK-3": {
+              "bucket": "flat",
+              "weight": 0.024313,
+              "value": -0.096085
+            },
+            "RK-4": {
+              "bucket": "up",
+              "weight": 0.0,
+              "value": -0.363921
+            },
+            "RK-5": {
+              "bucket": "down",
+              "weight": 0.016859,
+              "value": 0.633137
+            },
+            "RK-6": {
+              "bucket": "flat",
+              "weight": 0.356147,
+              "value": -0.002363
+            }
+          }
+        }
+      }
+    },
+    "status": "published",
+    "reason": null
+  },
+  {
+    "crop": "grapes",
+    "district": "nashik",
+    "market": "nashik-apmc",
+    "observations": 297,
+    "seasons": 2,
+    "horizons": {},
+    "status": "insufficient",
+    "reason": "thin series: 297 observations over 2 seasons (needs 400 and 2)"
+  },
+  {
+    "crop": "onion",
+    "district": "ahilyanagar",
+    "market": "rahuri",
+    "observations": 1682,
+    "seasons": 6,
+    "horizons": {
+      "h7": {
+        "horizon": 7,
+        "status": "published",
+        "reason": null,
+        "folds": 9,
+        "oof_rows": 1080,
+        "skill_naive": 0.12287915326173626,
+        "skill_seasonal": 0.2869182936406649,
+        "directional_accuracy": 0.6551724137931034,
+        "wait_precision": 0.6813186813186813,
+        "wait_count": 91,
+        "coverage_raw": 0.6092592592592593,
+        "coverage_conformal": 0.7916666666666666,
+        "coverage_calibration": 0.8041666666666667,
+        "widening": 0.07531284697527149,
+        "layer_skill": {
+          "RK-1": 0.0351082482456907,
+          "RK-2": 0.0012565961326477249,
+          "RK-3": 0.05635657352926049,
+          "RK-4": -0.00041109569177510963,
+          "RK-5": 0.029153889999630644,
+          "RK-6": 0.12287915326173626
+        },
+        "confidence_min": 0.1,
+        "epsilon": 0.0622584332343523,
+        "band_width": 0.38505995949527383,
+        "band_kappa": 0.06431490637334397,
+        "latest": {
+          "date": "2026-09-18",
+          "p0": 2843.0,
+          "q10": 2168.43,
+          "q50": 2570.63,
+          "q90": 3178.58,
+          "direction": "down",
+          "agreement": 0.737442,
+          "layers": {
+            "RK-1": {
+              "bucket": "flat",
+              "weight": 0.035108,
+              "value": 0.016971
+            },
+            "RK-2": {
+              "bucket": "down",
+              "weight": 0.001257,
+              "value": -0.065917
+            },
+            "RK-3": {
+              "bucket": "down",
+              "weight": 0.056357,
+              "value": -0.239079
+            },
+            "RK-4": {
+              "bucket": "up",
+              "weight": 0.0,
+              "value": -0.888543
+            },
+            "RK-5": {
+              "bucket": "flat",
+              "weight": 0.029154,
+              "value": 0.431872
+            },
+            "RK-6": {
+              "bucket": "down",
+              "weight": 0.122879,
+              "value": -0.10071
+            }
+          }
+        }
+      },
+      "h14": {
+        "horizon": 14,
+        "status": "published",
+        "reason": null,
+        "folds": 9,
+        "oof_rows": 1080,
+        "skill_naive": 0.20533992264092293,
+        "skill_seasonal": 0.31392550516316486,
+        "directional_accuracy": 0.7257383966244726,
+        "wait_precision": 0.6513761467889908,
+        "wait_count": 109,
+        "coverage_raw": 0.6064814814814815,
+        "coverage_conformal": 0.8011904761904762,
+        "coverage_calibration": 0.8041666666666667,
+        "widening": 0.062356890077486765,
+        "layer_skill": {
+          "RK-1": 0.009263418894369324,
+          "RK-2": 0.006253072032309515,
+          "RK-3": 0.037334292145941306,
+          "RK-4": -0.0013030105599334263,
+          "RK-5": 0.012779439090336076,
+          "RK-6": 0.20533992264092293
+        },
+        "confidence_min": 0.1,
+        "epsilon": 0.0770228264060207,
+        "band_width": 0.3955039891896292,
+        "band_kappa": 0.06136834226619063,
+        "latest": {
+          "date": "2026-09-18",
+          "p0": 2843.0,
+          "q10": 1974.26,
+          "q50": 2580.68,
+          "q90": 3070.11,
+          "direction": "down",
+          "agreement": 0.895575,
+          "layers": {
+            "RK-1": {
+              "bucket": "flat",
+              "weight": 0.009263,
+              "value": 0.016971
+            },
+            "RK-2": {
+              "bucket": "flat",
+              "weight": 0.006253,
+              "value": -0.037239
+            },
+            "RK-3": {
+              "bucket": "down",
+              "weight": 0.037334,
+              "value": -0.239079
+            },
+            "RK-4": {
+              "bucket": "down",
+              "weight": 0.0,
+              "value": -0.888543
+            },
+            "RK-5": {
+              "bucket": "flat",
+              "weight": 0.012779,
+              "value": 0.431872
+            },
+            "RK-6": {
+              "bucket": "down",
+              "weight": 0.20534,
+              "value": -0.096807
+            }
+          }
+        }
+      }
+    },
+    "status": "published",
+    "reason": null
+  },
+  {
+    "crop": "onion",
+    "district": "nashik",
+    "market": "lasalgaon",
+    "observations": 1679,
+    "seasons": 6,
+    "horizons": {
+      "h7": {
+        "horizon": 7,
+        "status": "published",
+        "reason": null,
+        "folds": 9,
+        "oof_rows": 1077,
+        "skill_naive": 0.2094222965224397,
+        "skill_seasonal": 0.4300878513318457,
+        "directional_accuracy": 0.7033898305084746,
+        "wait_precision": 0.7264150943396226,
+        "wait_count": 106,
+        "coverage_raw": 0.6620241411327762,
+        "coverage_conformal": 0.8016726403823178,
+        "coverage_calibration": 0.8059071729957806,
+        "widening": 0.03328895680879149,
+        "layer_skill": {
+          "RK-1": 0.02574728807551252,
+          "RK-2": -0.00035437140223404384,
+          "RK-3": 0.05934660848920492,
+          "RK-4": 0.0076281481471617285,
+          "RK-5": 0.04091461003888863,
+          "RK-6": 0.2094222965224397
+        },
+        "confidence_min": 0.1,
+        "epsilon": 0.06192355464419592,
+        "band_width": 0.31640570273778257,
+        "band_kappa": 0.09189322347851629,
+        "latest": {
+          "date": "2026-09-18",
+          "p0": 3508.0,
+          "q10": 2965.63,
+          "q50": 3304.15,
+          "q90": 3940.32,
+          "direction": "flat",
+          "agreement": 0.610456,
+          "layers": {
+            "RK-1": {
+              "bucket": "up",
+              "weight": 0.025747,
+              "value": -0.056527
+            },
+            "RK-2": {
+              "bucket": "down",
+              "weight": 0.0,
+              "value": -0.134061
+            },
+            "RK-3": {
+              "bucket": "up",
+              "weight": 0.059347,
+              "value": 0.347833
+            },
+            "RK-4": {
+              "bucket": "up",
+              "weight": 0.007628,
+              "value": -1.31417
+            },
+            "RK-5": {
+              "bucket": "down",
+              "weight": 0.040915,
+              "value": 0.997006
+            },
+            "RK-6": {
+              "bucket": "flat",
+              "weight": 0.209422,
+              "value": -0.059868
+            }
+          }
+        }
+      },
+      "h14": {
+        "horizon": 14,
+        "status": "published",
+        "reason": null,
+        "folds": 9,
+        "oof_rows": 1071,
+        "skill_naive": 0.18688475409533156,
+        "skill_seasonal": 0.36199647440802607,
+        "directional_accuracy": 0.7238493723849372,
+        "wait_precision": 0.8369565217391305,
+        "wait_count": 92,
+        "coverage_raw": 0.5910364145658263,
+        "coverage_conformal": 0.8014440433212996,
+        "coverage_calibration": 0.8051948051948052,
+        "widening": 0.04462919599862408,
+        "layer_skill": {
+          "RK-1": 0.025520785149989234,
+          "RK-2": 0.03526526810043562,
+          "RK-3": 0.08265081441559352,
+          "RK-4": 0.024066129606748365,
+          "RK-5": 0.017746465719212123,
+          "RK-6": 0.18688475409533156
+        },
+        "confidence_min": 0.1,
+        "epsilon": 0.0732883576034832,
+        "band_width": 0.35854224515636496,
+        "band_kappa": 0.0742922510937715,
+        "latest": {
+          "date": "2026-09-18",
+          "p0": 3508.0,
+          "q10": 2705.13,
+          "q50": 3156.14,
+          "q90": 3790.53,
+          "direction": "down",
+          "agreement": 0.549886,
+          "layers": {
+            "RK-1": {
+              "bucket": "up",
+              "weight": 0.025521,
+              "value": -0.056527
+            },
+            "RK-2": {
+              "bucket": "flat",
+              "weight": 0.035265,
+              "value": -0.055855
+            },
+            "RK-3": {
+              "bucket": "up",
+              "weight": 0.082651,
+              "value": 0.347833
+            },
+            "RK-4": {
+              "bucket": "up",
+              "weight": 0.024066,
+              "value": -1.31417
+            },
+            "RK-5": {
+              "bucket": "down",
+              "weight": 0.017746,
+              "value": 0.997006
+            },
+            "RK-6": {
+              "bucket": "down",
+              "weight": 0.186885,
+              "value": -0.105697
+            }
+          }
+        }
+      }
+    },
+    "status": "published",
+    "reason": null
+  },
+  {
+    "crop": "orange",
+    "district": "nagpur",
+    "market": "kalamna",
+    "observations": 1688,
+    "seasons": 6,
+    "horizons": {
+      "h7": {
+        "horizon": 7,
+        "status": "published",
+        "reason": null,
+        "folds": 9,
+        "oof_rows": 1080,
+        "skill_naive": 0.22540212504474744,
+        "skill_seasonal": 0.34994653740774484,
+        "directional_accuracy": 0.7311385459533608,
+        "wait_precision": 0.7105263157894737,
+        "wait_count": 114,
+        "coverage_raw": 0.6259259259259259,
+        "coverage_conformal": 0.8083333333333333,
+        "coverage_calibration": 0.8041666666666667,
+        "widening": 0.024056210190908846,
+        "layer_skill": {
+          "RK-1": 0.036903491978550806,
+          "RK-2": 0.016863422972159703,
+          "RK-3": 0.054482761020994586,
+          "RK-4": -0.0028374157903199304,
+          "RK-5": 0.03238241324711244,
+          "RK-6": 0.22540212504474744
+        },
+        "confidence_min": 0.1,
+        "epsilon": 0.037295037639007766,
+        "band_width": 0.1806572178014317,
+        "band_kappa": 0.09594453891342976,
+        "latest": {
+          "date": "2026-09-18",
+          "p0": 4540.0,
+          "q10": 4024.73,
+          "q50": 4302.09,
+          "q90": 4848.42,
+          "direction": "down",
+          "agreement": 0.764641,
+          "layers": {
+            "RK-1": {
+              "bucket": "up",
+              "weight": 0.036903,
+              "value": -0.104921
+            },
+            "RK-2": {
+              "bucket": "flat",
+              "weight": 0.016863,
+              "value": -0.005768
+            },
+            "RK-3": {
+              "bucket": "down",
+              "weight": 0.054483,
+              "value": -0.131394
+            },
+            "RK-4": {
+              "bucket": "flat",
+              "weight": 0.0,
+              "value": -0.027831
+            },
+            "RK-5": {
+              "bucket": "up",
+              "weight": 0.032382,
+              "value": -0.828223
+            },
+            "RK-6": {
+              "bucket": "down",
+              "weight": 0.225402,
+              "value": -0.053825
+            }
+          }
+        }
+      },
+      "h14": {
+        "horizon": 14,
+        "status": "published",
+        "reason": null,
+        "folds": 9,
+        "oof_rows": 1080,
+        "skill_naive": 0.38925528953816213,
+        "skill_seasonal": 0.4004182341035144,
+        "directional_accuracy": 0.8017751479289941,
+        "wait_precision": 0.6866359447004609,
+        "wait_count": 217,
+        "coverage_raw": 0.6166666666666667,
+        "coverage_conformal": 0.8333333333333334,
+        "coverage_calibration": 0.8041666666666667,
+        "widening": 0.023672134702969867,
+        "layer_skill": {
+          "RK-1": 0.016930334833374694,
+          "RK-2": 0.12463397908944995,
+          "RK-3": 0.030270639132056187,
+          "RK-4": -0.0170821549907767,
+          "RK-5": 0.01760314291690035,
+          "RK-6": 0.38925528953816213
+        },
+        "confidence_min": 0.1,
+        "epsilon": 0.0491002067279093,
+        "band_width": 0.193570243774619,
+        "band_kappa": 0.08543841647922396,
+        "latest": {
+          "date": "2026-09-18",
+          "p0": 4540.0,
+          "q10": 3828.05,
+          "q50": 4174.45,
+          "q90": 4729.22,
+          "direction": "down",
+          "agreement": 0.940325,
+          "layers": {
+            "RK-1": {
+              "bucket": "up",
+              "weight": 0.01693,
+              "value": -0.104921
+            },
+            "RK-2": {
+              "bucket": "down",
+              "weight": 0.124634,
+              "value": -0.062371
+            },
+            "RK-3": {
+              "bucket": "down",
+              "weight": 0.030271,
+              "value": -0.131394
+            },
+            "RK-4": {
+              "bucket": "flat",
+              "weight": 0.0,
+              "value": -0.027831
+            },
+            "RK-5": {
+              "bucket": "up",
+              "weight": 0.017603,
+              "value": -0.828223
+            },
+            "RK-6": {
+              "bucket": "down",
+              "weight": 0.389255,
+              "value": -0.083945
+            }
+          }
+        }
+      }
+    },
+    "status": "published",
+    "reason": null
+  },
+  {
+    "crop": "pomegranate",
+    "district": "ahilyanagar",
+    "market": "rahuri",
+    "observations": 1687,
+    "seasons": 6,
+    "horizons": {
+      "h7": {
+        "horizon": 7,
+        "status": "published",
+        "reason": null,
+        "folds": 9,
+        "oof_rows": 1080,
+        "skill_naive": 0.0874379256512905,
+        "skill_seasonal": 0.27464504068977613,
+        "directional_accuracy": 0.6594301221166893,
+        "wait_precision": 0.7878787878787878,
+        "wait_count": 33,
+        "coverage_raw": 0.6472222222222223,
+        "coverage_conformal": 0.8119047619047619,
+        "coverage_calibration": 0.8041666666666667,
+        "widening": 0.017841242830030125,
+        "layer_skill": {
+          "RK-1": 0.01632471592373619,
+          "RK-2": -0.007353607673362905,
+          "RK-3": 0.07644303936970176,
+          "RK-4": 0.0031756370408863033,
+          "RK-5": 0.02307560675828524,
+          "RK-6": 0.0874379256512905
+        },
+        "confidence_min": 0.1,
+        "epsilon": 0.02864829045101539,
+        "band_width": 0.15888792876880503,
+        "band_kappa": 0.08249117060971303,
+        "latest": {
+          "date": "2026-09-18",
+          "p0": 7010.0,
+          "q10": 6348.67,
+          "q50": 6981.39,
+          "q90": 7515.9,
+          "direction": "down",
+          "agreement": 0.561102,
+          "layers": {
+            "RK-1": {
+              "bucket": "down",
+              "weight": 0.016325,
+              "value": 0.03489
+            },
+            "RK-2": {
+              "bucket": "down",
+              "weight": 0.0,
+              "value": 0.062037
+            },
+            "RK-3": {
+              "bucket": "down",
+              "weight": 0.076443,
+              "value": -0.148818
+            },
+            "RK-4": {
+              "bucket": "up",
+              "weight": 0.003176,
+              "value": -0.555339
+            },
+            "RK-5": {
+              "bucket": "down",
+              "weight": 0.023076,
+              "value": 1.436002
+            },
+            "RK-6": {
+              "bucket": "flat",
+              "weight": 0.087438,
+              "value": -0.004089
+            }
+          }
+        }
+      },
+      "h14": {
+        "horizon": 14,
+        "status": "insufficient",
+        "reason": "the model does not beat the naive (no-change) baseline",
+        "folds": 9,
+        "oof_rows": 1080,
+        "skill_naive": -0.021904250064886277,
+        "skill_seasonal": 0.17558274900908744,
+        "directional_accuracy": 0.5972222222222222,
+        "wait_precision": 0.75,
+        "wait_count": 32,
+        "coverage_raw": 0.5703703703703704,
+        "coverage_conformal": 0.8345238095238096,
+        "coverage_calibration": 0.8041666666666667,
+        "widening": 0.00722987211079381,
+        "layer_skill": {
+          "RK-1": 0.0019181936567492786,
+          "RK-2": -0.0022165020293025695,
+          "RK-3": 0.04661592444519724,
+          "RK-4": 0.002687032413539625,
+          "RK-5": 0.015938131815312673,
+          "RK-6": -0.021904250064886277
+        },
+        "confidence_min": 0.3,
+        "epsilon": 0.037128601727944854,
+        "band_width": 0.15553768623127484,
+        "band_kappa": 0.08552956742754446,
+        "latest": {}
+      }
+    },
+    "status": "published",
+    "reason": null
+  },
+  {
+    "crop": "potato",
+    "district": "pune",
+    "market": "manchar",
+    "observations": 1676,
+    "seasons": 6,
+    "horizons": {
+      "h7": {
+        "horizon": 7,
+        "status": "published",
+        "reason": null,
+        "folds": 9,
+        "oof_rows": 1080,
+        "skill_naive": 0.1469919727097424,
+        "skill_seasonal": 0.30889526091549047,
+        "directional_accuracy": 0.6923076923076923,
+        "wait_precision": 0.664,
+        "wait_count": 125,
+        "coverage_raw": 0.6398148148148148,
+        "coverage_conformal": 0.7678571428571429,
+        "coverage_calibration": 0.8041666666666667,
+        "widening": 0.01906556148029223,
+        "layer_skill": {
+          "RK-1": 0.047248814778859116,
+          "RK-2": -0.00043547720670766843,
+          "RK-3": 0.040181202820606776,
+          "RK-4": -0.005479906041856664,
+          "RK-5": 0.02784480474040607,
+          "RK-6": 0.1469919727097424
+        },
+        "confidence_min": 0.1,
+        "epsilon": 0.04162226680286422,
+        "band_width": 0.2034990209412699,
+        "band_kappa": 0.1044589237650032,
+        "latest": {
+          "date": "2026-09-18",
+          "p0": 1661.0,
+          "q10": 1458.52,
+          "q50": 1645.9,
+          "q90": 1792.05,
+          "direction": "flat",
+          "agreement": 0.78725,
+          "layers": {
+            "RK-1": {
+              "bucket": "down",
+              "weight": 0.047249,
+              "value": 0.101891
+            },
+            "RK-2": {
+              "bucket": "down",
+              "weight": 0.0,
+              "value": -0.03633
+            },
+            "RK-3": {
+              "bucket": null,
+              "weight": 0.040181,
+              "value": null
+            },
+            "RK-4": {
+              "bucket": "down",
+              "weight": 0.0,
+              "value": -0.703969
+            },
+            "RK-5": {
+              "bucket": "flat",
+              "weight": 0.027845,
+              "value": 0.42279
+            },
+            "RK-6": {
+              "bucket": "flat",
+              "weight": 0.146992,
+              "value": -0.009135
+            }
+          }
+        }
+      },
+      "h14": {
+        "horizon": 14,
+        "status": "published",
+        "reason": null,
+        "folds": 9,
+        "oof_rows": 1080,
+        "skill_naive": 0.1787558041474686,
+        "skill_seasonal": 0.32341729606774017,
+        "directional_accuracy": 0.6805929919137467,
+        "wait_precision": 0.60431654676259,
+        "wait_count": 139,
+        "coverage_raw": 0.5703703703703704,
+        "coverage_conformal": 0.7869047619047619,
+        "coverage_calibration": 0.8041666666666667,
+        "widening": 0.024402529439659617,
+        "layer_skill": {
+          "RK-1": 0.06635648478687195,
+          "RK-2": 0.009403319636032359,
+          "RK-3": 0.038124202941443475,
+          "RK-4": -0.005290442475651025,
+          "RK-5": 0.03678948621466782,
+          "RK-6": 0.1787558041474686
+        },
+        "confidence_min": 0.1,
+        "epsilon": 0.05293851183626508,
+        "band_width": 0.2222920672733221,
+        "band_kappa": 0.09015752035885574,
+        "latest": {
+          "date": "2026-09-18",
+          "p0": 1661.0,
+          "q10": 1418.09,
+          "q50": 1587.44,
+          "q90": 1815.74,
+          "direction": "flat",
+          "agreement": 0.73993,
+          "layers": {
+            "RK-1": {
+              "bucket": "down",
+              "weight": 0.066356,
+              "value": 0.101891
+            },
+            "RK-2": {
+              "bucket": "down",
+              "weight": 0.009403,
+              "value": -0.066465
+            },
+            "RK-3": {
+              "bucket": null,
+              "weight": 0.038124,
+              "value": null
+            },
+            "RK-4": {
+              "bucket": "up",
+              "weight": 0.0,
+              "value": -0.703969
+            },
+            "RK-5": {
+              "bucket": "flat",
+              "weight": 0.036789,
+              "value": 0.42279
+            },
+            "RK-6": {
+              "bucket": "flat",
+              "weight": 0.178756,
+              "value": -0.045294
+            }
+          }
+        }
+      }
+    },
+    "status": "published",
+    "reason": null
+  },
+  {
+    "crop": "soybean",
+    "district": "latur",
+    "market": "latur-apmc",
+    "observations": 1682,
+    "seasons": 6,
+    "horizons": {
+      "h7": {
+        "horizon": 7,
+        "status": "published",
+        "reason": null,
+        "folds": 9,
+        "oof_rows": 1080,
+        "skill_naive": 0.23013459032155859,
+        "skill_seasonal": 0.23914873173171802,
+        "directional_accuracy": 0.747887323943662,
+        "wait_precision": 0.7297297297297297,
+        "wait_count": 111,
+        "coverage_raw": 0.6259259259259259,
+        "coverage_conformal": 0.8,
+        "coverage_calibration": 0.8041666666666667,
+        "widening": 0.014603126938543529,
+        "layer_skill": {
+          "RK-1": 0.0037903705854984704,
+          "RK-2": 0.03591917125819599,
+          "RK-3": 0.05386566541343363,
+          "RK-4": -0.00010891907365495612,
+          "RK-5": 0.014871365857758834,
+          "RK-6": 0.23013459032155859
+        },
+        "confidence_min": 0.1,
+        "epsilon": 0.016356094785138588,
+        "band_width": 0.08841634220592295,
+        "band_kappa": 0.08439259480238344,
+        "latest": {
+          "date": "2026-09-18",
+          "p0": 5837.0,
+          "q10": 5352.64,
+          "q50": 5661.96,
+          "q90": 6095.88,
+          "direction": "down",
+          "agreement": 0.796985,
+          "layers": {
+            "RK-1": {
+              "bucket": "down",
+              "weight": 0.00379,
+              "value": 0.091612
+            },
+            "RK-2": {
+              "bucket": "down",
+              "weight": 0.035919,
+              "value": -0.047613
+            },
+            "RK-3": {
+              "bucket": "flat",
+              "weight": 0.053866,
+              "value": -0.039658
+            },
+            "RK-4": {
+              "bucket": "up",
+              "weight": 0.0,
+              "value": -0.363921
+            },
+            "RK-5": {
+              "bucket": "up",
+              "weight": 0.014871,
+              "value": -1.882603
+            },
+            "RK-6": {
+              "bucket": "down",
+              "weight": 0.230135,
+              "value": -0.030447
+            }
+          }
+        }
+      },
+      "h14": {
+        "horizon": 14,
+        "status": "published",
+        "reason": null,
+        "folds": 9,
+        "oof_rows": 1080,
+        "skill_naive": 0.3241576754089892,
+        "skill_seasonal": 0.11253624089015135,
+        "directional_accuracy": 0.7669491525423728,
+        "wait_precision": 0.7417840375586855,
+        "wait_count": 213,
+        "coverage_raw": 0.5601851851851852,
+        "coverage_conformal": 0.7952380952380952,
+        "coverage_calibration": 0.8041666666666667,
+        "widening": 0.02171737768667678,
+        "layer_skill": {
+          "RK-1": -0.019433981583171445,
+          "RK-2": 0.1594716368115886,
+          "RK-3": 0.020381441866269223,
+          "RK-4": -0.0010752694252500472,
+          "RK-5": 0.0045460183866610215,
+          "RK-6": 0.3241576754089892
+        },
+        "confidence_min": 0.1,
+        "epsilon": 0.023129950085024234,
+        "band_width": 0.11593282252701932,
+        "band_kappa": 0.05269750353424665,
+        "latest": {
+          "date": "2026-09-18",
+          "p0": 5837.0,
+          "q10": 5083.42,
+          "q50": 5327.63,
+          "q90": 5884.9,
+          "direction": "down",
+          "agreement": 0.950984,
+          "layers": {
+            "RK-1": {
+              "bucket": "down",
+              "weight": 0.0,
+              "value": 0.091612
+            },
+            "RK-2": {
+              "bucket": "down",
+              "weight": 0.159472,
+              "value": -0.105527
+            },
+            "RK-3": {
+              "bucket": "flat",
+              "weight": 0.020381,
+              "value": -0.039658
+            },
+            "RK-4": {
+              "bucket": "up",
+              "weight": 0.0,
+              "value": -0.363921
+            },
+            "RK-5": {
+              "bucket": "up",
+              "weight": 0.004546,
+              "value": -1.882603
+            },
+            "RK-6": {
+              "bucket": "down",
+              "weight": 0.324158,
+              "value": -0.091311
+            }
+          }
+        }
+      }
+    },
+    "status": "published",
+    "reason": null
+  },
+  {
+    "crop": "tomato",
+    "district": "nashik",
+    "market": "nashik-apmc",
+    "observations": 1683,
+    "seasons": 6,
+    "horizons": {
+      "h7": {
+        "horizon": 7,
+        "status": "published",
+        "reason": null,
+        "folds": 9,
+        "oof_rows": 1063,
+        "skill_naive": 0.22271161859483013,
+        "skill_seasonal": 0.41788073918868607,
+        "directional_accuracy": 0.689807976366322,
+        "wait_precision": 0.7142857142857143,
+        "wait_count": 126,
+        "coverage_raw": 0.6886171213546566,
+        "coverage_conformal": 0.7837181044957473,
+        "coverage_calibration": 0.8071748878923767,
+        "widening": 0.05932722935448698,
+        "layer_skill": {
+          "RK-1": 0.05749251756219409,
+          "RK-2": -0.007588248989513824,
+          "RK-3": 0.04396872690921205,
+          "RK-4": 0.006206042920790966,
+          "RK-5": 0.05995982173398773,
+          "RK-6": 0.22271161859483013
+        },
+        "confidence_min": 0.1,
+        "epsilon": 0.07161715929081472,
+        "band_width": 0.4404735128769171,
+        "band_kappa": 0.07590082371446734,
+        "latest": {
+          "date": "2026-09-18",
+          "p0": 1539.0,
+          "q10": 1279.45,
+          "q50": 1727.52,
+          "q90": 1886.66,
+          "direction": "up",
+          "agreement": 0.586459,
+          "layers": {
+            "RK-1": {
+              "bucket": "down",
+              "weight": 0.057493,
+              "value": 0.114139
+            },
+            "RK-2": {
+              "bucket": "flat",
+              "weight": 0.0,
+              "value": -0.003374
+            },
+            "RK-3": {
+              "bucket": "flat",
+              "weight": 0.043969,
+              "value": 0.098279
+            },
+            "RK-4": {
+              "bucket": "up",
+              "weight": 0.006206,
+              "value": -1.642713
+            },
+            "RK-5": {
+              "bucket": "flat",
+              "weight": 0.05996,
+              "value": -0.0629
+            },
+            "RK-6": {
+              "bucket": "up",
+              "weight": 0.222712,
+              "value": 0.115556
+            }
+          }
+        }
+      },
+      "h14": {
+        "horizon": 14,
+        "status": "published",
+        "reason": null,
+        "folds": 9,
+        "oof_rows": 1057,
+        "skill_naive": 0.25966565214354165,
+        "skill_seasonal": 0.4752980318478017,
+        "directional_accuracy": 0.7295423023578363,
+        "wait_precision": 0.7184466019417476,
+        "wait_count": 103,
+        "coverage_raw": 0.6556291390728477,
+        "coverage_conformal": 0.7894736842105263,
+        "coverage_calibration": 0.8064516129032258,
+        "widening": 0.05824921082778034,
+        "layer_skill": {
+          "RK-1": 0.08517023649019584,
+          "RK-2": -0.013854314347231611,
+          "RK-3": 0.06323574076613026,
+          "RK-4": 0.01359224483462218,
+          "RK-5": 0.038191006117831106,
+          "RK-6": 0.25966565214354165
+        },
+        "confidence_min": 0.1,
+        "epsilon": 0.08461769436635554,
+        "band_width": 0.4583221721795024,
+        "band_kappa": 0.07087468373831214,
+        "latest": {
+          "date": "2026-09-18",
+          "p0": 1539.0,
+          "q10": 1191.64,
+          "q50": 1610.86,
+          "q90": 2061.55,
+          "direction": "flat",
+          "agreement": 0.785231,
+          "layers": {
+            "RK-1": {
+              "bucket": "down",
+              "weight": 0.08517,
+              "value": 0.114139
+            },
+            "RK-2": {
+              "bucket": "flat",
+              "weight": 0.0,
+              "value": 0.004215
+            },
+            "RK-3": {
+              "bucket": "flat",
+              "weight": 0.063236,
+              "value": 0.098279
+            },
+            "RK-4": {
+              "bucket": "up",
+              "weight": 0.013592,
+              "value": -1.642713
+            },
+            "RK-5": {
+              "bucket": "flat",
+              "weight": 0.038191,
+              "value": -0.0629
+            },
+            "RK-6": {
+              "bucket": "flat",
+              "weight": 0.259666,
+              "value": 0.045638
+            }
+          }
+        }
+      }
+    },
+    "status": "published",
+    "reason": null
+  },
+  {
+    "crop": "tomato",
+    "district": "pune",
+    "market": "narayangaon",
+    "observations": 1687,
+    "seasons": 6,
+    "horizons": {
+      "h7": {
+        "horizon": 7,
+        "status": "published",
+        "reason": null,
+        "folds": 9,
+        "oof_rows": 1080,
+        "skill_naive": 0.15075098950091814,
+        "skill_seasonal": 0.48976682746093314,
+        "directional_accuracy": 0.6913407821229051,
+        "wait_precision": 0.7524752475247525,
+        "wait_count": 101,
+        "coverage_raw": 0.662962962962963,
+        "coverage_conformal": 0.8178571428571428,
+        "coverage_calibration": 0.8041666666666667,
+        "widening": 0.028552073142131262,
+        "layer_skill": {
+          "RK-1": 0.09786189681795077,
+          "RK-2": -0.027779133781573595,
+          "RK-3": 0.04784812831946417,
+          "RK-4": -0.004048376187532954,
+          "RK-5": 0.05535875525648648,
+          "RK-6": 0.15075098950091814
+        },
+        "confidence_min": 0.1,
+        "epsilon": 0.08238244246463762,
+        "band_width": 0.38292296932947656,
+        "band_kappa": 0.11202996973454404,
+        "latest": {
+          "date": "2026-09-18",
+          "p0": 1975.0,
+          "q10": 1469.26,
+          "q50": 1680.95,
+          "q90": 2190.29,
+          "direction": "down",
+          "agreement": 0.585839,
+          "layers": {
+            "RK-1": {
+              "bucket": "flat",
+              "weight": 0.097862,
+              "value": 0.058986
+            },
+            "RK-2": {
+              "bucket": "flat",
+              "weight": 0.0,
+              "value": 0.031451
+            },
+            "RK-3": {
+              "bucket": "flat",
+              "weight": 0.047848,
+              "value": -0.019717
+            },
+            "RK-4": {
+              "bucket": "up",
+              "weight": 0.0,
+              "value": -1.173281
+            },
+            "RK-5": {
+              "bucket": "down",
+              "weight": 0.055359,
+              "value": 0.615767
+            },
+            "RK-6": {
+              "bucket": "down",
+              "weight": 0.150751,
+              "value": -0.161208
+            }
+          }
+        }
+      },
+      "h14": {
+        "horizon": 14,
+        "status": "published",
+        "reason": null,
+        "folds": 9,
+        "oof_rows": 1080,
+        "skill_naive": 0.045121556143462915,
+        "skill_seasonal": 0.5026953664933985,
+        "directional_accuracy": 0.6723891273247496,
+        "wait_precision": 0.7254901960784313,
+        "wait_count": 51,
+        "coverage_raw": 0.625,
+        "coverage_conformal": 0.8416666666666667,
+        "coverage_calibration": 0.8041666666666667,
+        "widening": 0.038736718601701525,
+        "layer_skill": {
+          "RK-1": 0.06669265002982039,
+          "RK-2": -0.02944924742954358,
+          "RK-3": 0.02593257050337172,
+          "RK-4": -0.00958580274965315,
+          "RK-5": 0.049382069227489,
+          "RK-6": 0.045121556143462915
+        },
+        "confidence_min": 0.1,
+        "epsilon": 0.09388553318095205,
+        "band_width": 0.44009398353941614,
+        "band_kappa": 0.08893219447647317,
+        "latest": {
+          "date": "2026-09-18",
+          "p0": 1975.0,
+          "q10": 1289.39,
+          "q50": 1698.47,
+          "q90": 2039.0,
+          "direction": "down",
+          "agreement": 0.505019,
+          "layers": {
+            "RK-1": {
+              "bucket": "flat",
+              "weight": 0.066693,
+              "value": 0.058986
+            },
+            "RK-2": {
+              "bucket": "down",
+              "weight": 0.0,
+              "value": -0.087898
+            },
+            "RK-3": {
+              "bucket": "flat",
+              "weight": 0.025933,
+              "value": -0.019717
+            },
+            "RK-4": {
+              "bucket": "up",
+              "weight": 0.0,
+              "value": -1.173281
+            },
+            "RK-5": {
+              "bucket": "down",
+              "weight": 0.049382,
+              "value": 0.615767
+            },
+            "RK-6": {
+              "bucket": "down",
+              "weight": 0.045122,
+              "value": -0.150841
+            }
+          }
+        }
+      }
+    },
+    "status": "published",
+    "reason": null
+  },
+  {
+    "crop": "tur",
+    "district": "latur",
+    "market": "latur-apmc",
+    "observations": 1688,
+    "seasons": 6,
+    "horizons": {
+      "h7": {
+        "horizon": 7,
+        "status": "published",
+        "reason": null,
+        "folds": 10,
+        "oof_rows": 1120,
+        "skill_naive": 0.1279073812708178,
+        "skill_seasonal": 0.20396398162605778,
+        "directional_accuracy": 0.657516339869281,
+        "wait_precision": 0.7788461538461539,
+        "wait_count": 104,
+        "coverage_raw": 0.5883928571428572,
+        "coverage_conformal": 0.8125,
+        "coverage_calibration": 0.80625,
+        "widening": 0.018752990545739007,
+        "layer_skill": {
+          "RK-1": 0.0034254994322270305,
+          "RK-2": 0.018024268700860824,
+          "RK-3": 0.03814669166770357,
+          "RK-4": 8.424222407321658e-06,
+          "RK-5": 0.015016966943561694,
+          "RK-6": 0.1279073812708178
+        },
+        "confidence_min": 0.1,
+        "epsilon": 0.02144959744008368,
+        "band_width": 0.11861732662448209,
+        "band_kappa": 0.07384728901960226,
+        "latest": {
+          "date": "2026-09-18",
+          "p0": 9646.0,
+          "q10": 9240.24,
+          "q50": 9613.23,
+          "q90": 10268.01,
+          "direction": "flat",
+          "agreement": 0.908898,
+          "layers": {
+            "RK-1": {
+              "bucket": "down",
+              "weight": 0.003425,
+              "value": 0.019308
+            },
+            "RK-2": {
+              "bucket": "flat",
+              "weight": 0.018024,
+              "value": -0.007688
+            },
+            "RK-3": {
+              "bucket": "flat",
+              "weight": 0.038147,
+              "value": -0.088065
+            },
+            "RK-4": {
+              "bucket": "down",
+              "weight": 8e-06,
+              "value": -0.363921
+            },
+            "RK-5": {
+              "bucket": "down",
+              "weight": 0.015017,
+              "value": 0.654914
+            },
+            "RK-6": {
+              "bucket": "flat",
+              "weight": 0.127907,
+              "value": -0.003403
+            }
+          }
+        }
+      },
+      "h14": {
+        "horizon": 14,
+        "status": "published",
+        "reason": null,
+        "folds": 9,
+        "oof_rows": 1080,
+        "skill_naive": 0.24590235505968905,
+        "skill_seasonal": 0.21398565401018965,
+        "directional_accuracy": 0.7270233196159122,
+        "wait_precision": 0.8512396694214877,
+        "wait_count": 121,
+        "coverage_raw": 0.5324074074074074,
+        "coverage_conformal": 0.8428571428571429,
+        "coverage_calibration": 0.8041666666666667,
+        "widening": 0.02271695524562827,
+        "layer_skill": {
+          "RK-1": -0.0013733627511751667,
+          "RK-2": 0.10024627078739201,
+          "RK-3": 0.02261118483444835,
+          "RK-4": -0.0015709376319561486,
+          "RK-5": 0.012852073002651676,
+          "RK-6": 0.24590235505968905
+        },
+        "confidence_min": 0.1,
+        "epsilon": 0.029814876292402787,
+        "band_width": 0.13920654809235727,
+        "band_kappa": 0.055838977176610224,
+        "latest": {
+          "date": "2026-09-18",
+          "p0": 9646.0,
+          "q10": 9232.16,
+          "q50": 9946.44,
+          "q90": 10629.64,
+          "direction": "up",
+          "agreement": 0.644378,
+          "layers": {
+            "RK-1": {
+              "bucket": "down",
+              "weight": 0.0,
+              "value": 0.019308
+            },
+            "RK-2": {
+              "bucket": "flat",
+              "weight": 0.100246,
+              "value": -0.016823
+            },
+            "RK-3": {
+              "bucket": "flat",
+              "weight": 0.022611,
+              "value": -0.088065
+            },
+            "RK-4": {
+              "bucket": "up",
+              "weight": 0.0,
+              "value": -0.363921
+            },
+            "RK-5": {
+              "bucket": "down",
+              "weight": 0.012852,
+              "value": 0.654914
+            },
+            "RK-6": {
+              "bucket": "up",
+              "weight": 0.245902,
+              "value": 0.030671
+            }
+          }
+        }
+      }
+    },
+    "status": "published",
+    "reason": null
+  }
+]

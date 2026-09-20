@@ -8,10 +8,13 @@
  * limits with stricter per-route limits on sign-in and verification; zod at every body; domain
  * errors, never "Something went wrong". None of it is ever shown to a farmer as a badge.
  */
+import { resolve, sep } from 'node:path';
+
 import cookie from '@fastify/cookie';
 import cors from '@fastify/cors';
 import helmet from '@fastify/helmet';
 import rateLimit from '@fastify/rate-limit';
+import fastifyStatic from '@fastify/static';
 import Fastify, { type FastifyReply, type FastifyRequest } from 'fastify';
 import { z } from 'zod';
 
@@ -459,6 +462,34 @@ export function buildApp(deps: AppDependencies) {
     const body = z.object({ method: z.enum(['gstin', 'udyam']), id: z.string().trim().min(5).max(40) }).parse(request.body);
     return verifyBuyer(verifyDeps(), requireActor(request), body.method, body.id);
   });
+
+  /**
+   * The PWA, served by this process when `WEB_DIST_DIR` is set (see config.ts): one origin for
+   * the app and its API, which is what relative `/api/…` and a cookie scoped to `/api/auth`
+   * require. Registered last, so every API route above still wins the path it owns.
+   */
+  const webDist = deps.config.WEB_DIST_DIR;
+  if (webDist !== undefined) {
+    const root = resolve(webDist);
+    void app.register(fastifyStatic, {
+      root,
+      index: ['index.html'],
+      // The cache policy below is this file's, not the file server's default.
+      cacheControl: false,
+      // Content-hashed under /assets: cacheable forever. Everything else, including the service
+      // worker, must be revalidated — a CDN holding sw.js holds the old app with it.
+      setHeaders: (reply, path: string) => {
+        const immutable = path.includes(`${sep}assets${sep}`);
+        reply.raw.setHeader('cache-control', immutable ? 'public, max-age=31536000, immutable' : 'no-cache');
+      },
+    });
+    // One shell for every route: the app's own routes are hashes, so anything that is not a file
+    // and not /api is the shell.
+    app.setNotFoundHandler((request, reply) => {
+      if (request.url.startsWith('/api/')) return reply.status(404).send({ error: { code: 'NO_SUCH_ROUTE', message: 'There is no such endpoint.' } });
+      return reply.header('cache-control', 'no-cache').sendFile('index.html');
+    });
+  }
 
   return app;
 }

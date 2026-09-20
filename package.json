@@ -18,6 +18,7 @@
     "db:start": "pnpm --filter @fasal/api run db:local",
     "db:bootstrap": "pnpm --filter @fasal/api run bootstrap",
     "db:migrate": "pnpm --filter @fasal/api run migrate",
+    "db:seed-demo": "pnpm --filter @fasal/api run seed-demo",
     "dev:api": "pnpm --filter @fasal/api run dev",
     "dev:web": "pnpm --filter @fasal/web run dev",
     "ml:test": "node tools/py.mjs -m pytest ml -q",

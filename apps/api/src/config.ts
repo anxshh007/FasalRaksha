@@ -94,6 +94,17 @@ const BaseSchema = z.object({
    * default: unset means those endpoints are closed, which is the safe way for them to fail.
    */
   CHANNEL_SECRET: optionalSecret,
+  /**
+   * Where the built PWA is, when this process is to serve it as well (`apps/web/dist`). The phone
+   * fetches `/api/…` relatively and its refresh cookie is scoped to `/api/auth`, so the app and
+   * its API belong on one origin; setting this is the simplest way to give them one. Unset, the
+   * API serves only `/api` and something else serves the files.
+   */
+  WEB_DIST_DIR: z
+    .string()
+    .trim()
+    .optional()
+    .transform((value) => (value === '' ? undefined : value)),
   /** Strict CORS allowlist, comma-separated origins. */
   CORS_ORIGINS: z
     .string()

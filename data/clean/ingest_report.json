@@ -1,0 +1,151 @@
+{
+  "dataset": "agmarknet_synthetic.csv, msamb_synthetic.csv",
+  "synthetic": true,
+  "as_of": "2026-09-18",
+  "raw_rows": 26055,
+  "resolved_columns": "22/24",
+  "unit_errors_repaired": 138,
+  "duplicate_sessions_collapsed": 302,
+  "impossible_rows_rejected": 74,
+  "rejected_by_reason": {
+    "modal outside the min–max range": 25,
+    "date in the future": 19,
+    "minimum above maximum": 17,
+    "non-positive price": 11,
+    "invalid or unparseable date": 2
+  },
+  "imputed_trading_days": 779,
+  "gaps_left_unimputed": 138,
+  "zero_arrival_days": 108,
+  "market_closed_days": 3320,
+  "outliers_flagged": 117,
+  "unknown_commodity_names": {},
+  "series_count": 12,
+  "series_length": {
+    "min": 297,
+    "median": 1683,
+    "max": 1699
+  },
+  "series": [
+    {
+      "crop": "banana",
+      "district": "jalgaon",
+      "market": "raver",
+      "observations": 1683,
+      "seasons": 6,
+      "first": "2021-01-01",
+      "last": "2026-09-18",
+      "sufficient": true
+    },
+    {
+      "crop": "gram",
+      "district": "latur",
+      "market": "latur-apmc",
+      "observations": 1699,
+      "seasons": 6,
+      "first": "2021-01-01",
+      "last": "2026-09-18",
+      "sufficient": true
+    },
+    {
+      "crop": "grapes",
+      "district": "nashik",
+      "market": "nashik-apmc",
+      "observations": 297,
+      "seasons": 2,
+      "first": "2025-01-01",
+      "last": "2026-06-11",
+      "sufficient": false
+    },
+    {
+      "crop": "onion",
+      "district": "ahilyanagar",
+      "market": "rahuri",
+      "observations": 1682,
+      "seasons": 6,
+      "first": "2021-01-01",
+      "last": "2026-09-18",
+      "sufficient": true
+    },
+    {
+      "crop": "onion",
+      "district": "nashik",
+      "market": "lasalgaon",
+      "observations": 1679,
+      "seasons": 6,
+      "first": "2021-01-01",
+      "last": "2026-09-18",
+      "sufficient": true
+    },
+    {
+      "crop": "orange",
+      "district": "nagpur",
+      "market": "kalamna",
+      "observations": 1688,
+      "seasons": 6,
+      "first": "2021-01-01",
+      "last": "2026-09-18",
+      "sufficient": true
+    },
+    {
+      "crop": "pomegranate",
+      "district": "ahilyanagar",
+      "market": "rahuri",
+      "observations": 1687,
+      "seasons": 6,
+      "first": "2021-01-01",
+      "last": "2026-09-18",
+      "sufficient": true
+    },
+    {
+      "crop": "potato",
+      "district": "pune",
+      "market": "manchar",
+      "observations": 1676,
+      "seasons": 6,
+      "first": "2021-01-01",
+      "last": "2026-09-18",
+      "sufficient": true
+    },
+    {
+      "crop": "soybean",
+      "district": "latur",
+      "market": "latur-apmc",
+      "observations": 1682,
+      "seasons": 6,
+      "first": "2021-01-01",
+      "last": "2026-09-18",
+      "sufficient": true
+    },
+    {
+      "crop": "tomato",
+      "district": "nashik",
+      "market": "nashik-apmc",
+      "observations": 1683,
+      "seasons": 6,
+      "first": "2021-01-01",
+      "last": "2026-09-18",
+      "sufficient": true
+    },
+    {
+      "crop": "tomato",
+      "district": "pune",
+      "market": "narayangaon",
+      "observations": 1687,
+      "seasons": 6,
+      "first": "2021-01-01",
+      "last": "2026-09-18",
+      "sufficient": true
+    },
+    {
+      "crop": "tur",
+      "district": "latur",
+      "market": "latur-apmc",
+      "observations": 1688,
+      "seasons": 6,
+      "first": "2021-01-01",
+      "last": "2026-09-18",
+      "sufficient": true
+    }
+  ]
+}

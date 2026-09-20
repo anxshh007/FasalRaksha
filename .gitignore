@@ -29,8 +29,11 @@ test-results/
 .DS_Store
 Thumbs.db
 
-# Derived by the pipeline from data/raw; reproducible, not committed.
-data/clean/
+# Derived by the pipeline from data/raw; reproducible, not committed — except the two reports
+# Judge Mode reads at runtime (§14.4), which belong with the release they describe.
+data/clean/*
+!data/clean/ingest_report.json
+!data/clean/validation_report.json
 
 # Intermediate PNG camera scenes; the committed fixtures are the JPEGs made from them.
 data/fixtures/camera/png/
