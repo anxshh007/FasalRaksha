@@ -4,11 +4,12 @@
  * seeing prices). Phase 1's auth panel and verification round-trip, on the design system: the
  * honest test-build sentence is kept, the padlock and shield chips are not (P1-07).
  */
-import { useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 
 import { Glyph } from '../design/Glyph';
 import { t } from '../i18n/strings';
-import { identity, type Device } from '../state/useDevice';
+import { Tx } from '../i18n/Tx';
+import { identity, type Device, type RegistrySample } from '../state/useDevice';
 
 function reasonOf(result: { kind: string; message?: string; code?: string }, fallback: string): string {
   return result.message !== undefined && result.message !== '' ? result.message : (result.code ?? fallback);
@@ -121,18 +122,37 @@ export function VerifyFarmer({ device }: { device: Device }) {
   const [id, setId] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  /**
+   * The demonstration registry's own records (§16.1). A live registry hands out no list, so this
+   * stays empty there and the screen is the plain one: type your number.
+   */
+  const [samples, setSamples] = useState<RegistrySample[]>([]);
 
-  const submit = async (event: FormEvent) => {
-    event.preventDefault();
+  useEffect(() => {
+    let cancelled = false;
+    void identity.registrySamples().then((answer) => {
+      if (!cancelled && answer.kind === 'ok') setSamples(answer.body.farmers);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const verifyWith = async (registryId: string, registry: 'pm-kisan' | 'agristack') => {
     setPending(true);
     setError(null);
-    const result = await identity.verifyFarmer(id.trim());
+    const result = await identity.verifyFarmer(registryId.trim(), registry);
     if (result.kind === 'ok') {
       await device.reloadProfile();
     } else {
       setError(result.kind === 'unreachable' ? t(locale, 'signin.offline') : t(locale, 'error.generic', { reason: reasonOf(result, result.kind) }));
     }
     setPending(false);
+  };
+
+  const submit = async (event: FormEvent) => {
+    event.preventDefault();
+    await verifyWith(id, 'pm-kisan');
   };
 
   return (
@@ -156,6 +176,34 @@ export function VerifyFarmer({ device }: { device: Device }) {
       </form>
       <p className="field__hint">{t(locale, 'signin.verifyNote')}</p>
       <Problem message={error} />
+
+      {samples.length > 0 && (
+        <section className="samples" data-testid="registry-samples" data-count={samples.length}>
+          <p className="label">{t(locale, 'verify.samples')}</p>
+          <p className="muted">{t(locale, 'verify.samplesNote')}</p>
+          <ul className="samples__list">
+            {samples.map((sample) => (
+              <li key={`${sample.registry}:${sample.id}`}>
+                <button
+                  type="button"
+                  className="samples__item"
+                  disabled={pending || reach?.reachable === false}
+                  onClick={() => void verifyWith(sample.id, sample.registry)}
+                  data-testid="registry-sample"
+                  data-id={sample.id}
+                  data-district={sample.district}
+                >
+                  <strong>{sample.name}</strong>
+                  <span className="muted">
+                    <Tx locale={locale} k="verify.sampleDistrict" values={{ village: sample.village ?? '', district: sample.district }} words={['village', 'district']} />
+                  </span>
+                  <span className="figure samples__id">{sample.id}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
     </section>
   );
 }

@@ -23,8 +23,10 @@ export const MOCK_FARMERS: readonly FarmerRecord[] = [
   { registry: 'pm-kisan', id: 'PMK-MH-2003-12750', name: 'Arun Madhav Salunkhe', district: 'nashik', village: 'Yeola' },
   { registry: 'pm-kisan', id: 'PMK-MH-2003-12860', name: 'Prakash Tukaram Jadhav', district: 'nashik', village: 'Lasalgaon' },
   { registry: 'pm-kisan', id: 'PMK-MH-2003-12977', name: 'Savita Ramesh More', district: 'nashik', village: 'Pimpalgaon Baswant' },
+  { registry: 'pm-kisan', id: 'PMK-MH-2003-13102', name: 'Nanda Bhaskar Sonawane', district: 'nashik', village: 'Lasalgaon' },
   { registry: 'pm-kisan', id: 'PMK-MH-2211-07314', name: 'Balasaheb Vitthal Shinde', district: 'latur', village: 'Ausa' },
   { registry: 'pm-kisan', id: 'PMK-MH-2211-07588', name: 'Shobha Ramdas More', district: 'latur', village: 'Nilanga' },
+  { registry: 'pm-kisan', id: 'PMK-MH-2211-07903', name: 'Ravi Shivaji Kamble', district: 'latur', village: 'Udgir' },
   { registry: 'pm-kisan', id: 'PMK-MH-1911-04420', name: 'Kishor Namdeo Patil', district: 'jalgaon', village: 'Raver' },
   { registry: 'pm-kisan', id: 'PMK-MH-2505-03318', name: 'Vinod Keshavrao Thakre', district: 'nagpur', village: 'Katol' },
   { registry: 'pm-kisan', id: 'PMK-MH-2106-08872', name: 'Prakash Baban Gaikwad', district: 'pune', village: 'Narayangaon' },
@@ -51,6 +53,11 @@ export class MockFarmerRegistryAdapter implements FarmerRegistryAdapter {
   readonly mode = 'mock' as const;
 
   constructor(private readonly records: readonly FarmerRecord[] = MOCK_FARMERS) {}
+
+  /** Every record this mock knows, for the demonstration's own sign-in list (CUTS C-14). */
+  samples(): readonly FarmerRecord[] {
+    return this.records;
+  }
 
   async lookup(registry: FarmerRegistry, id: string): Promise<FarmerRecord | null> {
     const wanted = id.trim().toUpperCase();

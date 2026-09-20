@@ -292,3 +292,26 @@ string, which Judge Mode reports.
 
 **To close.** Set `WEATHER_ADAPTER=live`. The document, the engine, the staleness rule and every
 screen stay exactly as they are; the disclosure line disappears with the flag.
+
+## C-14 · The sign-in screen lists the demonstration registry's farmers
+
+**What.** On the verification screen, under the box where a PM-KISAN number is typed, the app
+lists the records the registry adapter is holding — name, village, district and the number — and
+one tap verifies as that farmer. With `REGISTRY_ADAPTER=live` the list is not there.
+
+**Why.** A demonstration should not turn on somebody typing `PMK-MH-2003-11427` correctly from a
+slide, in a hall, on a phone, in front of a panel. The registry itself is already a mock (§16.1's
+"a small bundled sample standing in for a real lookup"), so showing what is in it costs no
+honesty — and hiding it would make the demonstration more fragile without making it more true.
+
+**What exists instead.** Everything behind the tap is the production path: the same
+`POST /api/verify/farmer`, the same adapter lookup, the same row written to
+`farmer_verifications` with `adapter_mode = 'mock'`, and the district taken from the record by the
+server rather than from anything the page said (P1-04). The list is the adapter's, not a flag's:
+`samples()` is an optional method that only `MockFarmerRegistryAdapter` implements, so a live
+deployment returns nothing and there is no switch anyone can forget. The panel says, above the
+names, that this is a demonstration registry and that the real service has no such list. Judge
+Mode reports the registry adapter's mode beside every other adapter.
+
+**To close.** Set `REGISTRY_ADAPTER=live` with a gateway URL and key. The list disappears, the
+screen becomes the plain "type your number", and nothing else about verification changes.

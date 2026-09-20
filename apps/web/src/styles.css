@@ -1664,6 +1664,54 @@ button.spine__item:hover {
   font-family: var(--font-mono);
 }
 
+/* ── the demonstration registry's sign-in list (§16.1; CUTS C-14) ────────────────────────── */
+
+.samples {
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: var(--hairline);
+  display: grid;
+  gap: var(--space-2);
+}
+.samples p {
+  margin: 0;
+}
+.samples__list {
+  display: grid;
+  gap: var(--space-2);
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+  max-height: 40vh;
+  overflow-y: auto;
+}
+.samples__item {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  min-height: var(--touch);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+.samples__item:hover:not(:disabled) {
+  border-color: var(--accent);
+  background: var(--accent-tint);
+}
+.samples__item:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.samples__id {
+  font-size: var(--size-label);
+  color: var(--text-muted);
+}
+
 /* ── Judge Mode (§14.4): dense on purpose — the one screen that is a table of figures ────── */
 
 .judge {

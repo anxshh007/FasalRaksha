@@ -78,6 +78,22 @@ describe.each(buyerRegistries)('ARCH-06 · P1-09 · BuyerRegistryAdapter contrac
   });
 });
 
+describe('§16.1 · only the mock registry hands out a list of farmers', () => {
+  it('the mock offers its own records as samples, and the live adapter offers none', () => {
+    const mock = new MockFarmerRegistryAdapter();
+    const samples = mock.samples();
+    expect(samples.length).toBeGreaterThanOrEqual(15);
+    for (const record of samples) {
+      expect(record.id).toMatch(/^(PMK-MH-\d{4}-\d{5}|\d{11})$/);
+      expect(record.district).toMatch(/^[a-z-]+$/);
+    }
+    // A real registry cannot publish a directory of farmers, so it implements no `samples()` at
+    // all: the demonstration list disappears in a live deployment with no flag to remember.
+    const live = new LiveFarmerRegistryAdapter({ baseUrl: 'https://gateway.test', apiKey: 'gw-key', transport: gateway().transport });
+    expect((live as { samples?: unknown }).samples).toBeUndefined();
+  });
+});
+
 describe('ARCH-06 · registries, live-only behaviour', () => {
   it('a wrong gateway key is a refusal, not an empty answer', async () => {
     const adapter = new LiveFarmerRegistryAdapter({ baseUrl: 'https://gateway.test', apiKey: 'wrong', transport: gateway().transport });

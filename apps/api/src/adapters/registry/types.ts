@@ -19,6 +19,12 @@ export interface FarmerRegistryAdapter {
   readonly mode: 'mock' | 'live';
   /** The registry's record for this identifier, or null when there is none. */
   lookup(registry: FarmerRegistry, id: string): Promise<FarmerRecord | null>;
+  /**
+   * The records this adapter is willing to show as examples. Only the mock has any: a real
+   * registry cannot hand out a list of farmers, and nobody has to remember to turn this off in
+   * a live deployment because there is nothing to turn off (PROMPT §16.1; CUTS C-14).
+   */
+  samples?(): readonly FarmerRecord[];
 }
 
 export type BusinessIdKind = 'gstin' | 'udyam';

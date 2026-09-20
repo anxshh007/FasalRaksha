@@ -432,12 +432,30 @@ export function buildApp(deps: AppDependencies) {
   app.get('/api/deals/:id', async (request) => dealById(requireDb(), requireActor(request), dealId(request)));
   app.get('/api/deals/:id/sauda-slip', async (request) => saudaSlipOf(requireDb(), requireActor(request), dealId(request)));
 
-  app.post('/api/verify/farmer', { config: { rateLimit: { max: 10, timeWindow: '1 hour' } } }, async (request) => {
+  /**
+   * The demonstration registry (§16.1): the sample records the *mock* adapter is willing to show,
+   * so a demonstration can be driven by choosing a farmer rather than typing a registry number.
+   * A live registry implements no `samples()`, so this is empty without any flag to forget.
+   */
+  app.get('/api/verify/samples', async (request) => {
+    requireActor(request);
+    const registry = deps.farmerRegistry;
+    return { mode: registry?.mode ?? 'live', farmers: registry?.samples?.() ?? [] };
+  });
+
+  /**
+   * Ten verification attempts an hour, counted per *account* rather than per address: the thing
+   * being prevented is one account guessing at registry ids, and a village on one connection must
+   * not lock each other out. An unauthenticated caller cannot reach these at all.
+   */
+  const perActor = (request: FastifyRequest) => request.actor?.userId ?? request.ip;
+
+  app.post('/api/verify/farmer', { config: { rateLimit: { max: 10, timeWindow: '1 hour', keyGenerator: perActor } } }, async (request) => {
     const body = z.object({ registry: z.enum(['pm-kisan', 'agristack']), id: z.string().trim().min(5).max(40) }).parse(request.body);
     return verifyFarmer(verifyDeps(), requireActor(request), body.registry, body.id);
   });
 
-  app.post('/api/verify/buyer', { config: { rateLimit: { max: 10, timeWindow: '1 hour' } } }, async (request) => {
+  app.post('/api/verify/buyer', { config: { rateLimit: { max: 10, timeWindow: '1 hour', keyGenerator: perActor } } }, async (request) => {
     const body = z.object({ method: z.enum(['gstin', 'udyam']), id: z.string().trim().min(5).max(40) }).parse(request.body);
     return verifyBuyer(verifyDeps(), requireActor(request), body.method, body.id);
   });

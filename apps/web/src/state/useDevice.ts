@@ -62,6 +62,15 @@ export interface Device {
   signOut: () => Promise<void>;
 }
 
+/** One record of the demonstration registry (§16.1), for the sign-in list. */
+export interface RegistrySample {
+  registry: 'pm-kisan' | 'agristack';
+  id: string;
+  name: string;
+  district: string;
+  village: string | null;
+}
+
 export interface ListingState {
   listing: LocalListing;
   state: 'saved-here' | 'waiting' | 'sent' | 'rejected';
@@ -337,5 +346,8 @@ export const identity = {
     request<{ challengeId: string; expiresInSeconds: number; devCode?: string }>('/api/auth/otp/request', { method: 'POST', body: { phone }, auth: false, timeoutMs: SIGN_IN_TIMEOUT_MS }),
   verifyCode: (phone: string, code: string, displayName: string, locale: Locale) =>
     request<{ accessToken: string }>('/api/auth/otp/verify', { method: 'POST', body: { phone, code, signup: { kind: 'farmer', displayName, locale } }, auth: false, timeoutMs: SIGN_IN_TIMEOUT_MS }),
-  verifyFarmer: (id: string) => request<{ district: string; village: string | null }>('/api/verify/farmer', { method: 'POST', body: { registry: 'pm-kisan', id }, timeoutMs: SIGN_IN_TIMEOUT_MS }),
+  verifyFarmer: (id: string, registry: 'pm-kisan' | 'agristack' = 'pm-kisan') =>
+    request<{ district: string; village: string | null }>('/api/verify/farmer', { method: 'POST', body: { registry, id }, timeoutMs: SIGN_IN_TIMEOUT_MS }),
+  /** The demonstration registry's sample records, or an empty list against a live registry. */
+  registrySamples: () => request<{ mode: 'mock' | 'live'; farmers: RegistrySample[] }>('/api/verify/samples', { timeoutMs: SIGN_IN_TIMEOUT_MS }),
 };
