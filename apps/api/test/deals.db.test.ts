@@ -23,6 +23,7 @@ import { createPool, type Pool } from '../src/db/pool.js';
 import { buildApp, type App } from '../src/http/app.js';
 import { createLogger } from '../src/log/logger.js';
 import type { DemandDocument } from '../src/modules/demand/service.js';
+import type { DisputeView, GrievancePattern } from '../src/modules/disputes/service.js';
 import type { DealView, SaudaSlip } from '../src/modules/deals/service.js';
 import { createKeyRing, type KeyRing } from '../src/security/keys.js';
 import { issueAccessToken } from '../src/security/tokens.js';
@@ -372,5 +373,113 @@ describe('FR-14 · delivery, payment, and a reputation that moves only on comple
       if (buyer.rating === null) continue;
       expect(Object.keys(buyer.rating).sort()).toEqual(['count', 'paymentTimeliness', 'pickupReliability', 'weighmentFairness']);
     }
+  });
+});
+
+describe('FR-15 · a complaint, with a reason code, routed to the district officer', () => {
+  const bearerOfficer = (userId: string) => ({ authorization: `Bearer ${issueAccessToken(keys, { userId, role: 'officer', sessionId: randomUUID() }, Math.floor(NOW.getTime() / 1000))}` });
+  const post = (url: string, userId: string, role: 'farmer' | 'buyer', payload: unknown = {}) =>
+    app.inject({ method: 'POST', url, headers: bearer(userId, role), payload: payload as object });
+
+  /** A deal carried to delivery, with a photograph of the lot on file to attach as evidence. */
+  async function deliveredDeal(): Promise<{ deal: DealView; photoId: string }> {
+    const clientId = await listLot(5);
+    const listing = await seed.query<{ id: string }>('SELECT id FROM app.listings WHERE client_id = $1', [clientId]);
+    const listingId = listing.rows[0]!.id;
+    const photo = await seed.query<{ storage_key: string }>(
+      `INSERT INTO app.listing_photos (listing_id, farmer_id, content_hash, byte_length, width, height, created_at)
+       VALUES ($1, $2, $3, 120000, 1280, 960, $4) RETURNING storage_key`,
+      [listingId, world.farmerA, randomUUID().replace(/-/g, '').padEnd(64, '0'), NOW],
+    );
+    const offer = (await offersOn(clientId))[0]!;
+    await post(`/api/offers/${offer.id}/accept`, world.farmerA, 'farmer');
+    const delivered = (await post(`/api/deals/${offer.id}/delivery`, world.farmerA, 'farmer')).json() as DealView;
+    expect(delivered.state).toBe('DELIVERY_CONFIRMED');
+    return { deal: delivered, photoId: photo.rows[0]!.storage_key };
+  }
+
+  it('cannot be raised before the lot has changed hands, or by anyone but the two parties', async () => {
+    const offer = (await offersOn(await listLot(5)))[0]!;
+    const early = await post(`/api/deals/${offer.id}/dispute`, world.farmerA, 'farmer', { reason: 'GRADE_DISPUTE', note: 'Too early to complain.' });
+    expect(early.statusCode).toBe(409);
+    expect(early.json()).toMatchObject({ error: { code: 'DISPUTE_TOO_EARLY' } });
+
+    const stranger = await post(`/api/deals/${offer.id}/dispute`, world.farmerB, 'farmer', { reason: 'OTHER', note: 'Not my deal.' });
+    expect([403, 404]).toContain(stranger.statusCode); // not a party, and not even readable
+  });
+
+  it('a grade dispute carries its photograph, reaches the officer, and shows on the buyer as an open dispute', async () => {
+    const { deal, photoId } = await deliveredDeal();
+    const raised = await post(`/api/deals/${deal.id}/dispute`, world.farmerA, 'farmer', {
+      reason: 'GRADE_DISPUTE',
+      note: 'They graded the lot C at the yard; it was photographed and declared B.',
+      evidencePhotoId: photoId,
+    });
+    expect(raised.statusCode).toBe(201);
+    const dispute = raised.json() as DisputeView;
+    expect(dispute.state).toBe('DISPUTE_OPEN');
+    expect(dispute.reason).toBe('GRADE_DISPUTE'); // a code, so a district can be counted, not parsed
+    expect(dispute.raisedByParty).toBe('seller');
+    expect(dispute.district).toBe('nashik'); // the deal's district, set by the database
+    expect(dispute.evidence).toBe(1); // the lot's own photograph, attached by reference
+
+    // One at a time, per deal.
+    const again = await post(`/api/deals/${deal.id}/dispute`, world.farmerA, 'farmer', { reason: 'OTHER', note: 'And another thing.' });
+    expect(again.statusCode).toBe(409);
+    expect(again.json()).toMatchObject({ error: { code: 'DISPUTE_ALREADY_OPEN' } });
+
+    // The buyer's clean record is not clean while this is open — that is what gives it teeth.
+    const document = (await app.inject({ method: 'GET', url: '/api/demand/nashik', headers: bearer(world.farmerA, 'farmer') })).json() as DemandDocument;
+    const buyer = document.buyers.find((b) => b.id === deal.buyer.id);
+    expect(buyer?.history.openDisputes).toBeGreaterThanOrEqual(1);
+    const onDeal = (await app.inject({ method: 'GET', url: `/api/deals/${deal.id}`, headers: bearer(world.farmerA, 'farmer') })).json() as DealView;
+    expect(onDeal.paymentRecord.openDisputes).toBeGreaterThanOrEqual(1);
+    expect(onDeal.dispute?.reason).toBe('GRADE_DISPUTE');
+  });
+
+  it('only the officer of that district moves it, open → under review → resolved', async () => {
+    const { deal } = await deliveredDeal();
+    const dispute = (await post(`/api/deals/${deal.id}/dispute`, world.farmerA, 'farmer', { reason: 'QUANTITY_SHORT', note: 'Four quintals were weighed, not five.' })).json() as DisputeView;
+
+    const byFarmer = await post(`/api/disputes/${dispute.id}/review`, world.farmerA, 'farmer');
+    expect(byFarmer.statusCode).toBe(403);
+    expect(byFarmer.json()).toMatchObject({ error: { code: 'OFFICERS_ONLY' } });
+
+    const byLatur = await app.inject({ method: 'POST', url: `/api/disputes/${dispute.id}/review`, headers: bearerOfficer(world.officerLatur) });
+    expect(byLatur.statusCode).toBe(409); // another district's officer cannot see it, let alone move it
+
+    const reviewing = await app.inject({ method: 'POST', url: `/api/disputes/${dispute.id}/review`, headers: bearerOfficer(world.officerNashik) });
+    expect(reviewing.statusCode).toBe(200);
+    expect((reviewing.json() as DisputeView).state).toBe('UNDER_REVIEW');
+
+    const resolved = await app.inject({
+      method: 'POST',
+      url: `/api/disputes/${dispute.id}/resolve`,
+      headers: bearerOfficer(world.officerNashik),
+      payload: { outcome: 'settled', note: 'Both parties agreed on four quintals at the agreed rate.' },
+    });
+    expect(resolved.statusCode).toBe(200);
+    const done = resolved.json() as DisputeView;
+    expect(done.state).toBe('RESOLVED');
+    expect(done.outcome).toBe('settled');
+    expect(done.resolvedAt).not.toBeNull();
+
+    // Resolved, the buyer's record is clean again — and a second resolution is not possible.
+    const twice = await app.inject({ method: 'POST', url: `/api/disputes/${dispute.id}/resolve`, headers: bearerOfficer(world.officerNashik), payload: { outcome: 'upheld', note: 'No.' } });
+    expect(twice.statusCode).toBe(409);
+  });
+
+  it('the officer sees the district counted by reason, not a pile of sentences', async () => {
+    const response = await app.inject({ method: 'GET', url: '/api/disputes/patterns', headers: bearerOfficer(world.officerNashik) });
+    expect(response.statusCode).toBe(200);
+    const patterns = (response.json() as { patterns: GrievancePattern[] }).patterns;
+    expect(patterns.length).toBeGreaterThan(0);
+    for (const pattern of patterns) {
+      expect(pattern.district).toBe('nashik'); // row-level security keeps the officer in their district
+      expect(['QUANTITY_SHORT', 'GRADE_DISPUTE', 'PAYMENT_OVERDUE', 'NO_SHOW', 'OTHER']).toContain(pattern.reason);
+    }
+    expect(JSON.stringify(patterns)).not.toContain('note'); // a pattern, not a case file
+    const farmer = await app.inject({ method: 'GET', url: '/api/disputes/patterns', headers: bearer(world.farmerA, 'farmer') });
+    expect(farmer.statusCode).toBe(403);
   });
 });

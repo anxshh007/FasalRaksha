@@ -124,7 +124,7 @@ export interface DealView {
   lastPriceBy: 'seller' | 'buyer';
   /** The district benchmark when the offer was made, so the price has something beside it. */
   benchmarkAtOffer: { modalPerQtl: number; asOf: string } | null;
-  paymentRecord: { typicalDays: number | null; completedDeals: number };
+  paymentRecord: { typicalDays: number | null; completedDeals: number; openDisputes: number };
   history: Array<{ type: string; by: 'seller' | 'buyer'; price: { amount: number; unit: string }; quantity: { value: number; unit: string }; at: string }>;
   slip: SaudaSlip | null;
   /** Each side confirms for itself; nobody confirms for the other (§8.9). */
@@ -132,6 +132,10 @@ export interface DealView {
   /** Written when the seller says the money arrived — the only way a deal completes. */
   payment: { amount: number; at: string; daysAfterDelivery: number } | null;
   rated: { you: boolean; them: boolean };
+  /** The photograph already on file for this lot, if any: what a complaint attaches (§8.9). */
+  photoId: string | null;
+  /** An open or resolved complaint about this deal (§8.9); the deal itself does not move. */
+  dispute: { id: string; state: 'DISPUTE_OPEN' | 'UNDER_REVIEW' | 'RESOLVED'; reason: string; note: string; raisedByParty: 'seller' | 'buyer'; openedAt: string; outcome: string | null } | null;
   /** The other side's reputation, as aggregates: never a rating row, never a rater. */
   counterpartyRating: { count: number; scores: Record<string, number | null> } | null;
   /** What this caller could do next, for the interface only. The server decides what happens. */
@@ -251,16 +255,17 @@ async function bundleFor(db: Database, crop: string, district: string): Promise<
   }
 }
 
-async function paymentRecord(client: PoolClient, buyerId: string): Promise<{ typicalDays: number | null; completedDeals: number }> {
-  const { rows } = await client.query<{ completed_deals: number; payment_days: number[]; defaults: number; default_exposure_days: number }>(
+async function paymentRecord(client: PoolClient, buyerId: string): Promise<{ typicalDays: number | null; completedDeals: number; openDisputes: number }> {
+  const { rows } = await client.query<{ completed_deals: number; payment_days: number[]; defaults: number; default_exposure_days: number; open_disputes: number }>(
     'SELECT * FROM app.buyer_track_records($1::uuid[])',
     [[buyerId]],
   );
   const r = rows[0];
-  if (r === undefined) return { typicalDays: null, completedDeals: 0 };
+  if (r === undefined) return { typicalDays: null, completedDeals: 0, openDisputes: 0 };
   return {
-    typicalDays: typicalDaysToPay({ completedDeals: r.completed_deals, paymentDays: r.payment_days, defaults: r.defaults, defaultExposureDays: r.default_exposure_days, openDisputes: 0 }),
+    typicalDays: typicalDaysToPay({ completedDeals: r.completed_deals, paymentDays: r.payment_days, defaults: r.defaults, defaultExposureDays: r.default_exposure_days, openDisputes: r.open_disputes }),
     completedDeals: r.completed_deals,
+    openDisputes: r.open_disputes,
   };
 }
 
@@ -326,6 +331,15 @@ async function view(client: PoolClient, row: DealRow, actor: Actor): Promise<Dea
     [row.id],
   );
   const payment = paid.rows[0];
+  const disputes = await client.query<{ id: string; state: 'DISPUTE_OPEN' | 'UNDER_REVIEW' | 'RESOLVED'; reason: string; note: string; raised_by_party: 'seller' | 'buyer'; opened_at: Date; outcome: string | null }>(
+    'SELECT id, state, reason, note, raised_by_party, opened_at, outcome FROM app.disputes WHERE deal_id = $1 ORDER BY opened_at DESC LIMIT 1',
+    [row.id],
+  );
+  const dispute = disputes.rows[0];
+  const photo = row.listing_id === null ? { rows: [] } : await client.query<{ storage_key: string }>(
+    'SELECT storage_key FROM app.listing_photos WHERE listing_id = $1 ORDER BY created_at DESC LIMIT 1',
+    [row.listing_id],
+  );
   return {
     id: row.id,
     state: row.state,
@@ -350,6 +364,18 @@ async function view(client: PoolClient, row: DealRow, actor: Actor): Promise<Dea
     },
     payment: payment === undefined ? null : { amount: Number(payment.amount), at: payment.confirmed_at.toISOString(), daysAfterDelivery: payment.days_after_delivery },
     rated: you === 'seller' ? { you: row.rated_seller, them: row.rated_buyer } : { you: row.rated_buyer, them: row.rated_seller },
+    photoId: photo.rows[0]?.storage_key ?? null,
+    dispute: dispute === undefined
+      ? null
+      : {
+          id: dispute.id,
+          state: dispute.state,
+          reason: dispute.reason,
+          note: dispute.note,
+          raisedByParty: dispute.raised_by_party,
+          openedAt: dispute.opened_at.toISOString(),
+          outcome: dispute.outcome,
+        },
     counterpartyRating: await reputationOf(client, you === 'seller' ? row.buyer_id : row.seller_id, you === 'seller' ? 'buyer' : 'seller'),
     youCan: availableEvents(deal, dealActor(actor, row)),
     version: row.version,

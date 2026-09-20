@@ -248,3 +248,26 @@ dressed up as a judgement.
 **To close.** A buyer client, or an inbound channel for real traders. The endpoints they would
 use already exist and are tested: `POST /api/offers`, `/counter`, `/accept`, `/decline`,
 `POST /api/deals/:id/delivery`, `/payment`, `/rate`.
+
+## C-12 · The district officer has endpoints and tests, but no screen
+
+**What.** A grievance reaches the agriculture officer of the deal's own district: the dispute is
+stamped with that district by the database, only that district's officer can move it open → under
+review → resolved, and `GET /api/disputes/patterns` counts the district's complaints by reason
+code. What does not exist is a screen an officer signs into.
+
+**Why.** §16's rehearsal is walked by a farmer, and step 19 asks for the routing to be *shown
+internally* — which is Judge Mode's job (P20), not a second application. An officer console built
+in the time the rehearsal needs would be surface with no test behind it and nobody to demonstrate
+it.
+
+**What exists instead.** Every rule the console would sit on is proven against a real PostgreSQL:
+a farmer cannot review a dispute (403), an officer from Latur cannot touch a Nashik dispute (the
+policy hides it entirely), the deal's own district officer moves it through both steps, a
+resolution needs an outcome, the record cannot be rewritten, and the pattern endpoint returns
+counts by reason with no names and no notes. The farmer's side — raising it, attaching the lot's
+photograph, seeing where it went and what was decided — is built and walked in the browser.
+
+**To close.** An officer sign-in and one screen over the endpoints that already exist: the
+district's open grievances by reason, each case with its note and evidence, and the two buttons
+that move it. The data it would show is already being computed for Judge Mode.

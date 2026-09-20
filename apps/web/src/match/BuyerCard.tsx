@@ -93,14 +93,18 @@ export function BuyerCard({
           <Tx locale={locale} k="card.record" values={{ n: number(locale, record.completedDeals), days: number(locale, Math.round(record.typicalDaysToPay ?? match.expectedDaysToPay)) }} />
         )}
       </p>
-      {/* What other farmers said, always with the count: one rating is not a hundred deals (§8.9). */}
-      <p className="muted buyer-card__rating" data-testid="buyer-rating" data-count={rating?.count ?? 0}>
-        {overallRating(rating) === null ? (
-          t(locale, 'deal.rating.none')
-        ) : (
-          <Tx locale={locale} k="deal.rating" values={{ rating: number(locale, overallRating(rating) ?? 0), n: number(locale, rating?.count ?? 0) }} />
-        )}
-      </p>
+      {/* What other farmers said, always with the count: one rating is not a hundred deals (§8.9).
+          While a complaint against this buyer is open it is not shown at all: an open dispute
+          suppresses the clean presentation, which is what gives the dispute path its teeth. */}
+      {dispute === undefined && (
+        <p className="muted buyer-card__rating" data-testid="buyer-rating" data-count={rating?.count ?? 0}>
+          {overallRating(rating) === null ? (
+            t(locale, 'deal.rating.none')
+          ) : (
+            <Tx locale={locale} k="deal.rating" values={{ rating: number(locale, overallRating(rating) ?? 0), n: number(locale, rating?.count ?? 0) }} />
+          )}
+        </p>
+      )}
       {risk !== undefined && (
         <p className="buyer-card__risk" data-testid="buyer-risk">
           <Glyph name="caution" size={16} />

@@ -22,11 +22,14 @@ import { Tx } from '../i18n/Tx';
 import type { Device } from '../state/useDevice';
 import { acceptOffer, counterOffer, declineOffer, overallOf, type DealView } from './deals';
 import { DealProgress } from './DealProgress';
+import { DisputePanel } from './DisputePanel';
 import { SaudaSlip } from './SaudaSlip';
 
 const STRUCK: readonly string[] = ['ACCEPTED', 'SAUDA_SLIP', 'DELIVERY_CONFIRMED', 'PAYMENT_CONFIRMED', 'MUTUALLY_RATED'];
+/** A complaint is possible once both sides agree the lot changed hands, and not before (SEC-11). */
+const DISPUTABLE: readonly string[] = ['DELIVERY_CONFIRMED', 'PAYMENT_CONFIRMED', 'MUTUALLY_RATED'];
 
-function Offer({ device, deal, cropName, lotSold }: { device: Device; deal: DealView; cropName: string; lotSold: boolean }) {
+function Offer({ device, deal, cropName, lotSold, district }: { device: Device; deal: DealView; cropName: string; lotSold: boolean; district: string }) {
   const { locale, reach } = device;
   const online = reach?.reachable === true;
   const [asking, setAsking] = useState(false);
@@ -92,14 +95,22 @@ function Offer({ device, deal, cropName, lotSold }: { device: Device; deal: Deal
           <Tx locale={locale} k="card.record" values={{ n: number(locale, deal.paymentRecord.completedDeals), days: number(locale, deal.paymentRecord.typicalDays) }} />
         )}
       </p>
-      {/* A rating is never shown without the number of people behind it (§8.9). */}
-      <p className="muted offer__rating" data-testid="offer-rating" data-count={deal.counterpartyRating?.count ?? 0}>
-        {rating === null ? (
-          t(locale, 'deal.rating.none')
-        ) : (
-          <Tx locale={locale} k="deal.rating" values={{ rating: number(locale, rating), n: number(locale, deal.counterpartyRating?.count ?? 0) }} />
-        )}
-      </p>
+      {/* A rating is never shown without the number of people behind it (§8.9) — and never shown
+          as clean while a complaint against this buyer is open, which is what gives one teeth. */}
+      {deal.paymentRecord.openDisputes > 0 ? (
+        <p className="offer__flag" data-testid="offer-under-dispute" data-open={deal.paymentRecord.openDisputes}>
+          <Glyph name="flag" size={16} />
+          <Tx locale={locale} k="dispute.against" values={{ n: number(locale, deal.paymentRecord.openDisputes) }} />
+        </p>
+      ) : (
+        <p className="muted offer__rating" data-testid="offer-rating" data-count={deal.counterpartyRating?.count ?? 0}>
+          {rating === null ? (
+            t(locale, 'deal.rating.none')
+          ) : (
+            <Tx locale={locale} k="deal.rating" values={{ rating: number(locale, rating), n: number(locale, deal.counterpartyRating?.count ?? 0) }} />
+          )}
+        </p>
+      )}
 
       {deal.state === 'DECLINED' && (
         <p className="muted" data-testid="offer-declined">
@@ -123,6 +134,7 @@ function Offer({ device, deal, cropName, lotSold }: { device: Device; deal: Deal
         </p>
       )}
       {struck && <DealProgress device={device} deal={deal} />}
+      {DISPUTABLE.includes(deal.state) && <DisputePanel device={device} deal={deal} district={district} />}
 
       {problem !== null && (
         <p className="notice notice--caution" data-testid="offer-problem">
@@ -178,7 +190,7 @@ function Offer({ device, deal, cropName, lotSold }: { device: Device; deal: Deal
   );
 }
 
-export function DealsPanel({ device, listingClientId, cropName }: { device: Device; listingClientId: string; cropName: string }) {
+export function DealsPanel({ device, listingClientId, cropName, district }: { device: Device; listingClientId: string; cropName: string; district: string }) {
   const mine = device.deals.filter((deal) => deal.listingClientId === listingClientId);
   if (mine.length === 0) return null;
   // Once one offer is taken the database declines the rest (migration 0011); those cards say the
@@ -189,7 +201,7 @@ export function DealsPanel({ device, listingClientId, cropName }: { device: Devi
       <p className="label">{t(device.locale, 'deal.title')}</p>
       <ul className="offer-list">
         {mine.map((deal) => (
-          <Offer key={deal.id} device={device} deal={deal} cropName={cropName} lotSold={lotSold} />
+          <Offer key={deal.id} device={device} deal={deal} cropName={cropName} lotSold={lotSold} district={district} />
         ))}
       </ul>
       {mine.some((deal) => deal.buyer.demonstration) && <p className="muted offers__note">{t(device.locale, 'buyers.demonstration')}</p>}

@@ -18,6 +18,10 @@ import { request, type HttpResult } from '../offline/http.js';
 export type PriceUnit = 'kg' | 'quintal' | 'tonne' | 'crate' | 'lot';
 export type QuantityUnit = 'kg' | 'quintal' | 'tonne' | 'crate' | 'bag';
 
+/** The five reason codes (§8.9). A code, so a district can be counted rather than parsed. */
+export const DISPUTE_REASONS = ['QUANTITY_SHORT', 'GRADE_DISPUTE', 'PAYMENT_OVERDUE', 'NO_SHOW', 'OTHER'] as const;
+export type DisputeReason = (typeof DISPUTE_REASONS)[number];
+
 export type DealState = 'OFFERED' | 'COUNTERED' | 'ACCEPTED' | 'SAUDA_SLIP' | 'DELIVERY_CONFIRMED' | 'PAYMENT_CONFIRMED' | 'MUTUALLY_RATED' | 'DECLINED';
 
 export interface SaudaSlipView {
@@ -53,13 +57,24 @@ export interface DealView {
   terms: { price: { amount: number; unit: PriceUnit }; quantity: { value: number; unit: QuantityUnit } };
   lastPriceBy: 'seller' | 'buyer';
   benchmarkAtOffer: { modalPerQtl: number; asOf: string } | null;
-  paymentRecord: { typicalDays: number | null; completedDeals: number };
+  paymentRecord: { typicalDays: number | null; completedDeals: number; openDisputes: number };
   history: Array<{ type: string; by: 'seller' | 'buyer'; price: { amount: number; unit: PriceUnit }; quantity: { value: number; unit: QuantityUnit }; at: string }>;
   slip: SaudaSlipView | null;
   /** Each side confirms delivery for itself; neither can confirm for the other (§8.9). */
   delivery: { seller: boolean; buyer: boolean; weighed: { value: number; unit: QuantityUnit } | null; note: string | null };
   payment: { amount: number; at: string; daysAfterDelivery: number } | null;
   rated: { you: boolean; them: boolean };
+  /** The photograph on file for this lot: what a complaint attaches, with no second upload. */
+  photoId: string | null;
+  dispute: {
+    id: string;
+    state: 'DISPUTE_OPEN' | 'UNDER_REVIEW' | 'RESOLVED';
+    reason: DisputeReason;
+    note: string;
+    raisedByParty: 'seller' | 'buyer';
+    openedAt: string;
+    outcome: 'upheld' | 'rejected' | 'settled' | null;
+  } | null;
   /** The other side's reputation, as an average per dimension with the number of ratings. */
   counterpartyRating: { count: number; scores: Record<string, number | null> } | null;
   youCan: string[];
@@ -140,4 +155,8 @@ export function overallOf(rating: DealView['counterpartyRating']): number | null
   const scores = Object.values(rating.scores).filter((value): value is number => value !== null);
   if (scores.length === 0) return null;
   return Math.round((scores.reduce((sum, value) => sum + value, 0) / scores.length) * 10) / 10;
+}
+
+export function raiseDispute(dealId: string, body: { reason: DisputeReason; note: string; evidencePhotoId?: string | null }): Promise<HttpResult<unknown>> {
+  return request(`/api/deals/${dealId}/dispute`, { method: 'POST', body });
 }

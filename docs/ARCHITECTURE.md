@@ -256,6 +256,18 @@ worth committing.
 | Ranking still ignores ratings entirely: the order is net realisation | §6.5. What a farmer is paid is arithmetic over the offer, the freight and the buyer's payment record; opinions inform the reader, they do not reorder the list. |
 | The demonstration trader confirms delivery and rates back through the same endpoints, with a constant rating | A deal with a seeded counterparty would otherwise stop at the farmer's own confirmation and never complete. The trader's 4-out-of-5 is a constant, disclosed in CUTS C-11, because there is nothing real to compute it from — unlike their offer price, which is their own requirement. |
 
+### Decisions taken in P17
+
+| Decision | Reason |
+|---|---|
+| A complaint carries a **reason code** — quantity short, grade dispute, payment overdue, no-show, other — and the words go in a note beside it | §8.9. The institutional value of this path is a district officer being able to say "eleven grade disputes in Niphad this month" without anybody parsing sentences. The farmer still chooses from five plain sentences; the code is what is sent. |
+| The evidence is the photograph **already on file for that lot**, attached by reference: storage key and content hash, no second upload | The photograph was verified against its hash when it arrived (§8.6) and is already in the store. Re-uploading it on a 2G connection to say the grade was wrong would be the worst moment to ask for eight megabytes. |
+| The complaint is possible only from DELIVERY_CONFIRMED onward, one open at a time, and nothing about the deal moves when it is raised | SEC-11 and `disputes_one_open`. Before delivery, declining an offer is the remedy. A dispute is a complaint about what happened, not a way to undo it — money and delivery already stand recorded. |
+| Only the officer of the deal's own district can move it, open → under review → resolved, and the record cannot be rewritten | `disputes_review` scopes the policy to that officer's district, and `disputes_guard` refuses an edit to what was said. A grievance record that can be edited is not a grievance record. |
+| An open dispute replaces the buyer's rating on every card — it does not sit beside it | §8.9: an open dispute suppresses the counterparty's clean-reputation presentation. Shown beside a 4.8, a complaint reads as a footnote; shown instead of it, it reads as what it is. |
+| `GET /api/disputes/patterns` counts a district's grievances by reason and returns no names and no notes | The institutional dashboard is a pattern, not a case file. Row-level security keeps an officer in their own district, so the endpoint cannot be widened by asking nicely. |
+| The officer has endpoints and tests, but no screen of their own | CUTS C-12. §16 is walked by a farmer, and the routing is shown internally (Judge Mode, P20). A dashboard nobody walks through in the rehearsal would be untested surface. |
+
 ## 4 · Environment (measured 2026-09-19)
 
 Windows 11 · Node 24.19 · pnpm 10.34.5 · Python 3.12.6 (`.venv`, pinned `ml/requirements.txt`) ·
@@ -307,7 +319,7 @@ precisely what v3 PART IX forbids.
 | P14 | FPO pools | **a real MOQ cleared from real listings** — 28 qtl + 5 qtl ≥ 30 qtl, in the browser |
 | P15 | Offers, deals, sauda slip | **Gate G** — the outbox inspected in the browser with the network off |
 | P16 | Delivery, payment, reputation | **reputation moves only on completed deals** — proven in the browser and against PostgreSQL |
-| P17 | Disputes, grievance routing | open dispute suppresses clean reputation |
+| P17 | Disputes, grievance routing | **open dispute suppresses clean reputation** — proven on the card and in the demand document |
 | P18 | Transport, storage, e-NWR, weather urgency | **Gates D, E** |
 | P19 | WhatsApp · SMS · IVR | identical benchmark on all four channels |
 | P20 | Full suite, Judge Mode, seeds | **Gate J**; all ten gates green |

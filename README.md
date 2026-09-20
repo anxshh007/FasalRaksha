@@ -19,8 +19,8 @@ farmers* · Government of Maharashtra, Maharashtra State Innovation Society · T
 
 ## Status
 
-Built phase by phase, each gate proven and committed (PROMPT PART XV). **Current: P16 — delivery, payment
-and reputation.** Done so far:
+Built phase by phase, each gate proven and committed (PROMPT PART XV). **Current: P17 — disputes.**
+Done so far:
 - the foundation, and the shared domain engine;
 - the schema with row-level security, and authentication;
 - the nine adapters;
@@ -63,6 +63,10 @@ and reputation.** Done so far:
   up as agreed. That mutual rating is the only thing a reputation is ever written by, and it is
   always shown with the number of people behind it, so one rating cannot look like a hundred
   closed deals.
+- when something goes wrong: from the moment both sides agree the lot changed hands, either of
+  them can say so — one of five plain reasons, their own words, and the photograph already taken
+  of the lot — and it goes to the agriculture officer of their own district, who is the only
+  person who can move it. While a complaint is open, the buyer's rating is not shown at all.
 - group sales: a lot offered for group sale shows the one consignment it can join — who is
   gathering it, for which buyer, how much is in it against the buyer's minimum, and how much is
   still needed. Putting the lot in clears the consignment when the volume clears the minimum;
@@ -75,8 +79,8 @@ speaking or typing, with a graded photograph, and see which buyer leaves them be
 keeps working with the API killed or the network gone — the shortlist included, which is the
 second half of Gate A. A small lot that no bulk buyer would look at twice can join six of its
 neighbours and clear that buyer's minimum. A price is agreed only where it can be recorded for
-both sides at once, and a buyer's record is what their completed deals say it is. Disputes come
-next (P17).
+both sides at once, a buyer's record is what their completed deals say it is, and a complaint has
+somewhere to go. Transport, storage and weather urgency come next (P18).
 
 `REQUIREMENTS.csv` is the source of truth for what is real. Run `pnpm requirements` to see it.
 

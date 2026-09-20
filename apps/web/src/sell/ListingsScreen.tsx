@@ -32,6 +32,8 @@ function ListingPhoto({ device, photo }: { device: Device; photo: NonNullable<Li
 export function ListingsScreen({ device, onSell, onBuyers }: { device: Device; onSell: () => void; onBuyers: (clientId: string) => void }) {
   const { locale, listings, briefing } = device;
   const cropName = (id: string) => briefing?.dictionary?.crops.find((c) => c.id === id)?.names[locale] ?? id;
+  // The farmer's own district, named in their language: where a complaint goes (§8.9).
+  const districtName = briefing?.registry?.districts.find((d) => d.id === briefing.district)?.names[locale] ?? briefing?.district ?? '';
   return (
     <section className="stack" aria-labelledby="listings-title" data-testid="listings">
       <div className="row" style={{ justifyContent: 'space-between' }}>
@@ -81,7 +83,7 @@ export function ListingsScreen({ device, onSell, onBuyers }: { device: Device; o
                   {t(locale, 'listings.buyers')}
                 </button>
                 <ConsignmentPanel device={device} listingClientId={listing.clientId} optedIn={d.poolOptIn} listed={state === 'sent'} />
-                <DealsPanel device={device} listingClientId={listing.clientId} cropName={cropName(d.crop)} />
+                <DealsPanel device={device} listingClientId={listing.clientId} cropName={cropName(d.crop)} district={districtName} />
               </li>
             );
           })}

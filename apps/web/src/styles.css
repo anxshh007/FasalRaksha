@@ -1735,6 +1735,55 @@ button.spine__item:hover {
   height: 1px;
 }
 
+/* ── a complaint, and where it went (P17) ────────────────────────────────────────────────── */
+
+.dispute {
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: var(--hairline);
+  display: grid;
+  gap: var(--space-2);
+}
+.dispute p {
+  margin: 0;
+}
+.dispute .btn--quiet {
+  justify-self: start;
+  padding-left: 0;
+}
+.dispute__state {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--caution);
+  font-weight: 700;
+}
+.dispute__title {
+  font-weight: 700;
+}
+.dispute__form {
+  display: grid;
+  gap: var(--space-3);
+}
+.dispute__form textarea {
+  width: 100%;
+  padding: var(--space-3);
+  font: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--text-faint);
+  border-radius: var(--radius-input);
+  resize: vertical;
+}
+.offer__flag {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--caution);
+  font-size: var(--size-small);
+  font-weight: 700;
+}
+
 /* ── the sauda slip: a record, printable and handed over (§9.9.4) ────────────────────────── */
 
 .slip {

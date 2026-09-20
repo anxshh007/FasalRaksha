@@ -48,6 +48,7 @@ import {
   RatingBody,
   saudaSlipOf,
 } from '../modules/deals/service.js';
+import { grievancePatterns, myDisputes, RaiseBody, raiseDispute, ResolveBody, resolveDispute, reviewDispute } from '../modules/disputes/service.js';
 import { createPool, CreateBody, JoinBody, joinPool, leavePool, myPools, OpenQuery, openPools } from '../modules/pools/service.js';
 import { parseOutboxEntry } from '../modules/outbox/schema.js';
 import { deliverOutboxEntry } from '../modules/outbox/service.js';
@@ -376,6 +377,16 @@ export function buildApp(deps: AppDependencies) {
     }
     return deal;
   });
+  // Complaints (§8.9; FR-15): reason-coded, from delivery onward, routed to the district officer.
+  app.post('/api/deals/:id/dispute', { config: { rateLimit: { max: 20, timeWindow: '1 hour' } } }, async (request, reply) => {
+    const dispute = await raiseDispute(requireDb(), requireActor(request), dealId(request), RaiseBody.parse(request.body), now());
+    return reply.status(201).send(dispute);
+  });
+  app.get('/api/disputes', async (request) => ({ disputes: await myDisputes(requireDb(), requireActor(request)) }));
+  const disputeId = (request: FastifyRequest) => z.object({ id: z.uuid() }).parse(request.params).id;
+  app.post('/api/disputes/:id/review', async (request) => reviewDispute(requireDb(), requireActor(request), disputeId(request)));
+  app.post('/api/disputes/:id/resolve', async (request) => resolveDispute(requireDb(), requireActor(request), disputeId(request), ResolveBody.parse(request.body)));
+  app.get('/api/disputes/patterns', async (request) => ({ patterns: await grievancePatterns(requireDb(), requireActor(request)) }));
   app.get('/api/deals/mine', async (request) => ({ deals: await myDeals(requireDb(), requireActor(request)) }));
   app.get('/api/deals/:id', async (request) => dealById(requireDb(), requireActor(request), dealId(request)));
   app.get('/api/deals/:id/sauda-slip', async (request) => saudaSlipOf(requireDb(), requireActor(request), dealId(request)));
