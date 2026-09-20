@@ -271,3 +271,24 @@ photograph, seeing where it went and what was decided — is built and walked in
 **To close.** An officer sign-in and one screen over the endpoints that already exist: the
 district's open grievances by reason, each case with its note and evidence, and the two buttons
 that move it. The data it would show is already being computed for Judge Mode.
+
+## C-13 · The demonstration forecast is a seasonal pattern, not a weather report
+
+**What.** With `WEATHER_ADAPTER=mock` — the default, and what `pnpm demo` runs — the district
+forecast is generated from a seeded monthly pattern for Maharashtra's plateau districts: monsoon
+June to September, a dry winter, pre-monsoon showers in May. It is deterministic, so the same day
+produces the same forecast, and it is shaped like the real thing, but nobody looked at the sky.
+
+**Why.** A real forecast needs a live source. One is implemented — `OpenMeteoWeatherAdapter`, the
+public Open-Meteo API, no credential required — and is exercised in the contract suite against
+recorded fixtures, but the demonstration must run with no network to any third party (§9.10's zero
+third-party requests, and the offline rehearsal).
+
+**What exists instead.** Every screen that shows an urgency sentence from a mock forecast says so
+in the same breath: "a demonstration seasonal pattern, not a real forecast", in all three
+languages. The engine that turns a forecast into urgency is the production one, the staleness rule
+is the production one, and the served document carries `mode: 'mock' | 'live'` and the source
+string, which Judge Mode reports.
+
+**To close.** Set `WEATHER_ADAPTER=live`. The document, the engine, the staleness rule and every
+screen stay exactly as they are; the disclosure line disappears with the flag.

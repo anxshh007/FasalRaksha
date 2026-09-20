@@ -1664,6 +1664,27 @@ button.spine__item:hover {
   font-family: var(--font-mono);
 }
 
+/* ── weather as urgency (P18) ───────────────────────────────────────────────────────────── */
+
+.weather {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-left: 2px solid var(--caution);
+  background: var(--caution-tint);
+  font-size: var(--size-small);
+}
+.weather--move {
+  font-size: var(--size-body);
+  font-weight: 700;
+}
+.weather .glyph {
+  color: var(--caution);
+  margin-top: 2px;
+}
+
 /* ── after the price is agreed (P16): delivery, payment, and what each side said ─────────── */
 
 .progress {

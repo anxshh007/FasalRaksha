@@ -39,6 +39,7 @@ async function main(): Promise<void> {
     buyerRegistry: adapters.buyerRegistry,
     speech: adapters.speech,
     photos: { store: new LocalPhotoStore(resolve(repoRoot, config.PHOTO_STORE_DIR)), scanner: new SignatureScanAdapter() },
+    weather: adapters.weather,
   });
   const shutdown = async (signal: string): Promise<void> => {
     logger.info({ signal }, 'shutting down');

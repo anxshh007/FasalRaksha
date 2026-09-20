@@ -7,7 +7,7 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
-import { computeBenchmark, locateFarmer, parseCropBundle, parseDemand, type CropDictionary, type DistrictRegistry } from '@fasal/shared';
+import { computeBenchmark, locateFarmer, parseCropBundle, parseDemand, weatherUrgency, type CropDictionary, type DistrictRegistry } from '@fasal/shared';
 import { describe, expect, it } from 'vitest';
 
 import { raw, LOCALES, type StringKey } from '../i18n/strings';
@@ -63,13 +63,14 @@ function briefing(extra: Partial<HomeBriefing> = {}): HomeBriefing {
     districtNames: nashik.names,
     locationNames: null,
     location: locateFarmer('Vinchur (Niphad)', nashik),
-    crops: [{ crop: 'onion', bundle: onion, names: { en: 'Onion', mr: 'कांदा' }, benchmark: computeBenchmark(onion, onion.asOf), evaluation: null as never, storage: null, release: onion.version }],
+    crops: [{ crop: 'onion', bundle: onion, names: { en: 'Onion', mr: 'कांदा' }, benchmark: computeBenchmark(onion, onion.asOf), evaluation: null as never, storage: null, urgency: weatherUrgency(null, { moistureRelevant: true }, onion.asOf), release: onion.version }],
     computedAt,
     release: VERSION,
     dataSource: 'synthetic',
     dictionary,
     registry,
     demand,
+    forecast: null,
     ...extra,
   };
 }

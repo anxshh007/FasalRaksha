@@ -65,7 +65,10 @@ export async function startCluster(): Promise<TestCluster> {
     user: 'postgres',
     password,
     port,
-    persistent: false,
+    // `persistent: false` makes embedded-postgres delete the cluster itself as it stops, and on
+    // Windows that throws EBUSY often enough to fail a suite whose tests have all passed. The
+    // directory is this file's to remove, patiently, below.
+    persistent: true,
     onLog: () => undefined,
     onError: () => undefined,
   });
@@ -74,10 +77,34 @@ export async function startCluster(): Promise<TestCluster> {
   return {
     superuserUrl: `postgres://postgres:${password}@127.0.0.1:${port}/postgres`,
     stop: async () => {
-      await server.stop();
-      rmSync(dir, { recursive: true, force: true });
+      // Tidying up is never a test result: a cluster that will not stop cleanly, or a directory
+      // Windows still holds, leaves a folder in the system temp and nothing else.
+      await server.stop().catch(() => undefined);
+      await removeCluster(dir);
     },
   };
+}
+
+/**
+ * Delete the throwaway cluster directory, patiently. On Windows the postmaster's own files can
+ * stay locked for a moment after it exits (a virus scanner reading them is enough), and an
+ * `EBUSY` while tidying up must never be reported as a failing test suite: the tests have already
+ * run, and the directory is in the system temp folder either way.
+ */
+async function removeCluster(dir: string): Promise<void> {
+  for (let attempt = 0; attempt < 5; attempt++) {
+    try {
+      rmSync(dir, { recursive: true, force: true });
+      return;
+    } catch {
+      await new Promise((done) => setTimeout(done, 200 * (attempt + 1)));
+    }
+  }
+  try {
+    rmSync(dir, { recursive: true, force: true, maxRetries: 3, retryDelay: 300 });
+  } catch {
+    // Left behind in the temp folder. Not a test result.
+  }
 }
 
 /** A fresh database with every migration applied and a fresh context key installed. */

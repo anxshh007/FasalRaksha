@@ -14,15 +14,18 @@ import {
   FINANCE_RATE_ANNUAL_DEFAULT,
   locateFarmer,
   TOLERABLE_LOSS_FRACTION_DEFAULT,
+  weatherUrgency,
   type Benchmark,
   type CropBundle,
   type CropDictionary,
   type Demand,
+  type DistrictForecast,
   type DistrictRegistry,
   type FarmerLocation,
   type ISODate,
   type StorageChoice,
   type WaitEvaluation,
+  type WeatherUrgency,
 } from '@fasal/shared';
 
 import { store, type StoredProfile } from './db.js';
@@ -50,6 +53,8 @@ export interface CropBriefing {
   benchmark: Benchmark;
   evaluation: WaitEvaluation;
   storage: StorageChoice | null;
+  /** What this week's weather means for this crop, today (§XIII). Never a price prediction. */
+  urgency: WeatherUrgency;
   release: string;
 }
 
@@ -70,6 +75,8 @@ export interface HomeBriefing {
   registry: DistrictRegistry | null;
   /** The district's buyer demand, verified; null before the first signed-in sync. */
   demand: Demand | null;
+  /** The district's published forecast, with its own age; null before the first sync. */
+  forecast: DistrictForecast | null;
 }
 
 /** Today's date in India (IST, UTC+05:30, no daylight saving), from a clock reading. */
@@ -80,12 +87,13 @@ export function todayInIndia(now: number): ISODate {
 export async function computeHome(profile: StoredProfile, context: DecisionContext = DEFAULT_CONTEXT, now = Date.now()): Promise<HomeBriefing | null> {
   if (profile.district === null) return null;
   const db = store();
-  const [bundles, cropsDoc, districtsDoc, manifest, demandDoc] = await Promise.all([
+  const [bundles, cropsDoc, districtsDoc, manifest, demandDoc, weatherDoc] = await Promise.all([
     db.bundles.where('district').equals(profile.district).toArray(),
     db.shared.get('crops'),
     db.shared.get('districts'),
     db.manifest.get('current'),
     db.demand.get(profile.district),
+    db.weather.get(profile.district),
   ]);
   const dictionaryDoc = (cropsDoc?.document['dictionary'] as CropDictionary | undefined) ?? null;
   const dictionary = dictionaryDoc?.crops ?? [];
@@ -108,11 +116,14 @@ export async function computeHome(profile: StoredProfile, context: DecisionConte
         today,
       });
       const profileEntry = dictionary.find((c) => c.id === bundle.crop);
-      return { crop: bundle.crop, bundle, names: profileEntry?.names ?? { en: bundle.crop, mr: bundle.crop }, benchmark, evaluation, storage, release: bundle.version };
+      // Weather is urgency, not prediction: the forecast is read for this crop's own sensitivity
+      // and turned into one operational sentence here, on the phone (§XIII).
+      const urgency = weatherUrgency(weatherDoc?.forecast ?? null, { moistureRelevant: profileEntry?.moistureRelevant ?? false }, today);
+      return { crop: bundle.crop, bundle, names: profileEntry?.names ?? { en: bundle.crop, mr: bundle.crop }, benchmark, evaluation, storage, urgency, release: bundle.version };
     })
     // Crops with current prices first, stale ones last; otherwise alphabetical, so no ranking is implied.
     .sort((a, b) => Number(a.benchmark.adviceSuppressed) - Number(b.benchmark.adviceSuppressed) || a.crop.localeCompare(b.crop));
 
   const market = location?.marketId === null || location === null ? null : (district?.markets.find((m) => m.id === location.marketId) ?? null);
-  return { district: profile.district, districtNames: district?.names ?? null, locationNames: market?.names ?? null, location, crops, computedAt: now, release: manifest?.version ?? null, dataSource: manifest?.dataSource ?? null, dictionary: dictionaryDoc, registry: registry ?? null, demand: demandDoc?.demand ?? null };
+  return { district: profile.district, districtNames: district?.names ?? null, locationNames: market?.names ?? null, location, crops, computedAt: now, release: manifest?.version ?? null, dataSource: manifest?.dataSource ?? null, dictionary: dictionaryDoc, registry: registry ?? null, demand: demandDoc?.demand ?? null, forecast: weatherDoc?.forecast ?? null };
 }

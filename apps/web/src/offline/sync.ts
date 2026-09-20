@@ -13,7 +13,7 @@
  * yesterday's verified price is better than today's unverifiable one. Other districts are not
  * fetched unless asked for.
  */
-import { parseCropBundle, parseDemand, verifyIntegrity } from '@fasal/shared';
+import { parseCropBundle, parseDemand, parseForecast, verifyIntegrity } from '@fasal/shared';
 
 import { recordEvent, store, type ManifestEntry, type StoredManifest } from './db.js';
 import { request } from './http.js';
@@ -207,4 +207,41 @@ export async function syncDistrict(district: string, now = Date.now()): Promise<
 
   await recordEvent({ kind: report.fetched.length > 0 ? 'synced' : 'not-modified', subject: district, detail: `release ${manifest.version}: ${report.fetched.length} fetched, ${report.unchanged.length} unchanged, ${report.rejected.length} rejected` }, now);
   return report;
+}
+
+/**
+ * The district's weather (§XIII). Verified and parsed like every other document the phone keeps,
+ * and kept even when it goes out of date: the engine decides what an old forecast may say, and
+ * the answer is "nothing" — but the screen still tells the farmer how old what it has is.
+ */
+export async function syncWeather(district: string, now = Date.now()): Promise<'synced' | 'unchanged' | 'unreachable' | 'rejected'> {
+  if (!SLUG.test(district)) throw new Error('A district id is a lower-case slug.');
+  const db = store();
+  const held = await db.weather.get(district);
+  const got = await request<string>(`/api/weather/${district}`, { raw: true, headers: held ? { 'if-none-match': `"${held.integrity}"` } : {} });
+  if (got.kind === 'unreachable') return 'unreachable';
+  if (got.kind === 'not-modified') return 'unchanged';
+  if (got.kind !== 'ok') {
+    await recordEvent({ kind: 'server-error', subject: `weather/${district}`, detail: `${got.status} ${got.message}` }, now);
+    return 'rejected';
+  }
+  let doc: unknown;
+  try {
+    doc = JSON.parse(got.body);
+  } catch {
+    doc = null;
+  }
+  if (!isRecord(doc) || !verifyIntegrity(doc)) {
+    await recordEvent({ kind: 'integrity-rejected', subject: `weather/${district}`, detail: 'content does not match its integrity hash' }, now);
+    return 'rejected';
+  }
+  try {
+    const forecast = parseForecast(doc);
+    if (forecast.district !== district) throw new Error('a forecast for another district');
+    await db.weather.put({ district, issuedDate: forecast.issuedDate, integrity: String(doc['integrity']), storedAt: now, forecast });
+    return 'synced';
+  } catch (error) {
+    await recordEvent({ kind: 'shape-rejected', subject: `weather/${district}`, detail: error instanceof Error ? error.message : 'unreadable' }, now);
+    return 'rejected';
+  }
 }

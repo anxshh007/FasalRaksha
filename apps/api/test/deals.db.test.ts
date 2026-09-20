@@ -18,6 +18,7 @@ import type { CropBundle } from '@fasal/shared';
 import pg from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
+import { MockWeatherAdapter } from '../src/adapters/weather/weather.js';
 import { loadConfig } from '../src/config.js';
 import { createPool, type Pool } from '../src/db/pool.js';
 import { buildApp, type App } from '../src/http/app.js';
@@ -93,7 +94,15 @@ beforeAll(async () => {
   pool = createPool(db.appUrl, { max: 4 });
   const config = loadConfig({ DATABASE_URL: db.appUrl, NODE_ENV: 'test', DB_CONTEXT_KEY: db.contextKey.toString('hex'), AUTH_SECRET: randomBytes(32).toString('hex') });
   keys = createKeyRing(config.AUTH_SECRET, config.DB_CONTEXT_KEY);
-  app = buildApp({ config, logger: createLogger({ level: 'fatal', destination: { write: () => undefined } }), db: { pool, contextKey: keys.contextKey }, keys, now: () => NOW });
+  app = buildApp({
+    config,
+    logger: createLogger({ level: 'fatal', destination: { write: () => undefined } }),
+    db: { pool, contextKey: keys.contextKey },
+    keys,
+    // The slip's suggested pickup is checked against a forecast, so the server has one (§XIII).
+    weather: new MockWeatherAdapter(),
+    now: () => NOW,
+  });
   await app.ready();
   await publish(VERSION, { ownerUrl: db.ownerUrl, env: {} }); // the slip's benchmark and freight come from the published bundle
   await seedDemand(db.ownerUrl, VERSION, NOW);
@@ -251,10 +260,13 @@ describe('SEC · only the two parties, and only a verified buyer', () => {
 
     const granted = await app.inject({ method: 'POST', url: `/api/offers/${offer.id}/acknowledge`, headers: bearer(world.farmerA, 'farmer'), payload: { reason: 'Happy to discuss pickup.' } });
     expect(granted.statusCode).toBe(200);
-    const grant = granted.json() as { relayHandle: string; expiresAt: string; buyer: { name: string } };
+    const grant = granted.json() as { relayHandle: string; expiresAt: string; buyer: { name: string; place: string } };
     expect(grant.relayHandle).toMatch(/^[0-9a-f]{24}$/); // a handle for the masked relay, never a number
     expect(grant.buyer.name).toBe(offer.buyer.name);
-    expect(JSON.stringify(grant)).not.toMatch(/\+?\d{10}/); // no phone number reaches either side
+    // What comes back is the handle, when it expires, and who it reaches — and nothing else: no
+    // phone number, and no field that could carry one (§8.4).
+    expect(Object.keys(grant).sort()).toEqual(['buyer', 'expiresAt', 'relayHandle']);
+    expect(Object.keys(grant.buyer).sort()).toEqual(['name', 'place']);
 
     const stored = await seed.query<{ reason: string }>('SELECT reason FROM app.contact_grants WHERE deal_id = $1', [offer.id]);
     expect(stored.rows[0]?.reason).toBe('Happy to discuss pickup.'); // audited, with the farmer's own words
@@ -373,6 +385,20 @@ describe('FR-14 · delivery, payment, and a reputation that moves only on comple
       if (buyer.rating === null) continue;
       expect(Object.keys(buyer.rating).sort()).toEqual(['count', 'paymentTimeliness', 'pickupReliability', 'weighmentFairness']);
     }
+  });
+});
+
+describe('FR-13 · the pickup a sauda slip suggests, checked against the weather', () => {
+  it("names a day inside the lot's own window, and says the forecast was consulted", async () => {
+    const clientId = await listLot(5);
+    const offer = (await offersOn(clientId))[0]!;
+    const accepted = (await app.inject({ method: 'POST', url: `/api/offers/${offer.id}/accept`, headers: bearer(world.farmerA, 'farmer') })).json() as DealView;
+    const pickup = accepted.slip?.pickup;
+    expect(pickup?.arrangedBy).toBe('phone'); // §XIII: inform the phone call, never replace it
+    expect(pickup?.weatherChecked).toBe(true); // the mock forecast is a real forecast document here
+    expect(pickup?.suggested).not.toBeNull();
+    expect(pickup!.suggested! >= bundle.asOf).toBe(true);
+    expect(pickup!.suggested! <= '2026-10-10').toBe(true); // inside the availability window the lot was listed with
   });
 });
 

@@ -17,6 +17,7 @@ import { z } from 'zod';
 
 import type { MessagingAdapter } from '../adapters/messaging/index.js';
 import type { PhotoStore, ScanAdapter } from '../adapters/photos/photos.js';
+import type { WeatherAdapter } from '../adapters/weather/weather.js';
 import type { SpeechAdapter } from '../adapters/speech/speech.js';
 import type { BuyerRegistryAdapter, FarmerRegistryAdapter } from '../adapters/registry/types.js';
 import type { Config } from '../config.js';
@@ -25,6 +26,7 @@ import type { Logger } from '../log/logger.js';
 import { refreshSession, requestOtp, revokeSession, verifyOtp, type AuthDeps, type SessionTokens } from '../modules/auth/service.js';
 import { cropBundle, currentManifest, sharedBundle, type ServedDocument } from '../modules/bundles/store.js';
 import { demandFor } from '../modules/demand/service.js';
+import { weatherFor } from '../modules/weather/service.js';
 import { listMine } from '../modules/listings/service.js';
 import { getMe } from '../modules/me/service.js';
 import { appendChunk, openUpload, PHOTO_LIMITS, readPhoto, type PhotoDeps } from '../modules/photos/service.js';
@@ -74,6 +76,8 @@ export interface AppDependencies {
   speech?: SpeechAdapter;
   /** Where photographs are spooled and stored, and what scans them (§8.6). */
   photos?: { store: PhotoStore; scanner: ScanAdapter };
+  /** The published forecast the phone turns into urgency itself (§XIII). */
+  weather?: WeatherAdapter;
   now?: () => Date;
 }
 
@@ -225,6 +229,15 @@ export function buildApp(deps: AppDependencies) {
 
   // Demand for the buyer shortlist (FR-09): signed-in only, verified on the phone like a bundle,
   // revalidated by ETag. The phone ranks it against its own lot, which never leaves the phone.
+  // Weather (§XIII): what a published source says, verifiable like a bundle. The urgency
+  // sentence is computed on the phone from it, so it survives this server being killed.
+  app.get('/api/weather/:district', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (request, reply) => {
+    requireActor(request);
+    const { district } = z.object({ district: z.string().trim().min(2).max(60) }).parse(request.params);
+    if (deps.weather === undefined) throw new DomainError(503, 'WEATHER_UNAVAILABLE', 'This server has no weather source. Prices on your phone still work.');
+    return sendDocument(request, reply, await weatherFor(deps.weather, district, now()));
+  });
+
   app.get('/api/demand/:district', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (request, reply) => {
     const { district } = z.object({ district: Slug }).parse(request.params);
     return sendDocument(request, reply, await demandFor(requireDb(), requireActor(request), district, now()));
@@ -349,7 +362,7 @@ export function buildApp(deps: AppDependencies) {
   });
   const dealId = (request: FastifyRequest) => z.object({ id: z.uuid() }).parse(request.params).id;
   app.post('/api/offers/:id/counter', async (request) => counterOffer(requireDb(), requireActor(request), dealId(request), CounterBody.parse(request.body), now()));
-  app.post('/api/offers/:id/accept', async (request) => acceptOffer(requireDb(), requireActor(request), dealId(request), now()));
+  app.post('/api/offers/:id/accept', async (request) => acceptOffer(requireDb(), requireActor(request), dealId(request), now(), deps.weather));
   app.post('/api/offers/:id/decline', async (request) => declineOffer(requireDb(), requireActor(request), dealId(request), now()));
   app.post('/api/offers/:id/acknowledge', { config: { rateLimit: { max: 30, timeWindow: '1 hour' } } }, async (request) =>
     acknowledgeOffer(requireDb(), requireActor(request), dealId(request), AcknowledgeBody.parse(request.body).reason),

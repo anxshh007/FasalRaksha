@@ -84,7 +84,21 @@ export function SaudaSlip({ locale, slip, cropName }: { locale: Locale; slip: Sa
             <Tx locale={locale} k="card.record" values={{ n: number(locale, slip.paymentRecord.completedDeals), days: number(locale, slip.paymentRecord.typicalDays) }} />
           )}
         </Row>
-        <Row label={t(locale, 'slip.pickup')}>{t(locale, 'slip.pickupNote')}</Row>
+        <Row label={t(locale, 'slip.pickup')} testId="slip-pickup">
+          {slip.pickup.suggested === null ? (
+            t(locale, 'slip.pickupNote')
+          ) : (
+            <>
+              <Tx
+                locale={locale}
+                k={slip.pickup.weatherChecked ? 'slip.pickupWeather' : 'slip.pickupDay'}
+                values={{ day: day(locale, slip.pickup.suggested) }}
+                words={['day']}
+              />{' '}
+              <span className="muted">{t(locale, 'slip.pickupNote')}</span>
+            </>
+          )}
+        </Row>
         <Row label={t(locale, 'slip.issued')}>{day(locale, slip.issuedAt.slice(0, 10))}</Row>
       </dl>
 

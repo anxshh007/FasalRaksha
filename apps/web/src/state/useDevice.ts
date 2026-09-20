@@ -18,7 +18,7 @@ import { photoKey } from '../offline/photos';
 import { attachRecording, saveRecording, transcribePending } from '../offline/recordings';
 import { effectiveType, probe, type Reachability } from '../offline/reach';
 import { adoptSession, refreshProfile, restoreSession, signOut as endSession, type SessionState } from '../offline/session';
-import { syncDemand, syncDistrict } from '../offline/sync';
+import { syncDemand, syncWeather, syncDistrict } from '../offline/sync';
 import { refreshDeals, storedDeals, type DealView } from '../deals/deals';
 import { refreshMyPools, storedPools, type ConsignmentView } from '../pools/pools';
 import { applyToDocument, savePreference, watchForBrightLight, type Preferences, type Theme } from './preferences';
@@ -147,6 +147,7 @@ export function useDevice(initial: Preferences): Device {
         if (state.status === 'signed-in' && state.profile.district !== null) {
           await syncDistrict(state.profile.district);
           await syncDemand(state.profile.district);
+          await syncWeather(state.profile.district);
           await refreshMyPools(state.profile.userId);
           await refreshDeals(state.profile.userId);
           await drain(state.profile.userId, { effectiveType: effectiveType() });

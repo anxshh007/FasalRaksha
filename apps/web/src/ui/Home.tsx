@@ -14,6 +14,7 @@ import { BenchmarkStrip } from '../briefing/BenchmarkStrip';
 import { EvidencePanel } from '../briefing/EvidencePanel';
 import { LotControl } from '../briefing/LotControl';
 import { RakshaCard } from '../briefing/RakshaCard';
+import { WeatherLine } from '../briefing/WeatherLine';
 import { Glyph } from '../design/Glyph';
 import { clock, headlineKey, number, rupees, t, type Locale } from '../i18n/strings';
 import { Tx } from '../i18n/Tx';
@@ -177,6 +178,8 @@ export function Home({ device, onBuyers }: { device: Device; onBuyers: () => voi
               })}
             />
           </div>
+          {/* Weather is urgency, not prediction (§XIII): one sentence, above the advice it changes. */}
+          <WeatherLine locale={locale} urgency={lead.urgency} cropName={cropName(locale, lead)} districtName={district} source={briefing.forecast?.source ?? null} />
           <div data-testid={`verdict-${lead.crop}`} data-verdict={verdict}>
             <RakshaCard locale={locale} evaluation={lead.evaluation} today={lead.benchmark.modal.amount} onWhy={why} />
           </div>
@@ -188,6 +191,7 @@ export function Home({ device, onBuyers }: { device: Device; onBuyers: () => voi
             storage={lead.storage}
             location={briefing.location}
             marketName={briefing.locationNames === null ? null : locale === 'en' ? briefing.locationNames.en : briefing.locationNames.mr}
+            waiting={verdict === 'wait'}
           />
           <BestBuyer locale={locale} briefing={briefing} crop={lead.crop} context={context} onBuyers={onBuyers} />
         </article>

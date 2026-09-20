@@ -156,6 +156,18 @@ export interface StoredDeal {
   deal: import('../deals/deals.js').DealView;
 }
 
+/**
+ * The district's published forecast (§XIII), verified and parsed. The urgency sentence is computed
+ * from it on the phone, so it is still there — with its age on it — when nothing can be reached.
+ */
+export interface StoredForecast {
+  district: string;
+  issuedDate: string;
+  integrity: string;
+  storedAt: number;
+  forecast: import('@fasal/shared').DistrictForecast;
+}
+
 /** The district's buyer demand, verified and parsed (FR-09): what the shortlist is ranked from, offline too. */
 export interface StoredDemand {
   district: string;
@@ -184,6 +196,7 @@ export class DeviceStore extends Dexie {
   demand!: Table<StoredDemand, string>;
   pools!: Table<StoredPool, string>;
   deals!: Table<StoredDeal, string>;
+  weather!: Table<StoredForecast, string>;
 
   constructor(name = 'fasal-raksha') {
     super(name);
@@ -216,6 +229,10 @@ export class DeviceStore extends Dexie {
     // v6 (P15): offers, deals and their sauda slips.
     this.version(6).stores({
       deals: 'id, userId, listingClientId',
+    });
+    // v7 (P18): the district's weather forecast.
+    this.version(7).stores({
+      weather: 'district',
     });
   }
 }

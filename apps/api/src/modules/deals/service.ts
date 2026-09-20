@@ -26,6 +26,7 @@ import {
   availableEvents,
   estimateFreight,
   roadKm,
+  suggestedPickup,
   transition,
   typicalDaysToPay,
   type Actor as DealActor,
@@ -33,6 +34,7 @@ import {
   type DealEvent,
   type DealState,
   type DealTerms,
+  type DistrictForecast,
   type DistrictRegistry,
   type Grade,
   type TransportTariff,
@@ -40,6 +42,7 @@ import {
 import type { PoolClient } from 'pg';
 import { z } from 'zod';
 
+import type { WeatherAdapter } from '../../adapters/weather/weather.js';
 import { withActor, type Actor, type Database } from '../../db/actor.js';
 import { DomainError } from '../../http/errors.js';
 import { cropBundle } from '../bundles/store.js';
@@ -102,7 +105,8 @@ export interface SaudaSlip {
   freight: { total: number; vehicleClass: string; trips: number; roadKm: number } | null;
   /** Not a promise by the buyer: what their completed deals show, and how many there are. */
   paymentRecord: { typicalDays: number | null; completedDeals: number };
-  pickup: { arrangedBy: 'phone'; note: string };
+  /** A day to aim for, not a booking: two verified parties still make the call (§XIII, FR-13). */
+  pickup: { arrangedBy: 'phone'; suggested: string | null; weatherChecked: boolean; note: string };
   /** Present when the seller is a consignment: what each contributing lot is owed, by volume. */
   split: { contributors: number; totalKg: number; shares: Array<{ contributedKg: number; amount: number | null }> } | null;
   disputeFrom: 'delivery-confirmed';
@@ -150,6 +154,8 @@ interface DealRow {
   listing_client_id: string | null;
   listing_grade: Grade | null;
   listing_provenance: string | null;
+  available_from: string | null;
+  available_until: string | null;
   pool_id: string | null;
   seller_id: string;
   seller_kind: 'farmer' | 'fpo';
@@ -177,6 +183,7 @@ interface DealRow {
 
 const DEAL_SELECT = `
   SELECT d.id, d.listing_id, l.client_id AS listing_client_id, l.grade AS listing_grade, l.grade_provenance AS listing_provenance,
+         l.available_from::text AS available_from, l.available_until::text AS available_until,
          d.pool_id, d.seller_id, d.seller_kind,
          COALESCE(f.display_name, fp.name) AS seller_name,
          d.buyer_id, b.business_name AS buyer_name, b.place AS buyer_place, b.demonstration AS buyer_demonstration,
@@ -474,12 +481,15 @@ export async function declineOffer(db: Database, actor: Actor, dealId: string, n
  * Acceptance, and the slip that follows it, in one transaction. `ISSUE_SLIP` is the engine's
  * system event: neither party issues the slip, the server does, the moment the price is agreed.
  */
-export async function acceptOffer(db: Database, actor: Actor, dealId: string, now: Date): Promise<DealView> {
+export async function acceptOffer(db: Database, actor: Actor, dealId: string, now: Date, weather?: WeatherAdapter): Promise<DealView> {
   const subject = await withActor(db, actor, async (client) => {
     const row = await rowById(client, dealId);
     return { crop: row.crop, district: row.district };
   });
   const bundle = await bundleFor(db, subject.crop, subject.district);
+  // The forecast is read before the transaction opens: a weather service having a bad afternoon
+  // must not hold a database transaction open, and a slip without a suggested day is still a slip.
+  const forecast = await forecastFor(weather, subject.district, now);
 
   return withActor(db, actor, async (client) => {
     const row = await rowById(client, dealId);
@@ -494,7 +504,7 @@ export async function acceptOffer(db: Database, actor: Actor, dealId: string, no
     await client.query('INSERT INTO app.sauda_slips (deal_id, slip_no, payload, issued_at) VALUES ($1, $2, $3, $4)', [
       dealId,
       await slipNumber(client, row.district, now),
-      JSON.stringify(await freeze(client, { ...row, state: issued.state }, bundle)),
+      JSON.stringify(await freeze(client, { ...row, state: issued.state }, bundle, forecast, now)),
       now,
     ]);
     return view(client, await rowById(client, dealId), actor);
@@ -508,8 +518,22 @@ async function slipNumber(client: PoolClient, district: string, now: Date): Prom
   return `SR-${district.slice(0, 3).toUpperCase()}-${day}-${(rows[0]?.n ?? '0').padStart(4, '0')}`;
 }
 
+/** The district's published forecast, or nothing: a slip is never held up by the weather service. */
+async function forecastFor(weather: WeatherAdapter | undefined, district: string, now: Date): Promise<DistrictForecast | null> {
+  if (weather === undefined) return null;
+  const registry = districtRegistry().districts.find((d) => d.id === district);
+  if (registry === undefined) return null;
+  try {
+    return await weather.forecast(district, registry.centroid, today(now), 7);
+  } catch {
+    return null;
+  }
+}
+
+const today = (now: Date): string => new Date(now.getTime() + 5.5 * 3600_000).toISOString().slice(0, 10);
+
 /** Everything the two parties agreed, and what it was measured against, written down once. */
-async function freeze(client: PoolClient, row: DealRow, bundle: Bundle | null): Promise<Omit<SaudaSlip, 'slipNo' | 'issuedAt'>> {
+async function freeze(client: PoolClient, row: DealRow, bundle: Bundle | null, forecast: DistrictForecast | null, now: Date): Promise<Omit<SaudaSlip, 'slipNo' | 'issuedAt'>> {
   const price = { amount: Number(row.price), unit: row.price_unit };
   const quantity = { value: Number(row.qty), unit: row.qty_unit };
   const kg = kilograms(quantity.value, quantity.unit);
@@ -535,11 +559,22 @@ async function freeze(client: PoolClient, row: DealRow, bundle: Bundle | null): 
     grossValue: grossValue(price, quantity),
     freight: freight === null || km === null ? null : { total: Math.round(freight.total), vehicleClass: freight.vehicleClass, trips: freight.trips, roadKm: Math.round(km) },
     paymentRecord: await paymentRecord(client, row.buyer_id),
-    pickup: { arrangedBy: 'phone', note: 'Pickup is arranged directly between the two parties named here.' },
+    pickup: {
+      arrangedBy: 'phone',
+      ...pickupDay(forecast, row, now),
+      note: 'Pickup is arranged directly between the two parties named here.',
+    },
     split: row.pool_id === null ? null : await splitTable(client, row.pool_id, price, quantity),
     disputeFrom: 'delivery-confirmed',
     district: row.district,
   };
+}
+
+/** The first day in the lot's own window that the weather does not argue against (FR-13). */
+function pickupDay(forecast: DistrictForecast | null, row: DealRow, now: Date): { suggested: string | null; weatherChecked: boolean } {
+  if (row.available_from === null || row.available_until === null) return { suggested: null, weatherChecked: false };
+  const chosen = suggestedPickup(forecast, row.available_from, row.available_until, today(now));
+  return { suggested: chosen.date, weatherChecked: chosen.weatherChecked };
 }
 
 /** Proportional by contributed volume (§6.6), in kilograms and rupees — never as a percentage. */

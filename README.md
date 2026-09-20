@@ -19,8 +19,8 @@ farmers* · Government of Maharashtra, Maharashtra State Innovation Society · T
 
 ## Status
 
-Built phase by phase, each gate proven and committed (PROMPT PART XV). **Current: P17 — disputes.**
-Done so far:
+Built phase by phase, each gate proven and committed (PROMPT PART XV). **Current: P18 — storage, transport
+and weather.** Done so far:
 - the foundation, and the shared domain engine;
 - the schema with row-level security, and authentication;
 - the nine adapters;
@@ -63,6 +63,13 @@ Done so far:
   up as agreed. That mutual rating is the only thing a reputation is ever written by, and it is
   always shown with the number of people behind it, so one rating cannot look like a hundred
   closed deals.
+- weather as urgency, not prediction: "Rain expected Thursday in Nashik. Onion is
+  moisture-sensitive — move the lot within 48 hours." One sentence, computed on the phone from a
+  published forecast, and nothing at all once that forecast is more than two days old. The sauda
+  slip suggests the first day in the lot's own window that the weather does not argue against, and
+  when the advice is to wait, the warehouse, its rate and the e-NWR pledge under the CGS-NPF
+  guarantee are named beside it — because advice to wait given to a farmer who cannot wait is not
+  advice.
 - when something goes wrong: from the moment both sides agree the lot changed hands, either of
   them can say so — one of five plain reasons, their own words, and the photograph already taken
   of the lot — and it goes to the agriculture officer of their own district, who is the only
@@ -80,7 +87,8 @@ keeps working with the API killed or the network gone — the shortlist included
 second half of Gate A. A small lot that no bulk buyer would look at twice can join six of its
 neighbours and clear that buyer's minimum. A price is agreed only where it can be recorded for
 both sides at once, a buyer's record is what their completed deals say it is, and a complaint has
-somewhere to go. Transport, storage and weather urgency come next (P18).
+somewhere to go, and every recommendation carries the mechanism that makes it possible. The
+channels — WhatsApp, SMS, IVR — come next (P19).
 
 `REQUIREMENTS.csv` is the source of truth for what is real. Run `pnpm requirements` to see it.
 

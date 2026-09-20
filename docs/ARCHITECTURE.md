@@ -268,6 +268,18 @@ worth committing.
 | `GET /api/disputes/patterns` counts a district's grievances by reason and returns no names and no notes | The institutional dashboard is a pattern, not a case file. Row-level security keeps an officer in their own district, so the endpoint cannot be widened by asking nicely. |
 | The officer has endpoints and tests, but no screen of their own | CUTS C-12. §16 is walked by a farmer, and the routing is shown internally (Judge Mode, P20). A dashboard nobody walks through in the rehearsal would be untested surface. |
 
+### Decisions taken in P18
+
+| Decision | Reason |
+|---|---|
+| The server serves the district's published forecast and nothing more; the urgency sentence is computed on the phone by `weatherUrgency` | Gate A again: the sentence has to survive the API being killed, and Constitution §3 wants WhatsApp, SMS and IVR to produce the same words from the same function. The document is canonical JSON with an integrity hash and an ETag, verified like a bundle before it is stored. |
+| A forecast has its own, shorter shelf life: past `WEATHER_MAX_AGE_DAYS` (2) it produces no urgency at all | Weather goes out of date faster than a price does. The rule is the engine's, not the screen's, so every channel forgets a stale forecast on the same day. |
+| Only a moisture-sensitive crop gets "move the lot"; everything else gets "worth knowing when you plan the pickup" | §XIII wants operational urgency, and urgency that fires for every crop in the monsoon is noise. `moistureRelevant` already exists on the crop profile and is the honest discriminator. |
+| The mock forecast says so on screen: "a demonstration seasonal pattern, not a real forecast" | It is a seeded seasonal pattern, and a farmer reading "rain expected Thursday" must not be reading a seeded pattern without being told (CUTS C-13). |
+| The sauda slip carries a **suggested pickup day**: the first day inside the lot's own availability window that the forecast does not argue against, with a flag for whether a forecast was consulted at all | FR-13, and §XIII's instruction not to build a booking engine. The slip informs the phone call; it does not replace it. The forecast is read before the transaction opens, so a slow weather service can never hold a deal open. |
+| When the answer is to wait, the warehouse, its monthly rate and the e-NWR pledge under CGS-NPF are named beside the advice — and where the warehouse issues no e-NWR, that is said too | §XIII: advice to wait given to a farmer who cannot afford to wait is not advice. The pledge rate is written as "about 9 percent", in words, because the percent sign belongs to nothing on a farmer's screen. |
+| Gates D and E are proven twice: as arithmetic in `packages/shared`, and on the screen in `gates-de.spec.ts` | An engine that refuses correctly behind a screen that hedges is not a product. The browser test moves the phone's clock eight days past the bundle and watches the advice go while the price stays, and drives the lot to two thousand quintals to fail GR-7 live, with no network call. |
+
 ## 4 · Environment (measured 2026-09-19)
 
 Windows 11 · Node 24.19 · pnpm 10.34.5 · Python 3.12.6 (`.venv`, pinned `ml/requirements.txt`) ·
@@ -320,7 +332,7 @@ precisely what v3 PART IX forbids.
 | P15 | Offers, deals, sauda slip | **Gate G** — the outbox inspected in the browser with the network off |
 | P16 | Delivery, payment, reputation | **reputation moves only on completed deals** — proven in the browser and against PostgreSQL |
 | P17 | Disputes, grievance routing | **open dispute suppresses clean reputation** — proven on the card and in the demand document |
-| P18 | Transport, storage, e-NWR, weather urgency | **Gates D, E** |
+| P18 | Transport, storage, e-NWR, weather urgency | **Gates D, E** — proven in the engine and on the screen |
 | P19 | WhatsApp · SMS · IVR | identical benchmark on all four channels |
 | P20 | Full suite, Judge Mode, seeds | **Gate J**; all ten gates green |
 | P21 | 23-step rehearsal, both themes | §16 unbroken twice |

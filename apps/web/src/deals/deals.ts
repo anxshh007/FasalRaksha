@@ -38,7 +38,7 @@ export interface SaudaSlipView {
   grossValue: number | null;
   freight: { total: number; vehicleClass: string; trips: number; roadKm: number } | null;
   paymentRecord: { typicalDays: number | null; completedDeals: number };
-  pickup: { arrangedBy: 'phone'; note: string };
+  pickup: { arrangedBy: 'phone'; suggested: string | null; weatherChecked: boolean; note: string };
   split: { contributors: number; totalKg: number; shares: Array<{ contributedKg: number; amount: number | null }> } | null;
   disputeFrom: 'delivery-confirmed';
   district: string;
