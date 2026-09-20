@@ -244,6 +244,18 @@ worth committing.
 | The seeded traders answer a new lot through `makeOffer`, as themselves, from their own standing requirements | There is no buyer client in this build, and an offer nobody made cannot be shown to a farmer. What is simulated is the decision to offer; the offer, the deal row, the policies and the record are the production path (CUTS C-11). |
 | The slip prints at A5 with the FIELD palette forced in `tokens.css` | §9.9.4 wants it printable and shareable; a near-black screen theme prints as a page of ink. The palette lives in the token file because nothing outside it may write a colour (§9.4, enforced by a test). |
 
+### Decisions taken in P16
+
+| Decision | Reason |
+|---|---|
+| Delivery is two independent confirmations, each side only for itself, and the deal moves to DELIVERY_CONFIRMED when the second one lands | §8.9. `deals_guard` refuses a flag set on the other party's behalf, so "both sides agreed the lot changed hands" is a fact in the database rather than a claim by whoever got there first. |
+| Only the seller confirms payment, and the days are counted from the second delivery confirmation | Only the person expecting the money knows whether it arrived. That day count is the load-bearing signal in every future shortlist the buyer appears in, so it is measured from the moment both sides agreed the lot had gone, not from the slip. |
+| A rating is possible only on a deal that reached PAYMENT_CONFIRMED, is never edited, and each side rates the other on its own three dimensions | "Reputation attaches to completed transactions only" (§8.9) is a rule about what may be written, not about what is displayed, so it lives in the engine (`RATE` refuses any earlier state), in the policy (`ratings_insert`) and in the service (a farmer rating the farmer's dimensions is a 422). |
+| Reputation leaves the database only as aggregates, from `app.party_ratings` (migration 0012) | A rating row belongs to the two people it is about, and `ratings_read` keeps it there. The next farmer needs the average and the count, not the rows — and the count is always shown, so one rating on one deal cannot look like a hundred closed transactions. |
+| The rating is displayed as "4.7 out of 5 · 12 ratings", on the shortlist card and on the offer | §8.9's rule again: always with the count. It is not a percentage and it is not a score out of a hundred — the interface scan bans the word "score" outright, which is why the string's placeholder is `{rating}`. |
+| Ranking still ignores ratings entirely: the order is net realisation | §6.5. What a farmer is paid is arithmetic over the offer, the freight and the buyer's payment record; opinions inform the reader, they do not reorder the list. |
+| The demonstration trader confirms delivery and rates back through the same endpoints, with a constant rating | A deal with a seeded counterparty would otherwise stop at the farmer's own confirmation and never complete. The trader's 4-out-of-5 is a constant, disclosed in CUTS C-11, because there is nothing real to compute it from — unlike their offer price, which is their own requirement. |
+
 ## 4 · Environment (measured 2026-09-19)
 
 Windows 11 · Node 24.19 · pnpm 10.34.5 · Python 3.12.6 (`.venv`, pinned `ml/requirements.txt`) ·
@@ -294,7 +306,7 @@ precisely what v3 PART IX forbids.
 | P13 | Matching + shortlist + honest emptiness | **Gate F** |
 | P14 | FPO pools | **a real MOQ cleared from real listings** — 28 qtl + 5 qtl ≥ 30 qtl, in the browser |
 | P15 | Offers, deals, sauda slip | **Gate G** — the outbox inspected in the browser with the network off |
-| P16 | Delivery, payment, reputation | reputation moves only on completed deals |
+| P16 | Delivery, payment, reputation | **reputation moves only on completed deals** — proven in the browser and against PostgreSQL |
 | P17 | Disputes, grievance routing | open dispute suppresses clean reputation |
 | P18 | Transport, storage, e-NWR, weather urgency | **Gates D, E** |
 | P19 | WhatsApp · SMS · IVR | identical benchmark on all four channels |

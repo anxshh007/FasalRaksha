@@ -20,10 +20,18 @@ import { roadKm } from '@fasal/shared';
 
 import type { Actor, Database } from '../../db/actor.js';
 import { withActor } from '../../db/actor.js';
-import { makeOffer } from './service.js';
+import { confirmDelivery, makeOffer, rateDeal } from './service.js';
 
 /** At most this many traders answer one lot: a shortlist, not an auction floor. */
 const MOST_OFFERS = 3;
+
+/**
+ * What a demonstration trader says about a farmer they have just finished a deal with. There is
+ * no underlying datum to compute this from — no real trader typed it — so it is a constant, and
+ * it is disclosed (CUTS C-11) rather than dressed up as a judgement. It exists so the farmer's
+ * own reputation, and the mutual rating that closes a deal, can be demonstrated at all.
+ */
+const DESK_RATING = { qualityAsDescribed: 4, quantityAsDescribed: 4, availability: 4 } as const;
 
 const KG: Readonly<Record<string, number>> = { kg: 1, quintal: 100, tonne: 1000 };
 
@@ -106,4 +114,36 @@ export async function runDemonstrationDesk(db: Database, farmer: Actor, listingC
     placed++;
   }
   return placed;
+}
+
+/** The deal, if its buyer is a demonstration trader and the caller is the farmer selling it. */
+async function demonstrationCounterparty(db: Database, farmer: Actor, dealId: string): Promise<Actor | null> {
+  const buyer = await withActor(db, farmer, async (client) => {
+    const { rows } = await client.query<{ buyer_id: string }>(
+      `SELECT d.buyer_id FROM app.deals d JOIN app.buyer_profiles b ON b.user_id = d.buyer_id
+        WHERE d.id = $1 AND d.seller_id = $2 AND b.demonstration`,
+      [dealId, farmer.userId],
+    );
+    return rows[0];
+  });
+  return buyer === undefined ? null : { userId: buyer.buyer_id, role: 'buyer' };
+}
+
+/**
+ * The trader confirms the pickup from their side. Delivery is two independent confirmations
+ * (§8.9), so a demonstration deal would stop dead at the farmer's if nobody ever answered it.
+ */
+export async function answerDelivery(db: Database, farmer: Actor, dealId: string, now: Date): Promise<boolean> {
+  const buyer = await demonstrationCounterparty(db, farmer, dealId);
+  if (buyer === null) return false;
+  await confirmDelivery(db, buyer, dealId, {}, now);
+  return true;
+}
+
+/** And rates the farmer back, so a completed deal can actually reach MUTUALLY_RATED. */
+export async function answerRating(db: Database, farmer: Actor, dealId: string, now: Date): Promise<boolean> {
+  const buyer = await demonstrationCounterparty(db, farmer, dealId);
+  if (buyer === null) return false;
+  await rateDeal(db, buyer, dealId, { ...DESK_RATING }, now);
+  return true;
 }

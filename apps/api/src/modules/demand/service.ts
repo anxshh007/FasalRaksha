@@ -64,6 +64,8 @@ export interface DemandBuyer {
   verified: boolean;
   demonstration: boolean;
   history: { completedDeals: number; paymentDays: number[]; defaults: number; defaultExposureDays: number; openDisputes: number };
+  /** What farmers who finished a deal with them said (§8.9). Null until somebody has rated them. */
+  rating: { count: number; paymentTimeliness: number | null; weighmentFairness: number | null; pickupReliability: number | null } | null;
 }
 
 export interface DemandDocument {
@@ -109,6 +111,14 @@ export async function demandFor(db: Database, actor: Actor, district: string, no
       [ids],
     );
     const record = new Map(records.rows.map((r) => [r.buyer_id, r]));
+    // Reputation, like the track record, comes out as aggregates only: a rating row belongs to
+    // the two people it is about (migration 0012).
+    const rated = await client.query<{ rated_id: string; ratings: number; payment_timeliness: string | null; weighment_fairness: string | null; pickup_reliability: string | null }>(
+      'SELECT rated_id, ratings, payment_timeliness, weighment_fairness, pickup_reliability FROM app.party_ratings($1::uuid[])',
+      [ids],
+    );
+    const rating = new Map(rated.rows.map((r) => [r.rated_id, r]));
+    const score = (value: string | null): number | null => (value === null ? null : Number(value));
     return {
       requirements: reach.map((r): DemandRequirement => ({
         id: r.id,
@@ -127,12 +137,17 @@ export async function demandFor(db: Database, actor: Actor, district: string, no
       })),
       buyers: profiles.rows.map((p): DemandBuyer => {
         const h = record.get(p.user_id);
+        const r = rating.get(p.user_id);
         return {
           id: p.user_id,
           name: p.business_name,
           place: p.place,
           verified: p.verified,
           demonstration: p.demonstration,
+          rating:
+            r === undefined || r.ratings === 0
+              ? null
+              : { count: r.ratings, paymentTimeliness: score(r.payment_timeliness), weighmentFairness: score(r.weighment_fairness), pickupReliability: score(r.pickup_reliability) },
           history: {
             completedDeals: h?.completed_deals ?? 0,
             paymentDays: h?.payment_days ?? [],

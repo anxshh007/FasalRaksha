@@ -9,7 +9,7 @@
  */
 import type { ISODate } from '../core/types.js';
 import type { PriceUnit, QuantityUnit } from '../units/units.js';
-import type { BuyerProfile, BuyerRequirement, Grade } from './types.js';
+import { RATING_DIMENSIONS, type BuyerProfile, type BuyerRequirement, type Grade, type PartyRating } from './types.js';
 
 export class DemandShapeError extends Error {
   constructor(
@@ -90,6 +90,20 @@ function requirement(raw: unknown, path: string): BuyerRequirement {
   };
 }
 
+/** A rating is a count and, for each dimension anyone has rated, a number between 1 and 5. */
+function rating(raw: unknown, path: string): PartyRating | null {
+  if (raw === undefined || raw === null) return null;
+  if (!isDoc(raw)) throw new DemandShapeError(path, 'must be a rating or null');
+  const parsed: PartyRating = { count: field(raw, 'count', path, count, 'must be a count'), paymentTimeliness: null, weighmentFairness: null, pickupReliability: null, qualityAsDescribed: null, quantityAsDescribed: null, availability: null };
+  for (const dimension of RATING_DIMENSIONS) {
+    const value = raw[dimension];
+    if (value === undefined || value === null) continue;
+    if (typeof value !== 'number' || !(value >= 1 && value <= 5)) throw new DemandShapeError(`${path}.${dimension}`, 'must be between 1 and 5');
+    parsed[dimension] = value;
+  }
+  return parsed;
+}
+
 function buyer(raw: unknown, path: string): BuyerProfile {
   if (!isDoc(raw)) throw new DemandShapeError(path, 'must be an object');
   const history = field(raw, 'history', path, isDoc, 'must be a track record');
@@ -102,6 +116,7 @@ function buyer(raw: unknown, path: string): BuyerProfile {
     place: field(raw, 'place', path, str, 'must be a place'),
     verified: field(raw, 'verified', path, bool, 'must be true or false'),
     demonstration: field(raw, 'demonstration', path, bool, 'must be true or false'),
+    rating: rating(raw['rating'], `${path}.rating`),
     history: {
       completedDeals,
       paymentDays,

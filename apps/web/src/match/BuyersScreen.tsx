@@ -107,7 +107,15 @@ export function BuyersScreen({ device, listingClientId, onHome }: { device: Devi
           {shortlist.result.matches.length > 0 ? (
             <ol className="buyer-list" data-testid="shortlist" data-count={shortlist.result.matches.length}>
               {shortlist.result.matches.map((match, i) => (
-                <BuyerCard key={match.requirementId} locale={locale} match={match} rank={i + 1} marketName={marketLabel(shortlist.benchmark.market)} below={shortlist.below.get(match.requirementId) ?? null} />
+                <BuyerCard
+                  key={match.requirementId}
+                  locale={locale}
+                  match={match}
+                  rank={i + 1}
+                  marketName={marketLabel(shortlist.benchmark.market)}
+                  below={shortlist.below.get(match.requirementId) ?? null}
+                  rating={shortlist.ratings.get(match.buyerId) ?? null}
+                />
               ))}
             </ol>
           ) : (

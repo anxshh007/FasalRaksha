@@ -237,5 +237,14 @@ buyer's own requirement — crop, quantity band, buying radius, validity window,
 it never acts for a buyer who is not flagged `demonstration`, which a test asserts. Every offer
 card says the traders are demonstration buyers, in all three languages.
 
+The desk also answers the second half of a deal (P16): when the farmer confirms delivery, the
+trader confirms their own side, and when the farmer rates them, the trader rates the farmer back.
+Delivery needs two independent confirmations and a completed deal needs a mutual rating, so a
+demonstration deal would otherwise stop at the farmer's own button. The trader's offer price is
+their own standing requirement, but a rating has nothing real behind it, so it is a constant —
+four out of five on each of a farmer's three dimensions — and that is stated here rather than
+dressed up as a judgement.
+
 **To close.** A buyer client, or an inbound channel for real traders. The endpoints they would
-use already exist and are tested: `POST /api/offers`, `/counter`, `/accept`, `/decline`.
+use already exist and are tested: `POST /api/offers`, `/counter`, `/accept`, `/decline`,
+`POST /api/deals/:id/delivery`, `/payment`, `/rate`.

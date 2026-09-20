@@ -20,6 +20,7 @@ import {
   type Lot,
   type MatchResult,
   type OrderExplanation,
+  type PartyRating,
   type Quantity,
   type RankedMatch,
 } from '@fasal/shared';
@@ -54,6 +55,8 @@ export type Shortlist =
       nearestMandi: { market: MarketRef; roadKm: number } | null;
       /** Any buyer here is a seeded demonstration trader. */
       demonstration: boolean;
+      /** What other farmers said about each buyer, by buyer id (§8.9); shown with its count. */
+      ratings: Map<string, PartyRating | null>;
       computedAt: number;
     };
 
@@ -107,6 +110,7 @@ export function shortlistFor(briefing: HomeBriefing, spec: LotSpec, context: Dec
     benchmark: { modalPerQtl: crop.benchmark.modal.amount, market: benchmarkMarket === undefined ? null : { id: benchmarkMarket.id, names: benchmarkMarket.names }, asOf: bundle.asOf },
     nearestMandi: nearest,
     demonstration: briefing.demand.buyers.some((b) => shown.has(b.id) && b.demonstration === true),
+    ratings: new Map(briefing.demand.buyers.map((b) => [b.id, b.rating ?? null])),
     computedAt: briefing.computedAt,
   };
 }

@@ -28,18 +28,24 @@ import { demandFor } from '../modules/demand/service.js';
 import { listMine } from '../modules/listings/service.js';
 import { getMe } from '../modules/me/service.js';
 import { appendChunk, openUpload, PHOTO_LIMITS, readPhoto, type PhotoDeps } from '../modules/photos/service.js';
-import { runDemonstrationDesk } from '../modules/deals/desk.js';
+import { answerDelivery, answerRating, runDemonstrationDesk } from '../modules/deals/desk.js';
 import {
   acceptOffer,
   acknowledgeOffer,
   AcknowledgeBody,
+  confirmDelivery,
+  confirmPayment,
   counterOffer,
   CounterBody,
   dealById,
   declineOffer,
+  DeliveryBody,
   makeOffer,
   myDeals,
   OfferBody,
+  PaymentBody,
+  rateDeal,
+  RatingBody,
   saudaSlipOf,
 } from '../modules/deals/service.js';
 import { createPool, CreateBody, JoinBody, joinPool, leavePool, myPools, OpenQuery, openPools } from '../modules/pools/service.js';
@@ -347,6 +353,29 @@ export function buildApp(deps: AppDependencies) {
   app.post('/api/offers/:id/acknowledge', { config: { rateLimit: { max: 30, timeWindow: '1 hour' } } }, async (request) =>
     acknowledgeOffer(requireDb(), requireActor(request), dealId(request), AcknowledgeBody.parse(request.body).reason),
   );
+  // The second half of a deal: delivery confirmed by each side for itself, payment confirmed by
+  // the seller, and then the mutual rating that is the only thing reputation is ever written by.
+  app.post('/api/deals/:id/delivery', async (request) => {
+    const actor = requireActor(request);
+    const id = dealId(request);
+    const deal = await confirmDelivery(requireDb(), actor, id, DeliveryBody.parse(request.body), now());
+    if (actor.role === 'farmer') {
+      await answerDelivery(requireDb(), actor, id, now()).catch((error: unknown) => request.log.warn({ error: String(error) }, 'the demonstration desk could not confirm its side'));
+      return dealById(requireDb(), actor, id);
+    }
+    return deal;
+  });
+  app.post('/api/deals/:id/payment', async (request) => confirmPayment(requireDb(), requireActor(request), dealId(request), PaymentBody.parse(request.body), now()));
+  app.post('/api/deals/:id/rate', async (request) => {
+    const actor = requireActor(request);
+    const id = dealId(request);
+    const deal = await rateDeal(requireDb(), actor, id, RatingBody.parse(request.body), now());
+    if (actor.role === 'farmer') {
+      await answerRating(requireDb(), actor, id, now()).catch((error: unknown) => request.log.warn({ error: String(error) }, 'the demonstration desk could not rate back'));
+      return dealById(requireDb(), actor, id);
+    }
+    return deal;
+  });
   app.get('/api/deals/mine', async (request) => ({ deals: await myDeals(requireDb(), requireActor(request)) }));
   app.get('/api/deals/:id', async (request) => dealById(requireDb(), requireActor(request), dealId(request)));
   app.get('/api/deals/:id/sauda-slip', async (request) => saudaSlipOf(requireDb(), requireActor(request), dealId(request)));

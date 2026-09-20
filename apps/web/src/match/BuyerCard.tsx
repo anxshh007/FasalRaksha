@@ -11,7 +11,7 @@
  * A buyer ranked below one offering less says why ("₹3,810 per quintal offered, but higher
  * payment-delay risk"). An open dispute is shown on the card, never hidden behind a clean record.
  */
-import type { MatchReason, OrderExplanation, RankedMatch } from '@fasal/shared';
+import { overallRating, type MatchReason, type OrderExplanation, type PartyRating, type RankedMatch } from '@fasal/shared';
 
 import { Glyph } from '../design/Glyph';
 import { number, rupees, t, type Locale } from '../i18n/strings';
@@ -21,7 +21,21 @@ function reason<C extends MatchReason['code']>(match: RankedMatch, code: C): Ext
   return match.reasons.find((r): r is Extract<MatchReason, { code: C }> => r.code === code);
 }
 
-export function BuyerCard({ locale, match, rank, marketName, below }: { locale: Locale; match: RankedMatch; rank: number; marketName: string; below: { above: RankedMatch; why: OrderExplanation } | null }) {
+export function BuyerCard({
+  locale,
+  match,
+  rank,
+  marketName,
+  below,
+  rating,
+}: {
+  locale: Locale;
+  match: RankedMatch;
+  rank: number;
+  marketName: string;
+  below: { above: RankedMatch; why: OrderExplanation } | null;
+  rating: PartyRating | null;
+}) {
   const unit = t(locale, `unit.q.${match.matched.unit}`);
   const partial = reason(match, 'QUANTITY_PARTIAL');
   const record = reason(match, 'TRACK_RECORD');
@@ -77,6 +91,14 @@ export function BuyerCard({ locale, match, rank, marketName, below }: { locale: 
           t(locale, 'card.newBuyer')
         ) : (
           <Tx locale={locale} k="card.record" values={{ n: number(locale, record.completedDeals), days: number(locale, Math.round(record.typicalDaysToPay ?? match.expectedDaysToPay)) }} />
+        )}
+      </p>
+      {/* What other farmers said, always with the count: one rating is not a hundred deals (§8.9). */}
+      <p className="muted buyer-card__rating" data-testid="buyer-rating" data-count={rating?.count ?? 0}>
+        {overallRating(rating) === null ? (
+          t(locale, 'deal.rating.none')
+        ) : (
+          <Tx locale={locale} k="deal.rating" values={{ rating: number(locale, overallRating(rating) ?? 0), n: number(locale, rating?.count ?? 0) }} />
         )}
       </p>
       {risk !== undefined && (

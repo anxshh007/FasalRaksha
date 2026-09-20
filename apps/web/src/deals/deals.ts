@@ -56,6 +56,12 @@ export interface DealView {
   paymentRecord: { typicalDays: number | null; completedDeals: number };
   history: Array<{ type: string; by: 'seller' | 'buyer'; price: { amount: number; unit: PriceUnit }; quantity: { value: number; unit: QuantityUnit }; at: string }>;
   slip: SaudaSlipView | null;
+  /** Each side confirms delivery for itself; neither can confirm for the other (§8.9). */
+  delivery: { seller: boolean; buyer: boolean; weighed: { value: number; unit: QuantityUnit } | null; note: string | null };
+  payment: { amount: number; at: string; daysAfterDelivery: number } | null;
+  rated: { you: boolean; them: boolean };
+  /** The other side's reputation, as an average per dimension with the number of ratings. */
+  counterpartyRating: { count: number; scores: Record<string, number | null> } | null;
   youCan: string[];
   version: number;
   updatedAt: string;
@@ -109,4 +115,29 @@ export function counterOffer(dealId: string, price: { amount: number; unit: Pric
 /** The farmer lets this buyer make contact: a masked relay handle, never a phone number (§8.4). */
 export function acknowledgeOffer(dealId: string, reason: string): Promise<HttpResult<{ relayHandle: string; expiresAt: string; buyer: { name: string; place: string } }>> {
   return request(`/api/offers/${dealId}/acknowledge`, { method: 'POST', body: { reason } });
+}
+
+/** The three dimensions a farmer judges a buyer on (§8.9). Payment timeliness is the load-bearing one. */
+export const BUYER_RATING_DIMENSIONS = ['paymentTimeliness', 'weighmentFairness', 'pickupReliability'] as const;
+export type BuyerRatingDimension = (typeof BUYER_RATING_DIMENSIONS)[number];
+
+/** Delivery, payment and the rating: server-authoritative like every other transition (Gate G). */
+export function confirmDelivery(dealId: string, body: { weighed?: { value: number; unit: QuantityUnit }; note?: string } = {}): Promise<HttpResult<DealView>> {
+  return request<DealView>(`/api/deals/${dealId}/delivery`, { method: 'POST', body });
+}
+
+export function confirmPayment(dealId: string, amount: number): Promise<HttpResult<DealView>> {
+  return request<DealView>(`/api/deals/${dealId}/payment`, { method: 'POST', body: { amount } });
+}
+
+export function rateDeal(dealId: string, scores: Partial<Record<BuyerRatingDimension, number>>): Promise<HttpResult<DealView>> {
+  return request<DealView>(`/api/deals/${dealId}/rate`, { method: 'POST', body: scores });
+}
+
+/** The average of the scores this account has actually been given, or null if it has none. */
+export function overallOf(rating: DealView['counterpartyRating']): number | null {
+  if (rating === null || rating.count === 0) return null;
+  const scores = Object.values(rating.scores).filter((value): value is number => value !== null);
+  if (scores.length === 0) return null;
+  return Math.round((scores.reduce((sum, value) => sum + value, 0) / scores.length) * 10) / 10;
 }

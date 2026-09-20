@@ -22,6 +22,7 @@ import { loadConfig } from '../src/config.js';
 import { createPool, type Pool } from '../src/db/pool.js';
 import { buildApp, type App } from '../src/http/app.js';
 import { createLogger } from '../src/log/logger.js';
+import type { DemandDocument } from '../src/modules/demand/service.js';
 import type { DealView, SaudaSlip } from '../src/modules/deals/service.js';
 import { createKeyRing, type KeyRing } from '../src/security/keys.js';
 import { issueAccessToken } from '../src/security/tokens.js';
@@ -266,5 +267,110 @@ describe('SEC · only the two parties, and only a verified buyer', () => {
     for (const offer of offers) expect(demonstration.has(offer.buyer.id)).toBe(true);
     // And the buyer the §16.2 scenario is built around is among them.
     expect(offers.map((o) => o.buyer.id)).toContain(demoId('buyer:godavari'));
+  });
+});
+
+describe('FR-14 · delivery, payment, and a reputation that moves only on completed deals', () => {
+  /** A lot taken all the way to a struck deal, ready for the second half of §8.9. */
+  async function struckDeal(): Promise<DealView> {
+    const offer = (await offersOn(await listLot(5)))[0]!;
+    const accepted = (await app.inject({ method: 'POST', url: `/api/offers/${offer.id}/accept`, headers: bearer(world.farmerA, 'farmer') })).json() as DealView;
+    expect(accepted.state).toBe('SAUDA_SLIP');
+    return accepted;
+  }
+
+  const buyerInDemand = async (buyerId: string) => {
+    const response = await app.inject({ method: 'GET', url: '/api/demand/nashik', headers: bearer(world.farmerA, 'farmer') });
+    return (response.json() as DemandDocument).buyers.find((b) => b.id === buyerId);
+  };
+
+  const post = (url: string, userId: string, role: 'farmer' | 'buyer', payload: unknown = {}) =>
+    app.inject({ method: 'POST', url, headers: bearer(userId, role), payload: payload as object });
+
+  it('a deal completes only when both sides confirm delivery and the seller confirms the money', async () => {
+    const deal = await struckDeal();
+    const before = await buyerInDemand(deal.buyer.id);
+
+    // The farmer confirms their side; the trader's own confirmation is what completes delivery.
+    const delivered = (await post(`/api/deals/${deal.id}/delivery`, world.farmerA, 'farmer', { weighed: { value: 4.96, unit: 'quintal' }, note: 'Weighed at the Niphad bridge.' })).json() as DealView;
+    expect(delivered.state).toBe('DELIVERY_CONFIRMED');
+    expect(delivered.delivery.seller).toBe(true);
+    expect(delivered.delivery.buyer).toBe(true);
+    expect(delivered.delivery.weighed).toEqual({ value: 4.96, unit: 'quintal' }); // what it actually weighed
+
+    // Nobody confirms twice: with both sides in, the deal has moved past the point where a
+    // delivery confirmation means anything (a second one while still waiting is ALREADY_DONE).
+    const twice = await post(`/api/deals/${deal.id}/delivery`, world.farmerA, 'farmer');
+    expect(twice.statusCode).toBe(409);
+    expect(twice.json()).toMatchObject({ error: { code: 'WRONG_STATE' } });
+    const byBuyer = await post(`/api/deals/${deal.id}/payment`, deal.buyer.id, 'buyer', { amount: 18_000 });
+    expect(byBuyer.statusCode).toBe(409);
+    expect(byBuyer.json()).toMatchObject({ error: { code: 'ONLY_SELLER_CONFIRMS_PAYMENT' } });
+
+    // Delivered is not completed: the buyer's record has not moved, and cannot be rated yet.
+    const midway = await buyerInDemand(deal.buyer.id);
+    expect(midway?.history.completedDeals).toBe(before?.history.completedDeals);
+    const early = await post(`/api/deals/${deal.id}/rate`, world.farmerA, 'farmer', { paymentTimeliness: 5 });
+    expect(early.statusCode).toBe(409);
+    expect(early.json()).toMatchObject({ error: { code: 'WRONG_STATE' } });
+
+    const paid = (await post(`/api/deals/${deal.id}/payment`, world.farmerA, 'farmer', { amount: deal.slip?.grossValue ?? 18_000 })).json() as DealView;
+    expect(paid.state).toBe('PAYMENT_CONFIRMED');
+    expect(paid.payment?.amount).toBe(deal.slip?.grossValue);
+    expect(paid.payment?.daysAfterDelivery).toBe(0); // paid the same day, on the app's clock
+
+    // Now — and only now — the buyer's public record counts one more completed deal.
+    const after = await buyerInDemand(deal.buyer.id);
+    expect(after?.history.completedDeals).toBe((before?.history.completedDeals ?? 0) + 1);
+    expect(after?.history.paymentDays).toContain(0);
+  });
+
+  it('each side rates the other on its own three things, once, and the rating shows with the count', async () => {
+    const deal = await struckDeal();
+    await post(`/api/deals/${deal.id}/delivery`, world.farmerA, 'farmer');
+    await post(`/api/deals/${deal.id}/payment`, world.farmerA, 'farmer', { amount: 18_000 });
+
+    // A farmer rates the buyer on payment, weighment and pickup — not on their own dimensions.
+    const wrong = await post(`/api/deals/${deal.id}/rate`, world.farmerA, 'farmer', { qualityAsDescribed: 5 });
+    expect(wrong.statusCode).toBe(422);
+    expect(wrong.json()).toMatchObject({ error: { code: 'WRONG_RATING' } });
+
+    const rated = (await post(`/api/deals/${deal.id}/rate`, world.farmerA, 'farmer', { paymentTimeliness: 5, weighmentFairness: 4, pickupReliability: 5 })).json() as DealView;
+    // The trader rates back through the desk, which is what closes a deal (§8.9).
+    expect(rated.state).toBe('MUTUALLY_RATED');
+    expect(rated.rated.you).toBe(true);
+    expect(rated.rated.them).toBe(true);
+
+    const again = await post(`/api/deals/${deal.id}/rate`, world.farmerA, 'farmer', { paymentTimeliness: 1 });
+    expect(again.statusCode).toBe(409); // never edited, never repeated (SEC-12)
+
+    // The buyer's reputation is now visible to the next farmer — as an average with its count.
+    const buyer = await buyerInDemand(deal.buyer.id);
+    expect(buyer?.rating?.count).toBeGreaterThanOrEqual(1);
+    expect(buyer?.rating?.paymentTimeliness).toBeGreaterThanOrEqual(1);
+    expect(buyer?.rating?.paymentTimeliness).toBeLessThanOrEqual(5);
+    // And the farmer sees their own, from the buyer who rated them.
+    const mine = ((await app.inject({ method: 'GET', url: `/api/deals/${deal.id}`, headers: bearer(world.farmerA, 'farmer') })).json() as DealView).counterpartyRating;
+    expect(mine?.count).toBeGreaterThanOrEqual(1);
+    expect(Object.keys(mine?.scores ?? {})).toEqual(['paymentTimeliness', 'weighmentFairness', 'pickupReliability']);
+  });
+
+  it('a rating is never a row anyone else can read: reputation leaves the database as aggregates', async () => {
+    // There are rating rows in the table — the previous test wrote two of them.
+    const rows = await seed.query<{ n: string }>('SELECT count(*) AS n FROM app.ratings');
+    expect(Number(rows.rows[0]!.n)).toBeGreaterThanOrEqual(2);
+
+    // A farmer who was not part of any of it cannot read the deal at all, and the demand document
+    // they are served carries counts and averages: never a rating, a rater, or a deal.
+    const stranger = await app.inject({ method: 'GET', url: '/api/demand/nashik', headers: bearer(world.farmerB, 'farmer') });
+    expect(stranger.statusCode).toBe(200);
+    const document = stranger.json() as DemandDocument;
+    const body = JSON.stringify(document);
+    expect(body).not.toContain('rater');
+    expect(body).not.toContain('dealId');
+    for (const buyer of document.buyers) {
+      if (buyer.rating === null) continue;
+      expect(Object.keys(buyer.rating).sort()).toEqual(['count', 'paymentTimeliness', 'pickupReliability', 'weighmentFairness']);
+    }
   });
 });

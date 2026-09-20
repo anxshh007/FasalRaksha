@@ -1664,6 +1664,77 @@ button.spine__item:hover {
   font-family: var(--font-mono);
 }
 
+/* ── after the price is agreed (P16): delivery, payment, and what each side said ─────────── */
+
+.progress {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: var(--hairline);
+}
+.progress p {
+  margin: 0;
+}
+.progress__ask {
+  font-weight: 700;
+}
+.progress__paid {
+  font-weight: 700;
+  color: var(--accent);
+}
+.progress .btn {
+  justify-self: start;
+}
+.progress .field {
+  margin-bottom: 0;
+}
+.progress .field input {
+  max-width: 10em;
+  font-family: var(--font-mono);
+}
+.rating {
+  display: grid;
+  gap: var(--space-3);
+}
+.rating__row {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+.rating__label {
+  padding: 0;
+  font-size: var(--size-small);
+  color: var(--text-muted);
+}
+.rating__scale {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+}
+.rating__point {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  min-width: var(--touch);
+  min-height: var(--touch);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+.rating__point:has(input:checked) {
+  border-color: var(--accent);
+  background: var(--accent-tint);
+  color: var(--accent);
+}
+.rating__point input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
 /* ── the sauda slip: a record, printable and handed over (§9.9.4) ────────────────────────── */
 
 .slip {

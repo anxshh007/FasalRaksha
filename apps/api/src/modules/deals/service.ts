@@ -11,6 +11,11 @@
  *   the policies     `deals_open`, `deals_update` — a verified buyer opens a deal on an open
  *                    listing, and only the two parties touch it afterwards.
  *
+ * After the slip: each side confirms delivery for itself and neither can confirm for the other,
+ * the *seller* confirms that the money arrived (only they know), and then each side rates the
+ * other on the three things their side of a deal is judged on. Reputation is written only by
+ * that path, which is what "reputation attaches to completed transactions only" means in code.
+ *
  * Acceptance is not a message; it is a transaction. In the same transaction the deal becomes
  * ACCEPTED, the server issues the sauda slip (the engine's one system-only event), freezes what
  * was agreed into it, and the database closes the lot behind it (migration 0011). A client that
@@ -53,6 +58,27 @@ const Terms = z
 export const OfferBody = Terms.extend({ listingId: z.uuid() }).strict();
 export const CounterBody = Terms;
 export const AcknowledgeBody = z.object({ reason: z.string().trim().min(1).max(200) }).strict();
+export const DeliveryBody = z
+  .object({
+    /** What the lot actually weighed at the weighbridge, if it was weighed. */
+    weighed: z.object({ value: z.number().positive().max(1_000_000), unit: z.enum(QUANTITY_UNITS) }).strict().optional(),
+    note: z.string().trim().max(500).optional(),
+  })
+  .strict();
+export const PaymentBody = z.object({ amount: z.number().positive().max(100_000_000) }).strict();
+const score = z.number().int().min(1).max(5);
+/** A farmer rates the buyer on these three; a buyer rates the farmer on the other three (§8.9). */
+export const RatingBody = z
+  .object({
+    paymentTimeliness: score.optional(),
+    weighmentFairness: score.optional(),
+    pickupReliability: score.optional(),
+    qualityAsDescribed: score.optional(),
+    quantityAsDescribed: score.optional(),
+    availability: score.optional(),
+  })
+  .strict()
+  .refine((body) => Object.values(body).some((value) => value !== undefined), { message: 'a rating needs at least one score' });
 
 export interface SlipParty {
   name: string;
@@ -101,6 +127,13 @@ export interface DealView {
   paymentRecord: { typicalDays: number | null; completedDeals: number };
   history: Array<{ type: string; by: 'seller' | 'buyer'; price: { amount: number; unit: string }; quantity: { value: number; unit: string }; at: string }>;
   slip: SaudaSlip | null;
+  /** Each side confirms for itself; nobody confirms for the other (§8.9). */
+  delivery: { seller: boolean; buyer: boolean; weighed: { value: number; unit: string } | null; note: string | null };
+  /** Written when the seller says the money arrived — the only way a deal completes. */
+  payment: { amount: number; at: string; daysAfterDelivery: number } | null;
+  rated: { you: boolean; them: boolean };
+  /** The other side's reputation, as aggregates: never a rating row, never a rater. */
+  counterpartyRating: { count: number; scores: Record<string, number | null> } | null;
   /** What this caller could do next, for the interface only. The server decides what happens. */
   youCan: DealEvent['type'][];
   version: number;
@@ -259,6 +292,22 @@ async function slipOf(client: PoolClient, dealId: string): Promise<SaudaSlip | n
   return slip === undefined ? null : { ...slip.payload, slipNo: slip.slip_no, issuedAt: slip.issued_at.toISOString() };
 }
 
+/** Reputation as aggregates only (migration 0012); the dimensions the other side is judged on. */
+async function reputationOf(client: PoolClient, userId: string, side: 'seller' | 'buyer'): Promise<DealView['counterpartyRating']> {
+  const { rows } = await client.query<{ ratings: number; payment_timeliness: string | null; weighment_fairness: string | null; pickup_reliability: string | null; quality_as_described: string | null; quantity_as_described: string | null; availability: string | null }>(
+    'SELECT * FROM app.party_ratings($1::uuid[])',
+    [[userId]],
+  );
+  const r = rows[0];
+  if (r === undefined || r.ratings === 0) return null;
+  const n = (value: string | null): number | null => (value === null ? null : Number(value));
+  const scores =
+    side === 'buyer'
+      ? { paymentTimeliness: n(r.payment_timeliness), weighmentFairness: n(r.weighment_fairness), pickupReliability: n(r.pickup_reliability) }
+      : { qualityAsDescribed: n(r.quality_as_described), quantityAsDescribed: n(r.quantity_as_described), availability: n(r.availability) };
+  return { count: r.ratings, scores };
+}
+
 async function view(client: PoolClient, row: DealRow, actor: Actor): Promise<DealView> {
   const deal = asDeal(row);
   const benchmark = await client.query<{ benchmark_modal: string | null; benchmark_as_of: string | null }>(
@@ -266,10 +315,21 @@ async function view(client: PoolClient, row: DealRow, actor: Actor): Promise<Dea
     [row.id],
   );
   const b = benchmark.rows[0];
+  const you = row.seller_id === actor.userId ? 'seller' : 'buyer';
+  const delivered = await client.query<{ weighed_qty: string | null; weighed_unit: string | null; note: string | null }>(
+    'SELECT weighed_qty, weighed_unit, note FROM app.deliveries WHERE deal_id = $1 ORDER BY confirmed_at DESC LIMIT 1',
+    [row.id],
+  );
+  const weighed = delivered.rows.find((d) => d.weighed_qty !== null && d.weighed_unit !== null);
+  const paid = await client.query<{ amount: string; confirmed_at: Date; days_after_delivery: number }>(
+    'SELECT amount, confirmed_at, days_after_delivery FROM app.payments WHERE deal_id = $1',
+    [row.id],
+  );
+  const payment = paid.rows[0];
   return {
     id: row.id,
     state: row.state,
-    you: row.seller_id === actor.userId ? 'seller' : 'buyer',
+    you,
     listingId: row.listing_id,
     listingClientId: row.listing_client_id,
     poolId: row.pool_id,
@@ -282,6 +342,15 @@ async function view(client: PoolClient, row: DealRow, actor: Actor): Promise<Dea
     paymentRecord: await paymentRecord(client, row.buyer_id),
     history: await history(client, row.id),
     slip: await slipOf(client, row.id),
+    delivery: {
+      seller: row.delivery_seller,
+      buyer: row.delivery_buyer,
+      weighed: weighed === undefined ? null : { value: Number(weighed.weighed_qty), unit: weighed.weighed_unit ?? '' },
+      note: delivered.rows[0]?.note ?? null,
+    },
+    payment: payment === undefined ? null : { amount: Number(payment.amount), at: payment.confirmed_at.toISOString(), daysAfterDelivery: payment.days_after_delivery },
+    rated: you === 'seller' ? { you: row.rated_seller, them: row.rated_buyer } : { you: row.rated_buyer, them: row.rated_seller },
+    counterpartyRating: await reputationOf(client, you === 'seller' ? row.buyer_id : row.seller_id, you === 'seller' ? 'buyer' : 'seller'),
     youCan: availableEvents(deal, dealActor(actor, row)),
     version: row.version,
     updatedAt: row.updated_at.toISOString(),
@@ -302,9 +371,24 @@ async function apply(client: PoolClient, row: DealRow, event: DealEvent, actor: 
   const next = result.deal;
   const terms = next.terms ?? { price: { amount: Number(row.price), unit: row.price_unit }, quantity: { value: Number(row.qty), unit: row.qty_unit } };
   const { rowCount } = await client.query(
-    `UPDATE app.deals SET state = $1, price = $2, price_unit = $3, qty = $4, qty_unit = $5, last_price_by = $6, version = $7
-      WHERE id = $8 AND version = $9`,
-    [next.state, terms.price.amount, terms.price.unit, terms.quantity.value, terms.quantity.unit, next.lastPriceBy, next.version, row.id, row.version],
+    `UPDATE app.deals SET state = $1, price = $2, price_unit = $3, qty = $4, qty_unit = $5, last_price_by = $6,
+            delivery_seller = $7, delivery_buyer = $8, rated_seller = $9, rated_buyer = $10, version = $11
+      WHERE id = $12 AND version = $13`,
+    [
+      next.state,
+      terms.price.amount,
+      terms.price.unit,
+      terms.quantity.value,
+      terms.quantity.unit,
+      next.lastPriceBy,
+      next.deliveryConfirmedBy.seller,
+      next.deliveryConfirmedBy.buyer,
+      next.ratedBy.seller,
+      next.ratedBy.buyer,
+      next.version,
+      row.id,
+      row.version,
+    ],
   );
   if (rowCount === 0) throw new DomainError(409, 'DEAL_MOVED', 'This deal changed while you were looking at it. Open it again.');
   return next;
@@ -504,5 +588,88 @@ export async function acknowledgeOffer(db: Database, actor: Actor, dealId: strin
     const grant = rows[0];
     if (grant === undefined) throw new DomainError(409, 'NO_GRANT', 'That offer cannot be acknowledged.');
     return { relayHandle: grant.relay_handle, expiresAt: grant.expires_at.toISOString(), buyer: { name: row.buyer_name, place: row.buyer_place } };
+  });
+}
+
+/**
+ * Delivery, confirmed by each side for itself. Two independent confirmations, never one party
+ * speaking for both: the database's `deals_guard` refuses a flag set by the other side, and the
+ * deal only reaches DELIVERY_CONFIRMED when both are in.
+ */
+export async function confirmDelivery(db: Database, actor: Actor, dealId: string, body: z.infer<typeof DeliveryBody>, now: Date): Promise<DealView> {
+  return withActor(db, actor, async (client) => {
+    const row = await rowById(client, dealId);
+    const party = row.seller_id === actor.userId ? 'seller' : 'buyer';
+    await apply(client, row, { type: 'CONFIRM_DELIVERY' }, dealActor(actor, row), now);
+    await client.query(
+      'INSERT INTO app.deliveries (deal_id, party, confirmed_by, weighed_qty, weighed_unit, note, confirmed_at) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+      [dealId, party, actor.userId, body.weighed?.value ?? null, body.weighed?.unit ?? null, body.note ?? null, now],
+    );
+    return view(client, await rowById(client, dealId), actor);
+  });
+}
+
+/**
+ * Payment, confirmed by the seller and nobody else: only the person expecting the money knows
+ * whether it arrived. The days it took are counted from the *second* delivery confirmation —
+ * the moment both sides agreed the lot had changed hands — and that number is the load-bearing
+ * signal in every future shortlist this buyer appears in.
+ */
+export async function confirmPayment(db: Database, actor: Actor, dealId: string, body: z.infer<typeof PaymentBody>, now: Date): Promise<DealView> {
+  return withActor(db, actor, async (client) => {
+    const row = await rowById(client, dealId);
+    await apply(client, row, { type: 'CONFIRM_PAYMENT' }, dealActor(actor, row), now);
+    const { rows } = await client.query<{ at: Date }>('SELECT max(confirmed_at) AS at FROM app.deliveries WHERE deal_id = $1', [dealId]);
+    const delivered = rows[0]?.at ?? now;
+    const days = Math.max(0, Math.floor((now.getTime() - delivered.getTime()) / 86_400_000));
+    await client.query('INSERT INTO app.payments (deal_id, amount, confirmed_by, confirmed_at, days_after_delivery) VALUES ($1, $2, $3, $4, $5)', [
+      dealId,
+      body.amount,
+      actor.userId,
+      now,
+      days,
+    ]);
+    return view(client, await rowById(client, dealId), actor);
+  });
+}
+
+/**
+ * Each side rates the other, on a deal that completed. A farmer rates the buyer on payment
+ * timeliness, weighment fairness and pickup reliability; a buyer rates the farmer on quality,
+ * quantity and availability. Nothing else is ratable, and a rating is never edited (SEC-12).
+ */
+export async function rateDeal(db: Database, actor: Actor, dealId: string, body: z.infer<typeof RatingBody>, now: Date): Promise<DealView> {
+  return withActor(db, actor, async (client) => {
+    const row = await rowById(client, dealId);
+    const party = row.seller_id === actor.userId ? 'seller' : row.buyer_id === actor.userId ? 'buyer' : null;
+    if (party === null) throw new DomainError(403, 'NOT_A_PARTY', 'Only the two parties to this deal can rate it.');
+    const forBuyer = party === 'seller';
+    const allowed = forBuyer ? ['paymentTimeliness', 'weighmentFairness', 'pickupReliability'] : ['qualityAsDescribed', 'quantityAsDescribed', 'availability'];
+    for (const key of Object.keys(body)) {
+      if (!allowed.includes(key)) throw new DomainError(422, 'WRONG_RATING', `A ${party} rates the other side on ${allowed.join(', ')}.`);
+    }
+    await apply(client, row, { type: 'RATE' }, dealActor(actor, row), now);
+    try {
+      await client.query(
+        `INSERT INTO app.ratings (deal_id, rater_id, ratee_id, payment_timeliness, weighment_fairness, pickup_reliability, quality_as_described, quantity_as_described, availability, created_at)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+        [
+          dealId,
+          actor.userId,
+          forBuyer ? row.buyer_id : row.seller_id,
+          body.paymentTimeliness ?? null,
+          body.weighmentFairness ?? null,
+          body.pickupReliability ?? null,
+          body.qualityAsDescribed ?? null,
+          body.quantityAsDescribed ?? null,
+          body.availability ?? null,
+          now,
+        ],
+      );
+    } catch (error) {
+      if ((error as { code?: string }).code === '23505') throw new DomainError(409, 'ALREADY_RATED', 'You have already rated this deal.');
+      throw error;
+    }
+    return view(client, await rowById(client, dealId), actor);
   });
 }

@@ -20,7 +20,8 @@ import { Glyph } from '../design/Glyph';
 import { number, rupees, t } from '../i18n/strings';
 import { Tx } from '../i18n/Tx';
 import type { Device } from '../state/useDevice';
-import { acceptOffer, counterOffer, declineOffer, type DealView } from './deals';
+import { acceptOffer, counterOffer, declineOffer, overallOf, type DealView } from './deals';
+import { DealProgress } from './DealProgress';
 import { SaudaSlip } from './SaudaSlip';
 
 const STRUCK: readonly string[] = ['ACCEPTED', 'SAUDA_SLIP', 'DELIVERY_CONFIRMED', 'PAYMENT_CONFIRMED', 'MUTUALLY_RATED'];
@@ -37,6 +38,7 @@ function Offer({ device, deal, cropName, lotSold }: { device: Device; deal: Deal
   const mine = deal.lastPriceBy === 'seller';
   const struck = STRUCK.includes(deal.state);
   const delta = deal.benchmarkAtOffer === null ? null : Math.round(deal.terms.price.amount - deal.benchmarkAtOffer.modalPerQtl);
+  const rating = overallOf(deal.counterpartyRating);
   const gross = deal.terms.price.unit === 'quintal' ? Math.round(deal.terms.price.amount * deal.terms.quantity.value) : null;
 
   const act = async (what: 'accept' | 'counter' | 'decline') => {
@@ -83,11 +85,19 @@ function Offer({ device, deal, cropName, lotSold }: { device: Device; deal: Deal
           <Tx locale={locale} k="deal.gross" values={{ amount: rupees(locale, gross) }} />
         </p>
       )}
-      <p className="muted offer__record">
+      <p className="muted offer__record" data-testid="offer-record" data-deals={deal.paymentRecord.completedDeals}>
         {deal.paymentRecord.typicalDays === null ? (
           t(locale, 'card.newBuyer')
         ) : (
           <Tx locale={locale} k="card.record" values={{ n: number(locale, deal.paymentRecord.completedDeals), days: number(locale, deal.paymentRecord.typicalDays) }} />
+        )}
+      </p>
+      {/* A rating is never shown without the number of people behind it (§8.9). */}
+      <p className="muted offer__rating" data-testid="offer-rating" data-count={deal.counterpartyRating?.count ?? 0}>
+        {rating === null ? (
+          t(locale, 'deal.rating.none')
+        ) : (
+          <Tx locale={locale} k="deal.rating" values={{ rating: number(locale, rating), n: number(locale, deal.counterpartyRating?.count ?? 0) }} />
         )}
       </p>
 
@@ -112,6 +122,7 @@ function Offer({ device, deal, cropName, lotSold }: { device: Device; deal: Deal
           {t(locale, 'deal.pending')}
         </p>
       )}
+      {struck && <DealProgress device={device} deal={deal} />}
 
       {problem !== null && (
         <p className="notice notice--caution" data-testid="offer-problem">

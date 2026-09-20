@@ -59,6 +59,40 @@ export interface BuyerHistory {
   openDisputes: number;
 }
 
+/**
+ * What the other side said afterwards (PROMPT §8.9). Buyers are rated on payment timeliness,
+ * weighment fairness and pickup reliability; farmers on quality, quantity and availability.
+ * `count` is always shown with the average, so one rating on one deal cannot be mistaken for a
+ * hundred closed transactions. Only completed deals can be rated, so this moves with them.
+ */
+export interface PartyRating {
+  count: number;
+  paymentTimeliness: number | null;
+  weighmentFairness: number | null;
+  pickupReliability: number | null;
+  qualityAsDescribed: number | null;
+  quantityAsDescribed: number | null;
+  availability: number | null;
+}
+
+export const RATING_DIMENSIONS = [
+  'paymentTimeliness',
+  'weighmentFairness',
+  'pickupReliability',
+  'qualityAsDescribed',
+  'quantityAsDescribed',
+  'availability',
+] as const;
+export type RatingDimension = (typeof RATING_DIMENSIONS)[number];
+
+/** The average of the dimensions this account has actually been rated on, or null if none. */
+export function overallRating(rating: PartyRating | null): number | null {
+  if (rating === null || rating.count === 0) return null;
+  const scores = RATING_DIMENSIONS.map((d) => rating[d]).filter((v): v is number => v !== null);
+  if (scores.length === 0) return null;
+  return Math.round((scores.reduce((sum, v) => sum + v, 0) / scores.length) * 10) / 10;
+}
+
 export interface BuyerProfile {
   id: string;
   name: string;
@@ -69,6 +103,8 @@ export interface BuyerProfile {
   /** A seeded demonstration trader (PROMPT §16.1): every screen that shows one says so. */
   demonstration?: boolean;
   history: BuyerHistory;
+  /** What farmers who finished a deal with them said. Null when nobody has rated them yet. */
+  rating?: PartyRating | null;
 }
 
 export interface MatchContext {

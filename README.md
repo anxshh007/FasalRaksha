@@ -19,8 +19,8 @@ farmers* · Government of Maharashtra, Maharashtra State Innovation Society · T
 
 ## Status
 
-Built phase by phase, each gate proven and committed (PROMPT PART XV). **Current: P15 — offers and the
-sauda slip.** Done so far:
+Built phase by phase, each gate proven and committed (PROMPT PART XV). **Current: P16 — delivery, payment
+and reputation.** Done so far:
 - the foundation, and the shared domain engine;
 - the schema with row-level security, and authentication;
 - the nine adapters;
@@ -58,6 +58,11 @@ sauda slip.** Done so far:
   slip, with the benchmark of the day, the grade and its provenance, the freight estimate and the
   proportional split frozen into it, and prints it at A5. With no network the offers and the slip
   are all still readable, and agreeing to anything is not: that is Gate G.
+- the rest of the deal: each side confirms delivery for itself, the farmer confirms that the
+  money arrived, and then each side says how the other did — paid on time, fair weighment, picked
+  up as agreed. That mutual rating is the only thing a reputation is ever written by, and it is
+  always shown with the number of people behind it, so one rating cannot look like a hundred
+  closed deals.
 - group sales: a lot offered for group sale shows the one consignment it can join — who is
   gathering it, for which buyer, how much is in it against the buyer's minimum, and how much is
   still needed. Putting the lot in clears the consignment when the volume clears the minimum;
@@ -70,7 +75,8 @@ speaking or typing, with a graded photograph, and see which buyer leaves them be
 keeps working with the API killed or the network gone — the shortlist included, which is the
 second half of Gate A. A small lot that no bulk buyer would look at twice can join six of its
 neighbours and clear that buyer's minimum. A price is agreed only where it can be recorded for
-both sides at once. Delivery, payment and reputation come next (P16).
+both sides at once, and a buyer's record is what their completed deals say it is. Disputes come
+next (P17).
 
 `REQUIREMENTS.csv` is the source of truth for what is real. Run `pnpm requirements` to see it.
 
