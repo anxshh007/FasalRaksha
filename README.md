@@ -19,8 +19,8 @@ farmers* · Government of Maharashtra, Maharashtra State Innovation Society · T
 
 ## Status
 
-Built phase by phase, each gate proven and committed (PROMPT PART XV). **Current: P20 — Judge Mode, and
-all ten gates green.** Done so far:
+Built phase by phase, each gate proven and committed (PROMPT PART XV). **All twenty-one phases are built, and the §16
+demonstration runs unbroken in both themes.** What is here:
 - the foundation, and the shared domain engine;
 - the schema with row-level security, and authentication;
 - the nine adapters;
@@ -102,6 +102,11 @@ both sides at once, a buyer's record is what their completed deals say it is, an
 somewhere to go, and every recommendation carries the mechanism that makes it possible. The
 narrowest channels carry the same figure as the richest, and a judge can check every claim on
 this page against the running system. The §16 rehearsal is the last phase (P21).
+
+The twenty-three steps of §16.3 are an automated test, run twice on every verify — once in NIGHT
+and once in FIELD — from choosing Marathi before sign-in, through the camera, the shortlist, the
+deal, the sauda slip, the dispute, the network being switched off and the outbox draining when it
+comes back. `apps/web/e2e/rehearsal.spec.ts` is the demonstration.
 
 All ten acceptance gates (PROMPT §14.3) now have automated proofs, and `pnpm verify` runs them:
 A offline · B security · C camera · D staleness · E the guardrail · F matching · G deal state ·

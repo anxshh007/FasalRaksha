@@ -303,6 +303,17 @@ worth committing.
 | P1-10 and P1-11 are proven by what the source does *not* contain: no API key, no provider SDK, no `localStorage` call, no HTML assembled from strings — with the drawn glyph set named as the single, build-time exception | A removal is only really done when something fails if it comes back. Phase 1's browser-side model key and its `localStorage` database are exactly the defects that would creep back without a scan. |
 | Gate J runs inside `pnpm verify` as `audit --gate-j` | The gate is "every P1-01 … P1-12 row has a passing test and `status = done`". Running it on every verify makes it impossible to regress quietly. FR-02 and FR-03 stay `planned` — there is no buyer client in this build, and CUTS C-11 says so. |
 
+### Decisions taken in P21
+
+| Decision | Reason |
+|---|---|
+| The twenty-three steps are one automated test, numbered as §16.3 numbers them, not a script a person follows | The other specs prove the parts in isolation. This one proves they survive each other: the lot photographed at step 9 is the lot ranked at 11, sold at 13, delivered at 16, disputed at 19, and still legible at 21 with the network gone. A rehearsal nobody can run twice is a rehearsal nobody has run. |
+| It runs twice, once per theme, in one stack, back to back | PART XV's "§16 unbroken twice", and §16.3's optional FIELD-theme switch made compulsory. NIGHT is the hall's theme; FIELD is what a farmer standing in the sun would pick, and a demonstration that only survives one of them is not a product. |
+| The second run meets a buyer whose clean record the first run took away, and the test says so rather than working around it | The buyer disputed at step 19 of the NIGHT run is the buyer offering in the FIELD run, so their rating is suppressed and the open complaint stands in its place. That is the mechanism working across two farmers, which is exactly what §8.9 claims it does. |
+| Two steps depart from the script, and the departures are written into the test's own header | Step 5's Marathi sentence is typed rather than spoken (the microphone path is walked in `sell.spec.ts`), and step 19's dispute is raised on the completed deal rather than a second one. Both are limits of a browser test, not of the product, and a reader of the file learns that before they learn anything else. |
+| The scripted camera moved to `e2e/support/camera.ts`, shared by Gate C and the rehearsal | Two specs driving two copies of a fake camera would eventually be driving two different cameras. |
+| The offline listing at step 21 is allowed to read "saved on this phone" **or** "waiting to send" | Both are honest states and which one shows depends on whether a drain has been scheduled yet. What the test pins is that neither of them says "sent" (§10.4). |
+
 ## 4 · Environment (measured 2026-09-19)
 
 Windows 11 · Node 24.19 · pnpm 10.34.5 · Python 3.12.6 (`.venv`, pinned `ml/requirements.txt`) ·
@@ -358,4 +369,4 @@ precisely what v3 PART IX forbids.
 | P18 | Transport, storage, e-NWR, weather urgency | **Gates D, E** — proven in the engine and on the screen |
 | P19 | WhatsApp · SMS · IVR | **identical benchmark on all four channels** — asserted over the renderers and over HTTP |
 | P20 | Full suite, Judge Mode, seeds | **Gate J** — 12/12 P1 rows done, run on every verify; all ten gates green |
-| P21 | 23-step rehearsal, both themes | §16 unbroken twice |
+| P21 | 23-step rehearsal, both themes | **§16 unbroken twice** — automated, NIGHT and FIELD, in `pnpm verify` |

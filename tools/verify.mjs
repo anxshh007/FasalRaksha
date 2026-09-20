@@ -14,7 +14,7 @@ const steps = [
   ['unit tests', 'pnpm', ['-r', 'run', 'test']],
   ['database tests (real PostgreSQL)', 'pnpm', ['test:db']],
   ['ml tests', 'node', ['tools/py.mjs', '-m', 'pytest', 'ml', '-q']],
-  ['end-to-end: Gates A C D E F G H I, design, budget (Edge)', 'pnpm', ['e2e']],
+  ['end-to-end: Gates A C D E F G H I, the §16 rehearsal, design, budget (Edge)', 'pnpm', ['e2e']],
   ['requirements audit (Gate J)', 'node', ['tools/requirements/audit.mjs', '--gate-j']],
 ];
 if (process.argv.includes('--deps')) steps.push(['dependency audit (high)', 'pnpm', ['audit', '--audit-level', 'high']]);
