@@ -314,6 +314,17 @@ worth committing.
 | The scripted camera moved to `e2e/support/camera.ts`, shared by Gate C and the rehearsal | Two specs driving two copies of a fake camera would eventually be driving two different cameras. |
 | The offline listing at step 21 is allowed to read "saved on this phone" **or** "waiting to send" | Both are honest states and which one shows depends on whether a drain has been scheduled yet. What the test pins is that neither of them says "sent" (§10.4). |
 
+### Decisions taken on the phone (§9.10)
+
+| Decision | Reason |
+|---|---|
+| A browser test measures every screen at 360×800 in its *loaded* state and fails on two things: anything wider than the phone, and any target under 44×44 | An empty screen fits on anything. What breaks a product held in one hand is a page that scrolls sideways and a button a thumb misses, and both are measurable, so they are measured rather than reviewed (`apps/web/e2e/mobile.spec.ts`). |
+| Judge Mode's tables scroll inside their own box; the page never does | It was overflowing a 375px phone by 1065 pixels. A table of figures is what that screen is, so the fix is a scroll container, not a narrower table — and the test allows a wide element only when a scrollable ancestor contains it. |
+| `.btn--quiet` carries a 44px minimum width, not only a minimum height | "नको" is three characters. It was drawing at 43×48 and failing the rule by a pixel, which is exactly the kind of thing review misses and measurement does not. |
+| `viewport-fit=cover` with `env(safe-area-inset-*)` on the spine and the content | The app paints edge to edge on a notched phone and then steps its chrome back off the notch, the home indicator and a landscape cut-out, so no tap lands under them. |
+| `overscroll-behavior-y: contain` on the body | A farmer scrolling to the end of a list of offers must not pull the whole page into a refresh. |
+| A unit test asserts that no two browser specs sign in with the same registry identifier | An identifier belongs to one account and the suite shares one database within a run, so a collision fails a test for a reason unrelated to what it tests. It happened twice while the suite grew; now it cannot happen quietly. |
+
 ## 4 · Environment (measured 2026-09-19)
 
 Windows 11 · Node 24.19 · pnpm 10.34.5 · Python 3.12.6 (`.venv`, pinned `ml/requirements.txt`) ·

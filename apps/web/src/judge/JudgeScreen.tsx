@@ -153,6 +153,7 @@ export function JudgeScreen({ device }: { device: Device }) {
         <Section title={`RAKSHA layers — ${lead.crop}, ${briefing?.district ?? ''}`}>
           {/* All nine, from the same ledger the farmer's evidence panel is built from: six carried
               in the bundle, and RK-7, RK-8 and RK-9 computed here on the device. */}
+          <div className="judge__scroll">
           <table className="judge__table" data-testid="judge-layers">
             <thead>
               <tr>
@@ -183,6 +184,8 @@ export function JudgeScreen({ device }: { device: Device }) {
               ))}
             </tbody>
           </table>
+          </div>
+          <div className="judge__scroll">
           <table className="judge__table" data-testid="judge-conditions">
             <thead>
               <tr>
@@ -203,6 +206,7 @@ export function JudgeScreen({ device }: { device: Device }) {
               ))}
             </tbody>
           </table>
+          </div>
           <p className="judge__note">
             Verdict: <strong>{lead.evaluation.suppressed ? 'suppressed (stale)' : lead.evaluation.verdict}</strong> · horizon 7 d · weather urgency:{' '}
             {lead.urgency.level} ({lead.urgency.reason})
@@ -211,7 +215,8 @@ export function JudgeScreen({ device }: { device: Device }) {
       )}
 
       <Section title="Forecast validation — skill against baselines, out of fold">
-        <table className="judge__table" data-testid="judge-validation">
+        <div className="judge__scroll">
+          <table className="judge__table" data-testid="judge-validation">
           <thead>
             <tr>
               <th>Crop × district</th>
@@ -239,6 +244,7 @@ export function JudgeScreen({ device }: { device: Device }) {
             ))}
           </tbody>
         </table>
+          </div>
       </Section>
 
       {status?.vision != null && (
@@ -246,6 +252,7 @@ export function JudgeScreen({ device }: { device: Device }) {
           <p className="judge__note" data-testid="judge-vision-note">
             {status.vision.version} · field-validated: <strong>{String(status.vision.fieldValidated)}</strong> · {status.vision.note}
           </p>
+          <div className="judge__scroll">
           <table className="judge__table" data-testid="judge-vision">
             <thead>
               <tr>
@@ -266,6 +273,7 @@ export function JudgeScreen({ device }: { device: Device }) {
               ))}
             </tbody>
           </table>
+          </div>
         </Section>
       )}
 
@@ -308,7 +316,8 @@ export function JudgeScreen({ device }: { device: Device }) {
             <dd>{device.reach?.reachable === true ? `reachable · last ${new Date(device.reach.checkedAt).toISOString().slice(11, 19)}` : 'unreachable (field mode)'}</dd>
           </div>
         </dl>
-        <table className="judge__table" data-testid="judge-events">
+        <div className="judge__scroll">
+          <table className="judge__table" data-testid="judge-events">
           <thead>
             <tr>
               <th>When</th>
@@ -328,6 +337,7 @@ export function JudgeScreen({ device }: { device: Device }) {
             ))}
           </tbody>
         </table>
+          </div>
       </Section>
 
       <Section title="Requirements — Gate J">

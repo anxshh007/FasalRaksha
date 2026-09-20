@@ -188,3 +188,30 @@ describe('P1-11 · the device store is IndexedDB, not localStorage, and the DOM 
     expect(glyph).not.toMatch(/fetch\(/);
   });
 });
+
+/**
+ * A registry id belongs to one account, and the browser suite shares one database within a run,
+ * so two specs signing in with the same farmer is a test that fails for a reason that has nothing
+ * to do with what it is testing. It happened twice while this suite grew; this is the guard.
+ */
+describe('e2e · no two browser specs claim the same farmer', () => {
+  const specs = files(join(WEB, 'e2e'), (n) => n.endsWith('.spec.ts'));
+
+  it('finds the specs it scans (guards against a vacuous pass)', () => {
+    expect(specs.length).toBeGreaterThanOrEqual(10);
+  });
+
+  it('each registry identifier is signed in with by exactly one spec', () => {
+    const claims = new Map<string, string[]>();
+    for (const file of specs) {
+      // Every identifier the spec's code names — comments are already stripped by `code()`.
+      const body = code(read(file));
+      for (const id of new Set([...body.matchAll(/PMK-MH-\d{4}-\d{5}/g)].map((m) => m[0]))) {
+        claims.set(id, [...(claims.get(id) ?? []), rel(file)]);
+      }
+    }
+    expect(claims.size).toBeGreaterThan(5);
+    const shared = [...claims.entries()].filter(([, where]) => new Set(where).size > 1).map(([id, where]) => `${id}: ${[...new Set(where)].join(', ')}`);
+    expect(shared).toEqual([]);
+  });
+});
