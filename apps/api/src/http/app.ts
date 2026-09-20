@@ -28,6 +28,20 @@ import { demandFor } from '../modules/demand/service.js';
 import { listMine } from '../modules/listings/service.js';
 import { getMe } from '../modules/me/service.js';
 import { appendChunk, openUpload, PHOTO_LIMITS, readPhoto, type PhotoDeps } from '../modules/photos/service.js';
+import { runDemonstrationDesk } from '../modules/deals/desk.js';
+import {
+  acceptOffer,
+  acknowledgeOffer,
+  AcknowledgeBody,
+  counterOffer,
+  CounterBody,
+  dealById,
+  declineOffer,
+  makeOffer,
+  myDeals,
+  OfferBody,
+  saudaSlipOf,
+} from '../modules/deals/service.js';
 import { createPool, CreateBody, JoinBody, joinPool, leavePool, myPools, OpenQuery, openPools } from '../modules/pools/service.js';
 import { parseOutboxEntry } from '../modules/outbox/schema.js';
 import { deliverOutboxEntry } from '../modules/outbox/service.js';
@@ -288,6 +302,14 @@ export function buildApp(deps: AppDependencies) {
     const header = request.headers['idempotency-key'];
     const result = await deliverOutboxEntry(requireDb(), actor, entry, typeof header === 'string' ? header : undefined);
     void reply.header('idempotent-replay', result.replayed ? 'true' : 'false');
+    // A lot nobody offers on demonstrates nothing: the seeded traders answer it here, through the
+    // ordinary offer path (CUTS C-11). Their silence is never the farmer's problem, so a failure
+    // is logged and the listing stands.
+    if (entry.kind === 'listing.create' && result.status === 201 && !result.replayed) {
+      await runDemonstrationDesk(requireDb(), actor, entry.listing.clientId, now()).catch((error: unknown) => {
+        request.log.warn({ error: String(error) }, 'the demonstration desk could not place its offers');
+      });
+    }
     return reply.status(result.status).send(result.body);
   });
 
@@ -311,6 +333,23 @@ export function buildApp(deps: AppDependencies) {
     const { id } = z.object({ id: z.uuid() }).parse(request.params);
     return leavePool(requireDb(), requireActor(request), id, JoinBody.parse(request.body).listingClientId);
   });
+
+  // Offers and the deal they open (§8.9). Every transition is the server's: there is no offline
+  // path to one, by type (`OutboxEntry`) and by route (Gate G).
+  app.post('/api/offers', { config: { rateLimit: { max: 60, timeWindow: '10 minutes' } } }, async (request, reply) => {
+    const deal = await makeOffer(requireDb(), requireActor(request), OfferBody.parse(request.body), now());
+    return reply.status(201).send(deal);
+  });
+  const dealId = (request: FastifyRequest) => z.object({ id: z.uuid() }).parse(request.params).id;
+  app.post('/api/offers/:id/counter', async (request) => counterOffer(requireDb(), requireActor(request), dealId(request), CounterBody.parse(request.body), now()));
+  app.post('/api/offers/:id/accept', async (request) => acceptOffer(requireDb(), requireActor(request), dealId(request), now()));
+  app.post('/api/offers/:id/decline', async (request) => declineOffer(requireDb(), requireActor(request), dealId(request), now()));
+  app.post('/api/offers/:id/acknowledge', { config: { rateLimit: { max: 30, timeWindow: '1 hour' } } }, async (request) =>
+    acknowledgeOffer(requireDb(), requireActor(request), dealId(request), AcknowledgeBody.parse(request.body).reason),
+  );
+  app.get('/api/deals/mine', async (request) => ({ deals: await myDeals(requireDb(), requireActor(request)) }));
+  app.get('/api/deals/:id', async (request) => dealById(requireDb(), requireActor(request), dealId(request)));
+  app.get('/api/deals/:id/sauda-slip', async (request) => saudaSlipOf(requireDb(), requireActor(request), dealId(request)));
 
   app.post('/api/verify/farmer', { config: { rateLimit: { max: 10, timeWindow: '1 hour' } } }, async (request) => {
     const body = z.object({ registry: z.enum(['pm-kisan', 'agristack']), id: z.string().trim().min(5).max(40) }).parse(request.body);

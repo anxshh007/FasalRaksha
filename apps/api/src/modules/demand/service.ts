@@ -32,7 +32,8 @@ const DISTRICT_REACH_KM = 60;
 
 let registry: DistrictRegistry | null = null;
 
-function districts(): DistrictRegistry {
+/** The shipped district registry, read once. Shared with the deals module for its centroids. */
+export function districtRegistry(): DistrictRegistry {
   if (registry === null) {
     const raw = JSON.parse(readFileSync(resolve(import.meta.dirname, '../../../../../data/reference/districts.json'), 'utf8')) as { registry?: DistrictRegistry } & DistrictRegistry;
     registry = raw.registry ?? raw;
@@ -80,7 +81,7 @@ export function todayIst(now: Date): string {
 }
 
 export async function demandFor(db: Database, actor: Actor, district: string, now: Date): Promise<ServedDocument & { document: DemandDocument }> {
-  const entry = districts().districts.find((d) => d.id === district);
+  const entry = districtRegistry().districts.find((d) => d.id === district);
   if (entry === undefined) throw new DomainError(404, 'UNKNOWN_DISTRICT', 'That district is not in the registry.');
   const asOf = todayIst(now);
 

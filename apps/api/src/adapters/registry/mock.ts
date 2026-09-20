@@ -15,6 +15,7 @@ export const MOCK_FARMERS: readonly FarmerRecord[] = [
   { registry: 'pm-kisan', id: 'PMK-MH-2003-11873', name: 'Dattatray Sopan Jadhav', district: 'nashik', village: 'Pimpalgaon Baswant' },
   { registry: 'pm-kisan', id: 'PMK-MH-2003-12004', name: 'Rekha Sanjay Pawar', district: 'nashik', village: 'Niphad' },
   { registry: 'pm-kisan', id: 'PMK-MH-2003-12115', name: 'Ganesh Narayan Shinde', district: 'nashik', village: 'Niphad' },
+  { registry: 'pm-kisan', id: 'PMK-MH-2003-12206', name: 'Sunita Balasaheb Kale', district: 'nashik', village: 'Ozar' },
   { registry: 'pm-kisan', id: 'PMK-MH-2211-07314', name: 'Balasaheb Vitthal Shinde', district: 'latur', village: 'Ausa' },
   { registry: 'pm-kisan', id: 'PMK-MH-2211-07588', name: 'Shobha Ramdas More', district: 'latur', village: 'Nilanga' },
   { registry: 'pm-kisan', id: 'PMK-MH-1911-04420', name: 'Kishor Namdeo Patil', district: 'jalgaon', village: 'Raver' },

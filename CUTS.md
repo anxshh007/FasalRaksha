@@ -217,3 +217,25 @@ Company, with six member farmers and their real listings.
 requirements in the district, what could be gathered for each, the consignments forming, and the
 proportional settlement at the sauda slip (P15) — which is where the coordinator becomes the
 counterparty of record and the screen starts earning its tests.
+
+## C-11 · The demonstration traders answer a lot through a server-side desk
+
+**What.** When a farmer lists a lot, the demonstration traders seeded from
+`data/reference/demo-buyers.json` place offers on it within the same request, through
+`apps/api/src/modules/deals/desk.ts`. Nobody is sitting at a screen deciding to bid.
+
+**Why.** A farmer cannot be shown an offer that nobody made, and this build has no buyer client:
+the traders have accounts, GSTIN verifications, standing requirements and completed-deal
+histories, but no way to sign in. §16.3's step 13 — make or accept an offer — needs offers to
+exist on a lot created live on stage, seconds earlier.
+
+**What exists instead.** Only the decision to offer is simulated. The desk calls `makeOffer`, the
+same service function a real buyer's request would reach, acting as that buyer's account: the
+same row-level security (`deals_open` requires a verified buyer and an open listing), the same
+deal and offer rows, the same benchmark frozen onto the offer. The rules it applies are the
+buyer's own requirement — crop, quantity band, buying radius, validity window, grade floor — and
+it never acts for a buyer who is not flagged `demonstration`, which a test asserts. Every offer
+card says the traders are demonstration buyers, in all three languages.
+
+**To close.** A buyer client, or an inbound channel for real traders. The endpoints they would
+use already exist and are tested: `POST /api/offers`, `/counter`, `/accept`, `/decline`.

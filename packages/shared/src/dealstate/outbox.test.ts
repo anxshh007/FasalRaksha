@@ -1,5 +1,5 @@
 /**
- * FR-10 · Gate G (compile-time half) — the offline outbox cannot carry a deal transition.
+ * FR-10 · FR-12 · Gate G (compile-time half) — the offline outbox cannot carry a deal transition.
  *
  * The `@ts-expect-error` lines below are the proof. They are type-checked by
  * `tsc -p tsconfig.test.json` in `pnpm typecheck`: if anyone ever widens `OutboxEntry` to accept a
@@ -24,7 +24,7 @@ type IsNever<T> = [T] extends [never] ? true : false;
 /** No outbox kind may name a deal, offer, payment, rating or dispute action. */
 export type NoDealKinds = Assert<IsNever<Extract<OutboxKind, `deal.${string}` | `offer.${string}` | `payment.${string}` | `rating.${string}` | `dispute.${string}`>>>;
 
-describe('FR-10 · Gate G · the outbox type excludes deal transitions', () => {
+describe('FR-10 · FR-12 · Gate G · the outbox type excludes deal transitions', () => {
   it('queues exactly the five offline-safe kinds', () => {
     expect([...OUTBOX_KINDS].sort()).toEqual(['listing.create', 'listing.renew', 'listing.update', 'photo.upload', 'price-alert.create']);
   });

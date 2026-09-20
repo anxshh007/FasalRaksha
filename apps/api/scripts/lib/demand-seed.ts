@@ -157,77 +157,84 @@ export async function seedDemand(ownerUrl: string, version: string, now: Date = 
   let requirements = 0;
   try {
     await client.query('BEGIN');
-    const existing = await client.query<{ n: string }>('SELECT count(*) AS n FROM app.buyer_profiles WHERE demonstration');
-    if (Number(existing.rows[0]?.n ?? 0) === 0) {
+    const sellers = new Map<string, string[]>();
+    const sellersOf = async (district: string): Promise<string[]> => {
+      const known = sellers.get(district);
+      if (known !== undefined) return known;
+      const ids: string[] = [];
+      for (let i = 1; i <= 3; i++) {
+        const id = demoId(`seller:${district}:${i}`);
+        // The counterparties of a history are per district, so a trader seeded later into a
+        // district that already has them joins the ones already there.
+        await client.query("INSERT INTO app.users (id, kind) VALUES ($1, 'farmer') ON CONFLICT (id) DO NOTHING", [id]);
+        await client.query(
+          'INSERT INTO app.farmer_profiles (user_id, display_name, district, verified_at) VALUES ($1, $2, $3, $4) ON CONFLICT (user_id) DO NOTHING',
+          [id, `Demonstration farmer ${i}`, district, new Date(now.getTime() - 400 * DAY)],
+        );
+        ids.push(id);
+      }
+      sellers.set(district, ids);
+      return ids;
+    };
+
+    for (const buyer of seed.buyers) {
+      const buyerId = demoId(`buyer:${buyer.key}`);
+      // Per buyer, not per database: a trader added to the seed file after a database was first
+      // seeded must still get an account, or the demand placed for them below has no buyer to
+      // point at. The whole-database check this replaced left the persistent demo database one
+      // account short of its own seed file, and the foreign key said so.
+      if ((await client.query('SELECT 1 FROM app.buyer_profiles WHERE user_id = $1', [buyerId])).rowCount !== 0) continue;
       created = true;
-      const sellers = new Map<string, string[]>();
-      const sellersOf = async (district: string): Promise<string[]> => {
-        const known = sellers.get(district);
-        if (known !== undefined) return known;
-        const ids: string[] = [];
-        for (let i = 1; i <= 3; i++) {
-          const id = demoId(`seller:${district}:${i}`);
-          await client.query("INSERT INTO app.users (id, kind) VALUES ($1, 'farmer')", [id]);
-          await client.query('INSERT INTO app.farmer_profiles (user_id, display_name, district, verified_at) VALUES ($1, $2, $3, $4)', [id, `Demonstration farmer ${i}`, district, new Date(now.getTime() - 400 * DAY)]);
-          ids.push(id);
-        }
-        sellers.set(district, ids);
-        return ids;
+      const place = places.get(buyer.market);
+      if (place === undefined) throw new Error(`demo-buyers.json: unknown market "${buyer.market}"`);
+      await client.query("INSERT INTO app.users (id, kind) VALUES ($1, 'buyer')", [buyerId]);
+      await client.query(
+        'INSERT INTO app.buyer_profiles (user_id, business_name, place, district, location_lat, location_lon, demonstration) VALUES ($1, $2, $3, $4, $5, $6, true)',
+        [buyerId, buyer.name, place.market.names.en, buyer.district, place.market.location.lat, place.market.location.lon],
+      );
+      if (buyer.verified) {
+        await client.query(
+          "INSERT INTO app.buyer_verifications (user_id, method, identifier_hash, identifier_last4, legal_name, status, adapter_mode) VALUES ($1, 'gstin', $2, $3, $4, 'verified', 'mock')",
+          [buyerId, `demo:${createHash('sha256').update(buyer.key).digest('hex')}`, buyer.gstinLast4 ?? '0000', buyer.name],
+        );
+      }
+
+      const crop = buyer.requirements[0]?.crop ?? 'onion';
+      const farmerIds = await sellersOf(buyer.district);
+      const days = buyer.history.paymentDays.flatMap(([count, d]) => Array.from({ length: count }, () => d));
+      const deal = async (index: number, ageDays: number, state: string) => {
+        const seller = farmerIds[index % farmerIds.length]!;
+        const opened = new Date(now.getTime() - ageDays * DAY);
+        const listing = await client.query<{ id: string }>(
+          `INSERT INTO app.listings (client_id, farmer_id, crop, qty, qty_unit, available_from, available_until, status, created_at)
+           VALUES ($1, $2, $3, 10, 'quintal', $4, $5, 'sold', $6) RETURNING id`,
+          [`demo-history-${buyer.key}-${index}`, seller, crop, opened.toISOString().slice(0, 10), new Date(opened.getTime() + 7 * DAY).toISOString().slice(0, 10), opened],
+        );
+        const inserted = await client.query<{ id: string }>(
+          `INSERT INTO app.deals (listing_id, seller_id, seller_kind, buyer_id, district, state, price, price_unit, qty, qty_unit, last_price_by, delivery_seller, delivery_buyer, created_at, updated_at)
+           VALUES ($1, $2, 'farmer', $3, $4, $5, 2000, 'quintal', 10, 'quintal', 'buyer', true, true, $6, $6) RETURNING id`,
+          [listing.rows[0]!.id, seller, buyerId, buyer.district, state, opened],
+        );
+        const dealId = inserted.rows[0]!.id;
+        const delivered = new Date(opened.getTime() + 2 * DAY);
+        await client.query("INSERT INTO app.deliveries (deal_id, party, confirmed_by, confirmed_at) VALUES ($1, 'seller', $2, $3), ($1, 'buyer', $4, $3)", [dealId, seller, delivered, buyerId]);
+        return { dealId, seller, delivered };
       };
 
-      for (const buyer of seed.buyers) {
-        const place = places.get(buyer.market);
-        if (place === undefined) throw new Error(`demo-buyers.json: unknown market "${buyer.market}"`);
-        const buyerId = demoId(`buyer:${buyer.key}`);
-        await client.query("INSERT INTO app.users (id, kind) VALUES ($1, 'buyer')", [buyerId]);
+      for (let i = 0; i < days.length; i++) {
+        const ageDays = 20 + Math.round(((i + 1) / (days.length + 1)) * 330);
+        const { dealId, seller, delivered } = await deal(i, ageDays, 'PAYMENT_CONFIRMED');
+        const d = days[i]!;
+        await client.query('INSERT INTO app.payments (deal_id, amount, confirmed_by, confirmed_at, days_after_delivery) VALUES ($1, 20000, $2, $3, $4)', [dealId, seller, new Date(delivered.getTime() + d * DAY), d]);
+        completedDeals++;
+      }
+      for (let i = 0; i < buyer.history.defaults; i++) await deal(days.length + i, 122, 'DELIVERY_CONFIRMED'); // delivered 120 days ago, never paid
+      for (let i = 0; i < buyer.history.openDisputes; i++) {
+        const { dealId, seller } = await deal(days.length + buyer.history.defaults + i, 14, 'DELIVERY_CONFIRMED');
         await client.query(
-          'INSERT INTO app.buyer_profiles (user_id, business_name, place, district, location_lat, location_lon, demonstration) VALUES ($1, $2, $3, $4, $5, $6, true)',
-          [buyerId, buyer.name, place.market.names.en, buyer.district, place.market.location.lat, place.market.location.lon],
+          "INSERT INTO app.disputes (deal_id, raised_by, raised_by_party, reason, note, district, state, opened_at) VALUES ($1, $2, 'seller', 'PAYMENT_OVERDUE', 'Payment not received after delivery.', $3, 'DISPUTE_OPEN', $4)",
+          [dealId, seller, buyer.district, new Date(now.getTime() - 3 * DAY)],
         );
-        if (buyer.verified) {
-          await client.query(
-            "INSERT INTO app.buyer_verifications (user_id, method, identifier_hash, identifier_last4, legal_name, status, adapter_mode) VALUES ($1, 'gstin', $2, $3, $4, 'verified', 'mock')",
-            [buyerId, `demo:${createHash('sha256').update(buyer.key).digest('hex')}`, buyer.gstinLast4 ?? '0000', buyer.name],
-          );
-        }
-
-        const crop = buyer.requirements[0]?.crop ?? 'onion';
-        const farmerIds = await sellersOf(buyer.district);
-        const days = buyer.history.paymentDays.flatMap(([count, d]) => Array.from({ length: count }, () => d));
-        const deal = async (index: number, ageDays: number, state: string) => {
-          const seller = farmerIds[index % farmerIds.length]!;
-          const opened = new Date(now.getTime() - ageDays * DAY);
-          const listing = await client.query<{ id: string }>(
-            `INSERT INTO app.listings (client_id, farmer_id, crop, qty, qty_unit, available_from, available_until, status, created_at)
-             VALUES ($1, $2, $3, 10, 'quintal', $4, $5, 'sold', $6) RETURNING id`,
-            [`demo-history-${buyer.key}-${index}`, seller, crop, opened.toISOString().slice(0, 10), new Date(opened.getTime() + 7 * DAY).toISOString().slice(0, 10), opened],
-          );
-          const inserted = await client.query<{ id: string }>(
-            `INSERT INTO app.deals (listing_id, seller_id, seller_kind, buyer_id, district, state, price, price_unit, qty, qty_unit, last_price_by, delivery_seller, delivery_buyer, created_at, updated_at)
-             VALUES ($1, $2, 'farmer', $3, $4, $5, 2000, 'quintal', 10, 'quintal', 'buyer', true, true, $6, $6) RETURNING id`,
-            [listing.rows[0]!.id, seller, buyerId, buyer.district, state, opened],
-          );
-          const dealId = inserted.rows[0]!.id;
-          const delivered = new Date(opened.getTime() + 2 * DAY);
-          await client.query("INSERT INTO app.deliveries (deal_id, party, confirmed_by, confirmed_at) VALUES ($1, 'seller', $2, $3), ($1, 'buyer', $4, $3)", [dealId, seller, delivered, buyerId]);
-          return { dealId, seller, delivered };
-        };
-
-        for (let i = 0; i < days.length; i++) {
-          const ageDays = 20 + Math.round(((i + 1) / (days.length + 1)) * 330);
-          const { dealId, seller, delivered } = await deal(i, ageDays, 'PAYMENT_CONFIRMED');
-          const d = days[i]!;
-          await client.query('INSERT INTO app.payments (deal_id, amount, confirmed_by, confirmed_at, days_after_delivery) VALUES ($1, 20000, $2, $3, $4)', [dealId, seller, new Date(delivered.getTime() + d * DAY), d]);
-          completedDeals++;
-        }
-        for (let i = 0; i < buyer.history.defaults; i++) await deal(days.length + i, 122, 'DELIVERY_CONFIRMED'); // delivered 120 days ago, never paid
-        for (let i = 0; i < buyer.history.openDisputes; i++) {
-          const { dealId, seller } = await deal(days.length + buyer.history.defaults + i, 14, 'DELIVERY_CONFIRMED');
-          await client.query(
-            "INSERT INTO app.disputes (deal_id, raised_by, raised_by_party, reason, note, district, state, opened_at) VALUES ($1, $2, 'seller', 'PAYMENT_OVERDUE', 'Payment not received after delivery.', $3, 'DISPUTE_OPEN', $4)",
-            [dealId, seller, buyer.district, new Date(now.getTime() - 3 * DAY)],
-          );
-        }
       }
     }
 

@@ -142,6 +142,20 @@ export interface StoredPool {
   pool: import('../pools/pools.js').ConsignmentView;
 }
 
+/**
+ * A deal one of this farmer's lots is in (§8.9), kept so the offer, the agreed price and the sauda
+ * slip are all readable with no network. Nothing here can move the deal: a transition is the
+ * server's, and there is no offline path to one (Gate G).
+ */
+export interface StoredDeal {
+  id: string;
+  userId: string;
+  listingClientId: string | null;
+  state: string;
+  fetchedAt: number;
+  deal: import('../deals/deals.js').DealView;
+}
+
 /** The district's buyer demand, verified and parsed (FR-09): what the shortlist is ranked from, offline too. */
 export interface StoredDemand {
   district: string;
@@ -169,6 +183,7 @@ export class DeviceStore extends Dexie {
   photos!: Table<StoredPhoto, string>;
   demand!: Table<StoredDemand, string>;
   pools!: Table<StoredPool, string>;
+  deals!: Table<StoredDeal, string>;
 
   constructor(name = 'fasal-raksha') {
     super(name);
@@ -197,6 +212,10 @@ export class DeviceStore extends Dexie {
     // v5 (P14): the consignments this farmer's lots are in.
     this.version(5).stores({
       pools: 'id, userId',
+    });
+    // v6 (P15): offers, deals and their sauda slips.
+    this.version(6).stores({
+      deals: 'id, userId, listingClientId',
     });
   }
 }

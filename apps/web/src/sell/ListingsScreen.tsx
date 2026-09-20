@@ -4,12 +4,14 @@
  * and "Waiting to send" are honest states, not errors, and a listing is never shown as received
  * until the server has confirmed it. A listing's photograph has its own journey, shown beside it
  * (CAM-13), and never holds the listing back. A lot offered for group sale shows the consignment
- * it can join, or is in (§6.6). Offers and deals join this screen in P15.
+ * it can join, or is in (§6.6), and the offers a lot has drawn, with the sauda slip once one
+ * is struck (§8.9).
  */
 import { Glyph } from '../design/Glyph';
 import { day, number, rupees, t } from '../i18n/strings';
 import type { Device, ListingState } from '../state/useDevice';
 import { gradeLine, useObjectUrl } from './PhotoPanel';
+import { DealsPanel } from '../deals/DealsPanel';
 import { ConsignmentPanel } from '../pools/ConsignmentPanel';
 
 function ListingPhoto({ device, photo }: { device: Device; photo: NonNullable<ListingState['photo']> }) {
@@ -79,6 +81,7 @@ export function ListingsScreen({ device, onSell, onBuyers }: { device: Device; o
                   {t(locale, 'listings.buyers')}
                 </button>
                 <ConsignmentPanel device={device} listingClientId={listing.clientId} optedIn={d.poolOptIn} listed={state === 'sent'} />
+                <DealsPanel device={device} listingClientId={listing.clientId} cropName={cropName(d.crop)} />
               </li>
             );
           })}

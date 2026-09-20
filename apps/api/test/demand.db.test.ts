@@ -9,6 +9,7 @@ import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 
 import { explainOrder, FINANCE_RATE_ANNUAL_DEFAULT, rankBuyers, roadKm, verifyIntegrity, type BuyerProfile, type BuyerRequirement, type CropBundle, type CropDictionary, type DistrictRegistry } from '@fasal/shared';
+import pg from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { loadConfig } from '../src/config.js';
@@ -158,5 +159,56 @@ describe('Gate F · the §16.2 scenario, from the database through the shared en
     expect(explainOrder(a!, b!).decisive).toBe('payment-risk');
     expect(result.excluded.map((e) => e.reason)).toEqual(expect.arrayContaining(['unverified-buyer', 'crop-mismatch']));
     expect(JSON.stringify(result)).not.toContain('%');
+  });
+});
+
+/**
+ * Last in this file on purpose: it removes a trader and everything of theirs from the database,
+ * which is how a database seeded before that trader existed actually looks.
+ */
+describe('FR-09 · a trader added to the seed file reaches a database seeded before them', () => {
+  it('seeds the missing account, its verification, its history and its demand, and leaves the rest alone', async () => {
+    const client = new pg.Client({ connectionString: db.ownerUrl });
+    await client.connect();
+    const buyerId = demoId('buyer:yeola-export');
+    try {
+      // Erase this one trader entirely — the state of the persistent demonstration database on the
+      // day the bulk buyer was added to data/reference/demo-buyers.json for §6.6.
+      const deals = 'SELECT id FROM app.deals WHERE buyer_id = $1';
+      const requirements = 'SELECT id FROM app.buyer_requirements WHERE buyer_id = $1';
+      for (const sql of [
+        `DELETE FROM app.payments WHERE deal_id IN (${deals})`,
+        `DELETE FROM app.deliveries WHERE deal_id IN (${deals})`,
+        `DELETE FROM app.disputes WHERE deal_id IN (${deals})`,
+        `DELETE FROM app.aggregation_members WHERE pool_id IN (SELECT id FROM app.aggregation_pools WHERE requirement_id IN (${requirements}))`,
+        `DELETE FROM app.aggregation_pools WHERE requirement_id IN (${requirements})`,
+        `DELETE FROM app.deals WHERE buyer_id = $1`,
+        `DELETE FROM app.listings WHERE client_id LIKE 'demo-history-yeola-export-%'`, // the lots that history was written against
+        `DELETE FROM app.buyer_requirements WHERE buyer_id = $1`,
+        `DELETE FROM app.buyer_verifications WHERE user_id = $1`,
+        `DELETE FROM app.buyer_profiles WHERE user_id = $1`,
+        `DELETE FROM app.users WHERE id = $1`,
+      ]) {
+        await client.query(sql, sql.includes('$1') ? [buyerId] : []);
+      }
+      const others = Number((await client.query<{ n: string }>('SELECT count(*) AS n FROM app.buyer_profiles WHERE demonstration')).rows[0]!.n);
+
+      const again = await seedDemand(db.ownerUrl, VERSION, NOW);
+      expect(again.created).toBe(true); // one account was missing, so one was made
+
+      const back = await client.query<{ name: string; verified: string | null; deals: string }>(
+        `SELECT b.business_name AS name, v.status AS verified, (SELECT count(*) FROM app.deals d WHERE d.buyer_id = b.user_id) AS deals
+           FROM app.buyer_profiles b LEFT JOIN app.buyer_verifications v ON v.user_id = b.user_id WHERE b.user_id = $1`,
+        [buyerId],
+      );
+      expect(back.rows[0]?.name).toBe('Yeola Onion Export Terminal');
+      expect(back.rows[0]?.verified).toBe('verified');
+      expect(Number(back.rows[0]?.deals)).toBe(12); // its payment record, seeded with it
+      expect((await client.query('SELECT 1 FROM app.buyer_requirements WHERE buyer_id = $1', [buyerId])).rowCount).toBe(1);
+      // And nobody was duplicated: the traders that were already there were left as they were.
+      expect(Number((await client.query<{ n: string }>('SELECT count(*) AS n FROM app.buyer_profiles WHERE demonstration')).rows[0]!.n)).toBe(others + 1);
+    } finally {
+      await client.end();
+    }
   });
 });

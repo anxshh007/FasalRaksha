@@ -133,3 +133,38 @@
     --dur-number: 0ms;
   }
 }
+
+/*
+ * Print takes the FIELD palette whatever is on screen: the sauda slip (§9.9.4) is printed and
+ * handed over, and a near-black ground prints as a page of ink. Same tokens, same components.
+ */
+@media print {
+  :root,
+  :root[data-theme='night'],
+  :root[data-theme='field'] {
+  color-scheme: light;
+  --ground: #f7f8f7;
+  --ground-soft: #edf2ee;
+  --surface: #ffffff;
+  --surface-raised: #ffffff;
+  --rule: #dce0dd;
+  --rule-strong: #a9beb0;
+
+  --text: #1a1e1c;
+  --text-muted: #5c645e;
+  --text-faint: #616a64; /* spec #7C8981 fails AA; see header */
+
+  --farmer: #1e5631;
+  --farmer-tint: #e9f3eb;
+  --buyer: #1f3864;
+  --buyer-tint: #ecf0f8;
+  --fpo: #8a5a00;
+  --fpo-tint: #eee7db;
+  --caution: #8a5a00;
+  --caution-tint: #fdf3e0;
+  --refuse: #9c3a2a;
+  --refuse-tint: #fbeeeb;
+
+  --on-accent: #ffffff;
+  }
+}

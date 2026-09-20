@@ -231,6 +231,19 @@ worth committing.
 | The farmer's share is shown as quintals of the total, never as a percentage | §8 of the Constitution: no match percentages, and a share is the same arithmetic wearing a different hat. "Your 5 quintals of the 33" is the number that governs the money. |
 | The coordinator's own screen is deferred; the FPO account type, its members, its consignments and `POST /api/pools` are built and tested | CUTS C-10. The farmer's side is what §16 demonstrates, and an FPO dashboard nobody walks through in the rehearsal would be untested surface. |
 
+### Decisions taken in P15
+
+| Decision | Reason |
+|---|---|
+| Every transition runs `transition()` from `@fasal/shared` on the server, then writes exactly what the engine returned, with `WHERE version = $n` | The phone uses the same function to decide which buttons to show. One implementation of the rules (Constitution §3), and the version check makes a second acceptance a 409 rather than a race. |
+| Acceptance and the sauda slip are one transaction: the deal becomes ACCEPTED, the server (the engine's only system-only event) issues the slip, the slip payload is frozen, and a trigger closes the lot | `ACCEPTED` is not a resting state — a farmer who has agreed a price must not be shown a deal with no record. Migration 0011 marks the listing sold, marks a consignment 'dealt', and declines the other offers on the same lot, as the owner, because row-level security lets only the farmer touch their listing and the accepting party may be the buyer. |
+| The slip is **frozen**, not recomputed: the benchmark of the day, the agreed price, the grade and its provenance, the freight estimate with its vehicle class, the buyer's payment record and the proportional split are all written into `sauda_slips.payload` at acceptance | §9.9.4. A record that recalculates itself is not a record. Tomorrow's benchmark must not silently change what yesterday's slip says the price was measured against. |
+| The slip's split table is kilograms and rupees per contributing lot, with no names and no percentages | §6.6 splits proceeds by contributed volume; the buyer is owed one consignment, not a list of farmers. A share as a percentage is a match percentage wearing a different hat. |
+| There is no offline path to a transition, and the browser test reads IndexedDB to prove it | Gate G. The compile-time half is `OutboxEntry` (P2); the runtime half is the outbox inspected after a farmer tries to act with no network. Offline the offers are all still readable from the device store — only agreeing needs a server. |
+| A masked relay handle is created when the farmer acknowledges an offer, never before, and never a phone number | §8.4, SEC-06, SEC-07: a marketplace of verified identities is a contact-harvesting resource without this. The database enforces both the acknowledgement and the twenty-a-day limit per buyer. |
+| The seeded traders answer a new lot through `makeOffer`, as themselves, from their own standing requirements | There is no buyer client in this build, and an offer nobody made cannot be shown to a farmer. What is simulated is the decision to offer; the offer, the deal row, the policies and the record are the production path (CUTS C-11). |
+| The slip prints at A5 with the FIELD palette forced in `tokens.css` | §9.9.4 wants it printable and shareable; a near-black screen theme prints as a page of ink. The palette lives in the token file because nothing outside it may write a colour (§9.4, enforced by a test). |
+
 ## 4 · Environment (measured 2026-09-19)
 
 Windows 11 · Node 24.19 · pnpm 10.34.5 · Python 3.12.6 (`.venv`, pinned `ml/requirements.txt`) ·
@@ -280,7 +293,7 @@ precisely what v3 PART IX forbids.
 | P12 | Camera pipeline | **Gate C** — CAM-01…14 walked |
 | P13 | Matching + shortlist + honest emptiness | **Gate F** |
 | P14 | FPO pools | **a real MOQ cleared from real listings** — 28 qtl + 5 qtl ≥ 30 qtl, in the browser |
-| P15 | Offers, deals, sauda slip | **Gate G** |
+| P15 | Offers, deals, sauda slip | **Gate G** — the outbox inspected in the browser with the network off |
 | P16 | Delivery, payment, reputation | reputation moves only on completed deals |
 | P17 | Disputes, grievance routing | open dispute suppresses clean reputation |
 | P18 | Transport, storage, e-NWR, weather urgency | **Gates D, E** |

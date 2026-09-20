@@ -1589,8 +1589,192 @@ button.spine__item:hover {
   white-space: nowrap;
 }
 
+/* ── offers and the deal they open (P15) ─────────────────────────────────────────────────── */
+
+.offers {
+  margin-top: var(--space-3);
+}
+.offers__note {
+  margin: var(--space-2) 0 0;
+  font-size: var(--size-small);
+}
+.offer-list {
+  display: grid;
+  gap: var(--space-3);
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.offer {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-4);
+  border: var(--hairline);
+  border-left: 2px solid var(--buyer);
+  border-radius: var(--radius);
+  background: var(--buyer-tint);
+}
+.offer p {
+  margin: 0;
+}
+.offer__head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.offer__name {
+  font-family: var(--font-display);
+  font-size: var(--size-lead);
+  text-transform: uppercase;
+}
+.offer__name:lang(mr),
+.offer__name:lang(hi) {
+  text-transform: none;
+  font-family: var(--font-deva);
+}
+.offer__state {
+  margin-left: auto;
+  font-size: var(--size-small);
+  color: var(--text-muted);
+}
+.offer__price .figure {
+  font-size: var(--size-h3);
+}
+.offer__gross {
+  font-weight: 700;
+}
+.offer__record {
+  font-size: var(--size-small);
+}
+.offer__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+.offer__ask {
+  margin-top: var(--space-3);
+}
+.offer__ask .field {
+  margin-bottom: var(--space-2);
+}
+.offer__ask input {
+  max-width: 10em;
+  font-family: var(--font-mono);
+}
+
+/* ── the sauda slip: a record, printable and handed over (§9.9.4) ────────────────────────── */
+
+.slip {
+  margin-top: var(--space-3);
+  padding: var(--space-5);
+  background: var(--surface);
+  border: var(--hairline);
+  /* The perforated edge, drawn rather than pictured: a repeating gradient masked to the frame. */
+  border-top: none;
+  border-bottom: none;
+  position: relative;
+}
+.slip::before,
+.slip::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: repeating-linear-gradient(to right, var(--rule-strong) 0 6px, transparent 6px 12px);
+}
+.slip::before {
+  top: 0;
+}
+.slip::after {
+  bottom: 0;
+}
+.slip__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  padding-bottom: var(--space-3);
+  border-bottom: var(--hairline);
+}
+.slip__head p {
+  margin: 0;
+}
+.slip__no {
+  font-size: var(--size-body);
+  letter-spacing: 0.04em;
+}
+.slip__rows {
+  display: grid;
+  gap: var(--space-2);
+  margin: var(--space-4) 0 0;
+}
+.slip__row {
+  display: grid;
+  grid-template-columns: minmax(0, 11em) minmax(0, 1fr);
+  gap: var(--space-1) var(--space-4);
+  padding-bottom: var(--space-2);
+  border-bottom: var(--hairline);
+}
+.slip__row dt {
+  margin: 0;
+}
+.slip__row dd {
+  margin: 0;
+}
+.slip__price,
+.slip__gross {
+  font-size: var(--size-lead);
+}
+.slip__split ul {
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--size-small);
+}
+.slip__foot {
+  margin-top: var(--space-4);
+  display: grid;
+  gap: var(--space-2);
+  justify-items: start;
+  font-size: var(--size-small);
+}
+@media (max-width: 480px) {
+  .slip__row {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media print {
   :root {
     color-scheme: light;
+  }
+  /* A slip that cannot be printed and handed over is not a slip: A5, nothing else on the page
+     (§9.9.4). tokens.css forces the FIELD palette for print, because a dark screen theme prints
+     as a black page. */
+  @page {
+    size: A5;
+    margin: 12mm;
+  }
+  body:has(.slip) * {
+    visibility: hidden;
+  }
+  body:has(.slip) .slip,
+  body:has(.slip) .slip * {
+    visibility: visible;
+  }
+  body:has(.slip) .slip {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+    padding: 0;
+    background: var(--surface);
+    color: var(--text);
+  }
+  body:has(.slip) .slip__print {
+    display: none;
   }
 }
