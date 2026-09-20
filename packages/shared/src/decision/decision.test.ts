@@ -1,5 +1,5 @@
 /**
- * FR-08 · RK-7 · RK-9 · GR-1…GR-7 · Gate E — the seven gates as seven independent refusals, and
+ * FR-06 · FR-08 · RK-7 · RK-9 · GR-1…GR-7 · Gate E — the seven gates as seven independent refusals, and
  * the cost-sensitive downside rule, on the device.
  */
 import { describe, expect, it } from 'vitest';

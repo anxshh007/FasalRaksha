@@ -111,3 +111,80 @@ describe('§9.4–§9.6 · tokens, materials and the type floor', () => {
     expect(Math.min(...scale)).toBeGreaterThanOrEqual(13);
   });
 });
+
+/**
+ * §14.4 · Judge Mode is the one place model terminology is allowed, and it is fenced: not linked
+ * from any farmer screen, and the only place literal English diagnostics copy is written.
+ */
+describe('§14.4 · Judge Mode is the exception, and the exception is fenced', () => {
+  const judge = (path: string) => rel(path).startsWith('src/judge/');
+  /** JSX text: what is written between tags, as opposed to a `t(locale, …)` lookup. */
+  const jsxText = (text: string) =>
+    [...code(text).matchAll(/>([^<>{}\n]{4,})</g)].map((m) => (m[1] ?? '').trim()).filter((line) => /[A-Za-z]/.test(line) && !/^[\s·—-]*$/.test(line));
+
+  it('only the route table and the root know it exists, and neither links to it', () => {
+    const allowed = new Set(['src/state/route.ts', 'src/App.tsx']);
+    const mentions = ui.filter((f) => !judge(f) && !allowed.has(rel(f)) && code(read(f)).includes('_judge')).map(rel);
+    expect(mentions).toEqual([]); // a screen that mentions it is a screen that could link to it
+    // And nowhere is it an anchor: a judge types the route, a farmer never taps into it.
+    const linked = ui.filter((f) => /href=[^\r\n]*_judge/.test(code(read(f)))).map(rel);
+    expect(linked).toEqual([]);
+  });
+
+  it('the navigation offers four places, and Judge Mode is not one of them', () => {
+    const app = read(join(WEB, 'src/App.tsx'));
+    const nav = app.slice(app.indexOf('const nav'), app.indexOf('];', app.indexOf('const nav')));
+    expect(nav).toContain("route: 'home'");
+    expect(nav).toContain("route: 'deals'");
+    expect(nav).not.toContain('_judge');
+  });
+
+  it('literal model terminology in the interface appears only under src/judge', () => {
+    const banned = /\b(model|skill|coverage|conformal|quantile|inference|accuracy)\b/i;
+    const offences = ui
+      .filter((f) => !judge(f) && /\.tsx$/.test(f))
+      .flatMap((f) => jsxText(read(f)).filter((line) => banned.test(line)).map((line) => `${rel(f)}: ${line}`));
+    expect(offences).toEqual([]);
+  });
+
+  it('and Judge Mode does use it — otherwise this fence guards nothing', () => {
+    const screen = read(join(WEB, 'src/judge/JudgeScreen.tsx'));
+    expect(jsxText(screen).some((line) => /skill|coverage/i.test(line))).toBe(true);
+  });
+});
+
+/**
+ * P1-10 · P1-11 — two Phase-1 defects that are proven fixed by what the source does *not*
+ * contain. A removal is only really done when something fails if it comes back.
+ */
+describe('P1-10 · no model credential ever reaches the browser', () => {
+  it('no API key field, no key in storage, no provider SDK in the app', () => {
+    const banned = /\b(apiKey|api_key|groq|anthropic|openai|bearer sk-|sk-[a-z0-9]{8})\b/i;
+    const offences = ui.filter((f) => banned.test(code(read(f)))).map(rel);
+    expect(offences).toEqual([]);
+  });
+
+  it('and the package the app ships depends on no model SDK', () => {
+    const manifest = JSON.parse(read(join(WEB, 'package.json'))) as { dependencies?: Record<string, string> };
+    const deps = Object.keys(manifest.dependencies ?? {});
+    expect(deps.filter((d) => /groq|openai|anthropic|@ai-sdk/.test(d))).toEqual([]);
+  });
+});
+
+describe('P1-11 · the device store is IndexedDB, not localStorage, and the DOM is React', () => {
+  it('localStorage and sessionStorage are never read or written', () => {
+    // Prose about Phase 1 is allowed; a call is not. `code()` has already stripped comments.
+    const offences = ui.filter((f) => /\b(local|session)Storage\s*\.\s*(get|set|remove|clear)/.test(code(read(f)))).map(rel);
+    expect(offences).toEqual([]);
+  });
+
+  it('nothing renders by assembling HTML strings, except the drawn glyph set', () => {
+    const offences = ui.filter((f) => /\b(innerHTML|outerHTML|insertAdjacentHTML|dangerouslySetInnerHTML)\b/.test(code(read(f)))).map(rel);
+    // Glyph.tsx inlines this repository's own SVG files, imported at build time, so that they
+    // inherit `currentColor`. They are drawn here, never fetched, and never come from a user.
+    expect(offences).toEqual(['src/design/Glyph.tsx']);
+    const glyph = code(read(join(WEB, 'src/design/Glyph.tsx')));
+    expect(glyph).toMatch(/import\.meta\.glob|\?raw/); // build-time, from the repository
+    expect(glyph).not.toMatch(/fetch\(/);
+  });
+});

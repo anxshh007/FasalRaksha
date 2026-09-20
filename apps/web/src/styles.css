@@ -1664,6 +1664,103 @@ button.spine__item:hover {
   font-family: var(--font-mono);
 }
 
+/* ── Judge Mode (§14.4): dense on purpose — the one screen that is a table of figures ────── */
+
+.judge {
+  display: grid;
+  gap: var(--space-5);
+  font-size: var(--size-small);
+}
+.judge__title {
+  font-size: var(--size-h2);
+  margin: 0;
+}
+.judge__note {
+  color: var(--text-muted);
+  margin: 0;
+  max-width: 80ch;
+}
+.judge__error {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-left: 2px solid var(--caution);
+  background: var(--caution-tint);
+}
+.judge__section {
+  display: grid;
+  gap: var(--space-3);
+}
+.judge__heading {
+  font-size: var(--size-lead);
+  margin: 0;
+  padding-bottom: var(--space-2);
+  border-bottom: var(--hairline);
+}
+.judge__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+}
+.judge__grid dt {
+  color: var(--text-muted);
+  font-size: var(--size-label);
+}
+.judge__grid dd {
+  margin: 0;
+  font-family: var(--font-mono);
+}
+.judge__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.judge__list li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border: var(--hairline);
+  border-radius: var(--radius);
+  font-family: var(--font-mono);
+}
+.judge__list li[data-mode='live'] strong {
+  color: var(--accent);
+}
+.judge__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: var(--size-label);
+}
+.judge__table th,
+.judge__table td {
+  text-align: left;
+  padding: var(--space-2) var(--space-3);
+  border-bottom: var(--hairline);
+  white-space: nowrap;
+}
+.judge__table th {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.judge__table tr[data-status='fail'] td {
+  color: var(--refuse);
+}
+.judge__pre {
+  margin: 0;
+  padding: var(--space-3);
+  border: var(--hairline);
+  border-radius: var(--radius);
+  background: var(--surface);
+  font-family: var(--font-mono);
+  font-size: var(--size-label);
+  overflow-x: auto;
+}
+
 /* ── weather as urgency (P18) ───────────────────────────────────────────────────────────── */
 
 .weather {

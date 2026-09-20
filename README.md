@@ -19,8 +19,8 @@ farmers* · Government of Maharashtra, Maharashtra State Innovation Society · T
 
 ## Status
 
-Built phase by phase, each gate proven and committed (PROMPT PART XV). **Current: P19 — WhatsApp, SMS
-and IVR.** Done so far:
+Built phase by phase, each gate proven and committed (PROMPT PART XV). **Current: P20 — Judge Mode, and
+all ten gates green.** Done so far:
 - the foundation, and the shared domain engine;
 - the schema with row-level security, and authentication;
 - the nine adapters;
@@ -63,6 +63,12 @@ and IVR.** Done so far:
   up as agreed. That mutual rating is the only thing a reputation is ever written by, and it is
   always shown with the number of people behind it, so one rating cannot look like a hundred
   closed deals.
+- Judge Mode (`#/_judge`, typed, never linked): the release actually loaded and how old it is,
+  every adapter in the mode it is really running in, all nine RAKSHA layers with their measured
+  weights, the seven conditions with pass or fail, the pipeline's validation table, the ingest
+  report, the grading models with "field-validated: false" on them, this phone's own cache, and
+  the requirements table. Every figure is read at the moment it is shown. It is the one place in
+  the product where model terminology is allowed, and a test enforces that fence both ways.
 - the same answer on a feature phone: one inbound message — "कांदा लासलगाव भाव", or
   `KANDA LASALGAON` — comes back as a WhatsApp reply, a single-segment SMS
   (`Kanda Lasalgaon Rs3508/qtl · 7d +4% · vikri karava`) or a spoken IVR script, all quoting the
@@ -94,10 +100,16 @@ second half of Gate A. A small lot that no bulk buyer would look at twice can jo
 neighbours and clear that buyer's minimum. A price is agreed only where it can be recorded for
 both sides at once, a buyer's record is what their completed deals say it is, and a complaint has
 somewhere to go, and every recommendation carries the mechanism that makes it possible. The
-narrowest channels carry the same figure as the richest. Judge Mode and the full suite come next
-(P20).
+narrowest channels carry the same figure as the richest, and a judge can check every claim on
+this page against the running system. The §16 rehearsal is the last phase (P21).
+
+All ten acceptance gates (PROMPT §14.3) now have automated proofs, and `pnpm verify` runs them:
+A offline · B security · C camera · D staleness · E the guardrail · F matching · G deal state ·
+H language · I price units · J requirements.
 
 `REQUIREMENTS.csv` is the source of truth for what is real. Run `pnpm requirements` to see it.
+Two rows are deliberately still `planned`: FR-02 and FR-03, the buyer's own desk, which this
+build does not have (CUTS C-11).
 
 ## Quick start
 

@@ -291,6 +291,18 @@ worth committing.
 | The channels answer **published district information only**: benchmark, movement, verdict, refusal. Never a lot, a deal, an offer or a buyer | A sender id on an SMS gateway is a claim, not an identity, and it is trivially spoofed. Quoting a farmer's deals back to whoever texted their number would be the product's worst possible failure. The app, where the sender holds a session, is where that lives — and a test greps the channel payloads for it. |
 | The webhook is authenticated by a gateway secret (`CHANNEL_SECRET`) compared in constant time, and an unset secret closes the endpoint | An open webhook on a public URL is an open relay. Failing closed is the only safe default, and the 401 path is tested with no secret, a wrong secret and a longer secret. |
 
+### Decisions taken in P20
+
+| Decision | Reason |
+|---|---|
+| Judge Mode reads every figure at the moment it is shown — the release from `app.bundle_releases`, the validation table and ingest report from the pipeline's own artefacts, the adapters from the parsed config, the requirements from `REQUIREMENTS.csv` | §14.4's surface exists to be disbelieved. A diagnostics page written by hand, or cached for effect, would be the one screen in the product that proves nothing. |
+| It answers without a session, and contains no personal data at all — a test greps its payload for farmers, buyers, deals and phone numbers | A judge at a demonstration has no account. An unauthenticated diagnostics endpoint is only safe if there is nothing behind it worth taking, so there is nothing behind it worth taking. |
+| The device half is read from this phone's own IndexedDB, and the nine layers come from `evidenceLedger` — the same function the farmer's evidence panel uses | Six layers travel in the bundle and three (RK-7, RK-8, RK-9) are computed on the device. Showing them from a second implementation would make Judge Mode a claim about the app rather than a window into it. |
+| The route is `#/_judge`, lazy-loaded, rendered before the session check, and absent from the navigation. Three tests hold that shape: nothing links to it, the nav offers four places, and the chunk is not downloaded until the route is opened | §14.4: never linked from the farmer UI. "We just won't link it" is a habit; a test is a rule. |
+| Judge Mode is the only place model terminology may appear, and the interface scan now enforces that as a fence in both directions: banned in literal copy everywhere else, and required to be present there | An exemption nobody checks quietly becomes an exemption everywhere. The last test fails if Judge Mode stops using the vocabulary it exists to expose. |
+| P1-10 and P1-11 are proven by what the source does *not* contain: no API key, no provider SDK, no `localStorage` call, no HTML assembled from strings — with the drawn glyph set named as the single, build-time exception | A removal is only really done when something fails if it comes back. Phase 1's browser-side model key and its `localStorage` database are exactly the defects that would creep back without a scan. |
+| Gate J runs inside `pnpm verify` as `audit --gate-j` | The gate is "every P1-01 … P1-12 row has a passing test and `status = done`". Running it on every verify makes it impossible to regress quietly. FR-02 and FR-03 stay `planned` — there is no buyer client in this build, and CUTS C-11 says so. |
+
 ## 4 · Environment (measured 2026-09-19)
 
 Windows 11 · Node 24.19 · pnpm 10.34.5 · Python 3.12.6 (`.venv`, pinned `ml/requirements.txt`) ·
@@ -345,5 +357,5 @@ precisely what v3 PART IX forbids.
 | P17 | Disputes, grievance routing | **open dispute suppresses clean reputation** — proven on the card and in the demand document |
 | P18 | Transport, storage, e-NWR, weather urgency | **Gates D, E** — proven in the engine and on the screen |
 | P19 | WhatsApp · SMS · IVR | **identical benchmark on all four channels** — asserted over the renderers and over HTTP |
-| P20 | Full suite, Judge Mode, seeds | **Gate J**; all ten gates green |
+| P20 | Full suite, Judge Mode, seeds | **Gate J** — 12/12 P1 rows done, run on every verify; all ten gates green |
 | P21 | 23-step rehearsal, both themes | §16 unbroken twice |

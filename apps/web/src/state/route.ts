@@ -6,12 +6,17 @@
  * The camera is a step inside "sell" (`#/sell/photo`), so the back button closes it, and closing
  * it, by any route, turns the camera off. It is opened only by a tap (CAM-06: a user gesture);
  * a reload onto `#/sell/photo` lands on the sell screen with the camera closed.
+ *
+ * `#/_judge` is a fifth place that is not one of the four: Judge Mode (§14.4). It is reachable
+ * only by typing it, lazy-loaded when it is, and deliberately absent from the navigation — a test
+ * asserts that nothing in the farmer interface links to it.
  */
 import { useEffect, useState } from 'react';
 
-export type Route = 'home' | 'sell' | 'buyers' | 'deals';
+export type Route = 'home' | 'sell' | 'buyers' | 'deals' | '_judge';
 
-const ROUTES: readonly Route[] = ['home', 'sell', 'buyers', 'deals'];
+/** The four places in the navigation. Judge Mode is a route, never a destination on screen. */
+const ROUTES: readonly Route[] = ['home', 'sell', 'buyers', 'deals', '_judge'];
 const CAMERA_HASH = '#/sell/photo';
 
 function segments(): string[] {

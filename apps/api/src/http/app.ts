@@ -27,6 +27,7 @@ import { refreshSession, requestOtp, revokeSession, verifyOtp, type AuthDeps, ty
 import { cropBundle, currentManifest, sharedBundle, type ServedDocument } from '../modules/bundles/store.js';
 import { answerInbound, InboundBody, secretMatches } from '../modules/channels/service.js';
 import { demandFor } from '../modules/demand/service.js';
+import { judgeStatus } from '../modules/judge/service.js';
 import { weatherFor } from '../modules/weather/service.js';
 import { listMine } from '../modules/listings/service.js';
 import { getMe } from '../modules/me/service.js';
@@ -230,6 +231,16 @@ export function buildApp(deps: AppDependencies) {
 
   // Demand for the buyer shortlist (FR-09): signed-in only, verified on the phone like a bundle,
   // revalidated by ETag. The phone ranks it against its own lot, which never leaves the phone.
+  /**
+   * Judge Mode (§14.4): everything a judge needs to check that nothing here is faked, read from
+   * artefacts and the database at the moment it is asked for. No session — a judge at a
+   * demonstration has no account — and no personal data, ever. Never linked from a farmer screen.
+   */
+  app.get('/api/_judge/status', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (_request, reply) => {
+    void reply.header('cache-control', 'no-store');
+    return judgeStatus(deps.db, deps.config, now(), API_VERSION);
+  });
+
   /**
    * The narrow channels (PART XII). Authenticated by the gateway's shared secret, never by the
    * sender id in the body: a phone number in an inbound webhook is a claim. The reply carries

@@ -186,7 +186,7 @@ describe('SEC-04 · forged buyer_id at the DB layer', () => {
   });
 });
 
-describe('SEC-05 · an unverified buyer attempts an offer', () => {
+describe('SEC-05 · P1-09 · an unverified buyer attempts an offer', () => {
   it('cannot open a deal', async () => {
     await expect(
       as(buyer(w.buyerUnverified), (c) =>

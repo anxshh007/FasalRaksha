@@ -236,7 +236,7 @@ describe('FR-12 · Gate G · acceptance is the server\'s, and so is the slip', (
   });
 });
 
-describe('SEC · only the two parties, and only a verified buyer', () => {
+describe('SEC · P1-08 · P1-09 · only the two parties, only a verified buyer, and contact only after an acknowledgement', () => {
   it('an unverified buyer cannot open a deal, and a farmer cannot offer at all', async () => {
     const clientId = await listLot(5);
     const listing = await seed.query<{ id: string }>('SELECT id FROM app.listings WHERE client_id = $1', [clientId]);
@@ -388,7 +388,7 @@ describe('FR-14 · delivery, payment, and a reputation that moves only on comple
   });
 });
 
-describe('FR-13 · the pickup a sauda slip suggests, checked against the weather', () => {
+describe('FR-05 · FR-13 · the vehicle, the freight and the pickup a sauda slip carries', () => {
   it("names a day inside the lot's own window, and says the forecast was consulted", async () => {
     const clientId = await listLot(5);
     const offer = (await offersOn(clientId))[0]!;
@@ -397,6 +397,11 @@ describe('FR-13 · the pickup a sauda slip suggests, checked against the weather
     expect(pickup?.arrangedBy).toBe('phone'); // §XIII: inform the phone call, never replace it
     expect(pickup?.weatherChecked).toBe(true); // the mock forecast is a real forecast document here
     expect(pickup?.suggested).not.toBeNull();
+    // FR-05: the vehicle class and its indicative freight, from the tariff directory, attached
+    // at acceptance — not distance times an arbitrary rate.
+    expect(accepted.slip?.freight?.vehicleClass).toBeTypeOf('string');
+    expect(accepted.slip?.freight?.total).toBeGreaterThan(0);
+    expect(accepted.slip?.freight?.roadKm).toBeGreaterThan(0);
     expect(pickup!.suggested! >= bundle.asOf).toBe(true);
     expect(pickup!.suggested! <= '2026-10-10').toBe(true); // inside the availability window the lot was listed with
   });

@@ -7,10 +7,15 @@
  * Navigation is §9.7's four: HOME · SELL · BUYERS · MY DEALS. No link ever leads to a page that
  * does not exist.
  */
+import { lazy, Suspense } from 'react';
+
 import { Glyph } from './design/Glyph';
 import { t } from './i18n/strings';
 import type { Preferences } from './state/preferences';
 import { href, useRoute, type Route } from './state/route';
+
+/** §14.4: lazy, so a farmer's phone never downloads the diagnostics it will never open. */
+const JudgeScreen = lazy(() => import('./judge/JudgeScreen').then((m) => ({ default: m.JudgeScreen })));
 import { useDevice } from './state/useDevice';
 import { BuyersScreen } from './match/BuyersScreen';
 import { ListingsScreen } from './sell/ListingsScreen';
@@ -68,7 +73,13 @@ export function App({ preferences }: { preferences: Preferences }) {
             </nav>
           )}
           <main data-testid="screen" data-session={session?.status ?? 'booting'} style={{ marginTop: signedIn ? 0 : 'var(--space-5)' }}>
-            {session === null ? null : session.status === 'signed-out' ? (
+            {/* Judge Mode (§14.4) answers before the session does: a judge at a demonstration
+                has no account, and the diagnostics are nobody's personal data. */}
+            {route === '_judge' ? (
+              <Suspense fallback={<p className="muted">Loading diagnostics</p>}>
+                <JudgeScreen device={device} />
+              </Suspense>
+            ) : session === null ? null : session.status === 'signed-out' ? (
               <Landing device={device} />
             ) : session.profile.district === null ? (
               <VerifyFarmer device={device} />

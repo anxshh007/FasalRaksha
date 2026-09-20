@@ -1,5 +1,5 @@
 /**
- * Gates D and E in the browser · GR-1 … GR-7 · RK-6 · §5.7 · §XIII.
+ * Gates D and E in the browser · FR-06 · GR-1 … GR-7 · RK-6 · §5.7 · §XIII.
  *
  * Both gates are proven as arithmetic in `packages/shared` — seven independent refusals in
  * `decision.test.ts`, the per-crop thresholds in `staleness.test.ts`. This is the other half of
