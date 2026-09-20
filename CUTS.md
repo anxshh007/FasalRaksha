@@ -32,7 +32,7 @@ suite against a `postgres:18` service container. Switching is configuration
 ## C-02 · Live adapters are verified against recorded responses, not against the real services
 
 **What.** All nine adapters have a `Live*` implementation (Agmarknet/OGD, Open-Meteo, the
-PM-KISAN/AgriStack and GSTIN/Udyam registry gateway, a DLT SMS gateway, Bhashini ASR, Claude,
+PM-KISAN/AgriStack and GSTIN/Udyam registry gateway, a DLT SMS gateway, Bhashini ASR, a hosted language model,
 the WDRA storage and transport gateways). None has been run against the real service.
 
 **Why.** The build has no credentials for any of them, and a hackathon team cannot obtain

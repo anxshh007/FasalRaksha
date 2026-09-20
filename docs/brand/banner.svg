@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300" width="1200" height="300" role="img" aria-label="Fasal Raksha — today's rate first, then a decision you can defend">
+  <title>फसल रक्षा · Fasal Raksha</title>
+  <!--
+    Drawn here, in the product's own palette (design/tokens.css): the near-black-green ground
+    #07110c and the lime #b9e879 that reads as crop and daylight. Flat fills, hairline strokes,
+    no gradients and no glow — the same rules the interface is held to.
+  -->
+  <defs>
+    <!-- One maize grain: a wedge with a rounded crown, the way it sits on the cob. -->
+    <path id="grain" d="M0 0 C 6.2 0 11 4.6 11 11.4 L 11 18.6 C 11 24.4 6.2 28 0 28 C -6.2 28 -11 24.4 -11 18.6 L -11 11.4 C -11 4.6 -6.2 0 0 0 Z" />
+    <clipPath id="frame">
+      <rect x="0" y="0" width="1200" height="300" rx="4" />
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#frame)">
+    <rect width="1200" height="300" fill="#07110c" />
+
+    <!-- A cob's worth of grains, spilling from the right edge. Rows are offset, as they are on a cob. -->
+    <g fill="#b9e879">
+      <g opacity="0.14">
+        <use href="#grain" x="1046" y="18" /><use href="#grain" x="1072" y="18" /><use href="#grain" x="1098" y="18" /><use href="#grain" x="1124" y="18" /><use href="#grain" x="1150" y="18" /><use href="#grain" x="1176" y="18" />
+        <use href="#grain" x="1059" y="50" /><use href="#grain" x="1085" y="50" /><use href="#grain" x="1111" y="50" /><use href="#grain" x="1137" y="50" /><use href="#grain" x="1163" y="50" /><use href="#grain" x="1189" y="50" />
+      </g>
+      <g opacity="0.26">
+        <use href="#grain" x="1046" y="82" /><use href="#grain" x="1072" y="82" /><use href="#grain" x="1098" y="82" /><use href="#grain" x="1124" y="82" /><use href="#grain" x="1150" y="82" /><use href="#grain" x="1176" y="82" />
+        <use href="#grain" x="1059" y="114" /><use href="#grain" x="1085" y="114" /><use href="#grain" x="1111" y="114" /><use href="#grain" x="1137" y="114" /><use href="#grain" x="1163" y="114" /><use href="#grain" x="1189" y="114" />
+      </g>
+      <g opacity="0.42">
+        <use href="#grain" x="1046" y="146" /><use href="#grain" x="1072" y="146" /><use href="#grain" x="1098" y="146" /><use href="#grain" x="1124" y="146" /><use href="#grain" x="1150" y="146" /><use href="#grain" x="1176" y="146" />
+        <use href="#grain" x="1059" y="178" /><use href="#grain" x="1085" y="178" /><use href="#grain" x="1111" y="178" /><use href="#grain" x="1137" y="178" /><use href="#grain" x="1163" y="178" /><use href="#grain" x="1189" y="178" />
+      </g>
+      <g opacity="0.62">
+        <use href="#grain" x="1046" y="210" /><use href="#grain" x="1072" y="210" /><use href="#grain" x="1098" y="210" /><use href="#grain" x="1124" y="210" /><use href="#grain" x="1150" y="210" /><use href="#grain" x="1176" y="210" />
+        <use href="#grain" x="1059" y="242" /><use href="#grain" x="1085" y="242" /><use href="#grain" x="1111" y="242" /><use href="#grain" x="1137" y="242" /><use href="#grain" x="1163" y="242" /><use href="#grain" x="1189" y="242" />
+      </g>
+      <!-- A few loose grains, fallen away from the cob. -->
+      <g opacity="0.5">
+        <use href="#grain" x="986" y="196" transform="rotate(-14 986 210)" />
+        <use href="#grain" x="944" y="238" transform="rotate(22 944 252)" />
+        <use href="#grain" x="1006" y="256" transform="rotate(-6 1006 270)" />
+      </g>
+    </g>
+
+    <!-- The sprout mark, drawn on the same 20px grid as the interface glyph set. -->
+    <g transform="translate(72 96) scale(2.1)" fill="none" stroke="#b9e879" stroke-width="1.25" stroke-linecap="square">
+      <path d="M10 19 V 9" />
+      <path d="M10 12 C 10 8, 7 5, 3 5 C 3 9, 6 12, 10 12 Z" />
+      <path d="M10 10 C 10 6.5, 12.6 4, 16.4 4 C 16.4 7.5, 13.8 10, 10 10 Z" />
+      <path d="M4.5 19 H 15.5" />
+    </g>
+
+    <text x="136" y="126" fill="#f4f7f3" font-family="Manrope, 'Segoe UI', system-ui, sans-serif" font-size="46" font-weight="800" letter-spacing="-1.5">Fasal Raksha</text>
+    <text x="136" y="166" fill="#b9e879" font-family="'Nirmala UI', 'Noto Sans Devanagari', system-ui, sans-serif" font-size="30" font-weight="600">फसल रक्षा</text>
+    <text x="136" y="212" fill="#91a097" font-family="'DM Sans', 'Segoe UI', system-ui, sans-serif" font-size="19">Today's rate first. Then a decision you can defend.</text>
+    <text x="136" y="240" fill="#91a097" font-family="'DM Mono', ui-monospace, 'Cascadia Mono', monospace" font-size="15" letter-spacing="0.06em">OFFLINE-FIRST · MARATHI, HINDI, ENGLISH · NASHIK · SIH 2026 · PS 26132</text>
+
+    <rect x="0" y="292" width="1200" height="8" fill="#b9e879" opacity="0.5" />
+  </g>
+</svg>

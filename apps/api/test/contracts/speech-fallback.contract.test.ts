@@ -7,7 +7,7 @@ import { randomBytes } from 'node:crypto';
 
 import { describe, expect, it } from 'vitest';
 
-import { ClaudeModelFallbackAdapter, FALLBACK_MODEL, MockModelFallbackAdapter, type FallbackRequest, type ModelFallbackAdapter } from '../../src/adapters/model-fallback/model-fallback.js';
+import { HostedModelFallbackAdapter, FALLBACK_MODEL, MockModelFallbackAdapter, type FallbackRequest, type ModelFallbackAdapter } from '../../src/adapters/model-fallback/model-fallback.js';
 import { BhashiniSpeechAdapter, MockSpeechAdapter, type SpeechAdapter } from '../../src/adapters/speech/speech.js';
 import crops from '../../../../data/reference/crops.json' with { type: 'json' };
 import { recorded } from './support/recorded.js';
@@ -84,7 +84,7 @@ const ONYON = { crop: 'onion', quantity: { value: 5, unit: 'quintal' }, price_am
 
 const fallbacks: Array<[string, () => ModelFallbackAdapter]> = [
   ['mock', () => new MockModelFallbackAdapter()],
-  ['live', () => new ClaudeModelFallbackAdapter({ apiKey: 'sk-test', transport: claude(ONYON).transport })],
+  ['live', () => new HostedModelFallbackAdapter({ apiKey: 'sk-test', transport: claude(ONYON).transport })],
 ];
 
 describe.each(fallbacks)('ARCH-06 · P1-10 · ModelFallbackAdapter contract (%s)', (_mode, make) => {
@@ -107,7 +107,7 @@ describe.each(fallbacks)('ARCH-06 · P1-10 · ModelFallbackAdapter contract (%s)
 describe('ARCH-06 · ModelFallbackAdapter, live-only behaviour', () => {
   it('asks claude-opus-5 for structured output at low effort, with server-side refusal fallbacks', async () => {
     const api = claude(ONYON);
-    await new ClaudeModelFallbackAdapter({ apiKey: 'sk-test', transport: api.transport }).suggest(request('onyon 5 quintal', ['crop']));
+    await new HostedModelFallbackAdapter({ apiKey: 'sk-test', transport: api.transport }).suggest(request('onyon 5 quintal', ['crop']));
     const call = api.calls[0];
     const body = call?.body as { model: string; fallbacks: unknown; output_config: { effort: string; format: { type: string } }; system: string };
     expect(body.model).toBe('claude-opus-5');
@@ -120,18 +120,18 @@ describe('ARCH-06 · ModelFallbackAdapter, live-only behaviour', () => {
 
   it('drops a crop outside the dictionary and a quantity that makes no sense', async () => {
     const odd = claude({ crop: 'kiwi', quantity: { value: -5, unit: 'quintal' }, price_amount: null, place: null, intent: 'sell' });
-    const s = await new ClaudeModelFallbackAdapter({ apiKey: 'sk-test', transport: odd.transport }).suggest(request('kiwi 5', ['crop', 'quantity']));
+    const s = await new HostedModelFallbackAdapter({ apiKey: 'sk-test', transport: odd.transport }).suggest(request('kiwi 5', ['crop', 'quantity']));
     expect(s).toMatchObject({ crop: null, quantity: null });
   });
 
   it('treats a refusal as "no suggestion" — the farmer is simply asked', async () => {
     const refusal = claude({}, { content: [], stop_reason: 'refusal', stop_details: { type: 'refusal', category: null, explanation: null } });
-    const s = await new ClaudeModelFallbackAdapter({ apiKey: 'sk-test', transport: refusal.transport }).suggest(request('onyon', ['crop']));
+    const s = await new HostedModelFallbackAdapter({ apiKey: 'sk-test', transport: refusal.transport }).suggest(request('onyon', ['crop']));
     expect(s).toEqual({ crop: null, quantity: null, price: null, place: null, intent: null });
   });
 
   it('a rejected key is reported as not configured, with no raw SDK error leaking out', async () => {
     const denied = recorded([{ when: () => true, status: 401, json: { type: 'error', error: { type: 'authentication_error', message: 'invalid x-api-key' } } }]);
-    await expect(new ClaudeModelFallbackAdapter({ apiKey: 'sk-bad', transport: denied.transport }).suggest(request('onyon', ['crop']))).rejects.toMatchObject({ problem: 'not-configured' });
+    await expect(new HostedModelFallbackAdapter({ apiKey: 'sk-bad', transport: denied.transport }).suggest(request('onyon', ['crop']))).rejects.toMatchObject({ problem: 'not-configured' });
   });
 });

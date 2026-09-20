@@ -7,7 +7,7 @@ import { resolve } from 'node:path';
 import type { Config } from '../config.js';
 import { AgmarknetMarketDataAdapter, MockMarketDataAdapter, type MarketDataAdapter } from './market-data/market-data.js';
 import { LiveSmsMessagingAdapter, MockMessagingAdapter, type MessagingAdapter } from './messaging/index.js';
-import { ClaudeModelFallbackAdapter, MockModelFallbackAdapter, type ModelFallbackAdapter } from './model-fallback/model-fallback.js';
+import { HostedModelFallbackAdapter, MockModelFallbackAdapter, type ModelFallbackAdapter } from './model-fallback/model-fallback.js';
 import { LiveBuyerRegistryAdapter, LiveFarmerRegistryAdapter } from './registry/live.js';
 import { MockBuyerRegistryAdapter, MockFarmerRegistryAdapter } from './registry/mock.js';
 import type { BuyerRegistryAdapter, FarmerRegistryAdapter } from './registry/types.js';
@@ -71,7 +71,7 @@ export function createAdapters(config: Config, repoRoot: string): Adapters {
           })
         : new MockSpeechAdapter(),
     modelFallback:
-      config.MODEL_FALLBACK_ADAPTER === 'live' ? new ClaudeModelFallbackAdapter({ apiKey: need(config.ANTHROPIC_API_KEY, 'ANTHROPIC_API_KEY') }) : new MockModelFallbackAdapter(),
+      config.MODEL_FALLBACK_ADAPTER === 'live' ? new HostedModelFallbackAdapter({ apiKey: need(config.MODEL_FALLBACK_KEY, 'MODEL_FALLBACK_KEY') }) : new MockModelFallbackAdapter(),
     storage:
       config.STORAGE_ADAPTER === 'live'
         ? new LiveStorageRegistryAdapter(gateway(config.LOGISTICS_GATEWAY_URL, config.LOGISTICS_GATEWAY_KEY, ['LOGISTICS_GATEWAY_URL', 'LOGISTICS_GATEWAY_KEY']))

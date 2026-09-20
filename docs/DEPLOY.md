@@ -139,7 +139,7 @@ Every adapter is switched by one environment variable, and a live adapter missin
 | `WEATHER_ADAPTER` | Open-Meteo forecasts | nothing — it is a public API |
 | `REGISTRY_ADAPTER` | Real PM-KISAN / AgriStack lookup | `REGISTRY_GATEWAY_URL`, `REGISTRY_GATEWAY_KEY` |
 | `SPEECH_ADAPTER` | Bhashini speech-to-text | `BHASHINI_URL`, `BHASHINI_KEY`, `BHASHINI_SERVICE_IDS` |
-| `MODEL_FALLBACK_ADAPTER` | Server-side language model fallback | `ANTHROPIC_API_KEY` |
+| `MODEL_FALLBACK_ADAPTER` | Server-side language fallback when the rule-based parser cannot read a sentence | `MODEL_FALLBACK_KEY`, optionally `MODEL_FALLBACK_MODEL` |
 | `STORAGE_ADAPTER`, `TRANSPORT_ADAPTER` | Real warehouse and tariff directories | `LOGISTICS_GATEWAY_URL`, `LOGISTICS_GATEWAY_KEY` |
 | `CHANNEL_SECRET` | Opens the WhatsApp/SMS/IVR webhooks | a shared secret your gateway presents |
 

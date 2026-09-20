@@ -39,7 +39,7 @@ const LIVE_REQUIREMENTS: ReadonlyArray<readonly [string, readonly string[]]> = [
   ['REGISTRY_ADAPTER', ['REGISTRY_GATEWAY_URL', 'REGISTRY_GATEWAY_KEY']],
   ['MESSAGING_ADAPTER', ['SMS_GATEWAY_URL', 'SMS_GATEWAY_KEY', 'SMS_TEMPLATE_ID']],
   ['SPEECH_ADAPTER', ['BHASHINI_URL', 'BHASHINI_KEY', 'BHASHINI_SERVICE_IDS']],
-  ['MODEL_FALLBACK_ADAPTER', ['ANTHROPIC_API_KEY']],
+  ['MODEL_FALLBACK_ADAPTER', ['MODEL_FALLBACK_KEY']],
   ['STORAGE_ADAPTER', ['LOGISTICS_GATEWAY_URL', 'LOGISTICS_GATEWAY_KEY']],
   ['TRANSPORT_ADAPTER', ['LOGISTICS_GATEWAY_URL', 'LOGISTICS_GATEWAY_KEY']],
 ];
@@ -79,7 +79,9 @@ const BaseSchema = z.object({
   /** JSON map of locale → Bhashini ASR service id, e.g. {"mr":"…","hi":"…"}. */
   BHASHINI_SERVICE_IDS: optionalSecret,
   MODEL_FALLBACK_ADAPTER: adapterMode,
-  ANTHROPIC_API_KEY: optionalSecret,
+  /** The hosted language model's credential, and optionally which model to ask. */
+  MODEL_FALLBACK_KEY: optionalSecret,
+  MODEL_FALLBACK_MODEL: optionalSecret,
   STORAGE_ADAPTER: adapterMode,
   TRANSPORT_ADAPTER: adapterMode,
   LOGISTICS_GATEWAY_URL: optionalUrl,

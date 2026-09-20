@@ -25,6 +25,11 @@ data/uploads/
 playwright-report/
 test-results/
 
+# Editor and tooling state, not the product.
+.claude/
+.vscode/
+.idea/
+
 *.log
 .DS_Store
 Thumbs.db

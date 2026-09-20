@@ -12,7 +12,7 @@
  *   MockModelFallbackAdapter — spelling-tolerant matching against the crop dictionary ("onyon",
  *                              "tamaatarr"): the most common failure of a rule cascade, handled
  *                              deterministically; everything else it leaves unresolved
- *   ClaudeModelFallbackAdapter — Claude (claude-opus-5) through the Anthropic SDK, with
+ *   HostedModelFallbackAdapter — a hosted language model, reached through its vendor SDK, with
  *                              structured output and server-side refusal fallbacks
  */
 import Anthropic from '@anthropic-ai/sdk';
@@ -123,13 +123,14 @@ const SuggestionSchema = z.object({
   intent: z.enum(['sell', 'enquire']).nullable().describe('sell = offering produce; enquire = asking about rates. Null if unclear.'),
 });
 
-export interface ClaudeFallbackConfig {
+export interface HostedFallbackConfig {
   apiKey: string;
   transport?: Transport;
   timeoutMs?: number;
 }
 
-export const FALLBACK_MODEL = 'claude-opus-5';
+/** The hosted model asked, overridable per deployment: this is configuration, not a choice in code. */
+export const FALLBACK_MODEL = process.env['MODEL_FALLBACK_MODEL'] ?? 'claude-opus-5';
 
 function systemPrompt(request: FallbackRequest): string {
   const crops = request.crops.map((c) => `${c.id} (${c.names.en} / ${c.names.mr} / ${c.names.hi})`).join('; ');
@@ -142,11 +143,11 @@ function systemPrompt(request: FallbackRequest): string {
   ].join('\n');
 }
 
-export class ClaudeModelFallbackAdapter implements ModelFallbackAdapter {
+export class HostedModelFallbackAdapter implements ModelFallbackAdapter {
   readonly mode = 'live' as const;
   private readonly client: Anthropic;
 
-  constructor(config: ClaudeFallbackConfig) {
+  constructor(config: HostedFallbackConfig) {
     this.client = new Anthropic({
       apiKey: config.apiKey,
       // A farmer is waiting on this: one quick retry, then the parse-confirm card simply asks.
@@ -170,19 +171,19 @@ export class ClaudeModelFallbackAdapter implements ModelFallbackAdapter {
         messages: [{ role: 'user', content: request.text }],
       });
     } catch (error) {
-      if (error instanceof Anthropic.RateLimitError) throw new AdapterError('Claude fallback', 'upstream-unavailable', 'The language fallback is busy; the farmer will be asked directly.');
+      if (error instanceof Anthropic.RateLimitError) throw new AdapterError('language fallback', 'upstream-unavailable', 'The language fallback is busy; the farmer will be asked directly.');
       if (error instanceof Anthropic.AuthenticationError || error instanceof Anthropic.PermissionDeniedError) {
-        throw new AdapterError('Claude fallback', 'not-configured', 'The language fallback is not authorised on this server.');
+        throw new AdapterError('language fallback', 'not-configured', 'The language fallback is not authorised on this server.');
       }
-      if (error instanceof Anthropic.BadRequestError) throw new AdapterError('Claude fallback', 'upstream-rejected', 'The language fallback refused the request.');
+      if (error instanceof Anthropic.BadRequestError) throw new AdapterError('language fallback', 'upstream-rejected', 'The language fallback refused the request.');
       if (error instanceof Anthropic.APIError || error instanceof Anthropic.APIConnectionError) {
-        throw new AdapterError('Claude fallback', 'upstream-unavailable', 'The language fallback could not be reached.');
+        throw new AdapterError('language fallback', 'upstream-unavailable', 'The language fallback could not be reached.');
       }
       throw error;
     }
     if (response.stop_reason === 'refusal') return guardSuggestion(request, {});
     const parsed = response.parsed_output;
-    if (parsed === null || parsed === undefined) throw new AdapterError('Claude fallback', 'bad-response', 'The language fallback did not return a readable answer.');
+    if (parsed === null || parsed === undefined) throw new AdapterError('language fallback', 'bad-response', 'The language fallback did not return a readable answer.');
     return guardSuggestion(request, {
       crop: parsed.crop,
       quantity: parsed.quantity,

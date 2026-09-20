@@ -21,7 +21,7 @@ describe('ARCH-06 · adapters are chosen by .env', () => {
       ...BASE,
       WEATHER_ADAPTER: 'live',
       MODEL_FALLBACK_ADAPTER: 'live',
-      ANTHROPIC_API_KEY: 'sk-test',
+      MODEL_FALLBACK_KEY: 'sk-test',
       STORAGE_ADAPTER: 'live',
       TRANSPORT_ADAPTER: 'live',
       LOGISTICS_GATEWAY_URL: 'https://logistics.example.in',
@@ -38,6 +38,6 @@ describe('ARCH-06 · adapters are chosen by .env', () => {
   });
 
   it('treats an empty credential as missing', () => {
-    expect(() => loadConfig({ ...BASE, MODEL_FALLBACK_ADAPTER: 'live', ANTHROPIC_API_KEY: '' })).toThrow(/ANTHROPIC_API_KEY is required/);
+    expect(() => loadConfig({ ...BASE, MODEL_FALLBACK_ADAPTER: 'live', MODEL_FALLBACK_KEY: '' })).toThrow(/MODEL_FALLBACK_KEY is required/);
   });
 });

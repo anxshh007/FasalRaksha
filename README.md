@@ -1,204 +1,188 @@
-# फसल रक्षा · Fasal Raksha — Phase 2 prototype (v3)
+<p align="center">
+  <img src="docs/brand/banner.png" alt="फसल रक्षा · Fasal Raksha — today's rate first, then a decision you can defend" width="900">
+</p>
 
-**Offline-first price intelligence and a verified-buyer marketplace for the field gate.**
-Smart India Hackathon 2026 · PS 26132 — *Strengthening market linkages and price discovery for
-farmers* · Government of Maharashtra, Maharashtra State Innovation Society · Team Fasal Rakshak.
+<p align="center">
+  <strong>Offline-first price intelligence and a verified-buyer marketplace for the field gate.</strong><br>
+  Smart India Hackathon 2026 · PS 26132 — <em>Strengthening market linkages and price discovery for farmers</em><br>
+  Government of Maharashtra · Maharashtra State Innovation Society · Team Fasal Rakshak
+</p>
 
-> Fasal Raksha does not merely find a buyer. It protects the farmer's decision before the buyer
-> names the price.
+---
 
-| Read first | What it is |
-|---|---|
-| [`PROMPT.md`](PROMPT.md) | The master build prompt (v3) — the contract |
-| [`CONSTITUTION.md`](CONSTITUTION.md) | The eighteen rules that cannot be broken |
-| [`SPEC.md`](SPEC.md) | The condensed specification |
-| [`REQUIREMENTS.csv`](REQUIREMENTS.csv) | Traceability: every requirement, where it lives, which test proves it |
-| [`CUTS.md`](CUTS.md) | Every scope decision and substitution, with its reason |
-| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | The architecture map, decisions, gaps and phase plan |
-| [`docs/PHASE1-STUDY.md`](docs/PHASE1-STUDY.md) | What carries forward from the Phase-1 build, and what changes |
-| [`docs/DEPLOY.md`](docs/DEPLOY.md) | Running it somewhere other than this laptop: database, API, PWA, and mock to live |
+A farmer standing at the field gate is asked to name a price by someone who already knows what the
+mandi paid this morning. Fasal Raksha closes that gap before the buyer opens his mouth: today's
+district rate, what waiting would actually cost, and which buyer leaves the most money in the
+farmer's hand after freight and the risk of being paid late.
 
-## Status
+> **It does not merely find a buyer. It protects the farmer's decision before the buyer names the price.**
 
-Built phase by phase, each gate proven and committed (PROMPT PART XV). **All twenty-one phases are built, and the §16
-demonstration runs unbroken in both themes.** What is here:
-- the foundation, and the shared domain engine;
-- the schema with row-level security, and authentication;
-- the nine adapters;
-- the synthetic dataset with its cleaner;
-- the forecast pipeline with its validation table;
-- sealed, versioned bundles served with ETags;
-- the offline core: service worker, device store, verified district-first sync, session persistence
-  across connectivity loss, and the outbox (Gate A, automated);
-- the Phase-1 identity on a real design system: NIGHT and FIELD themes, self-hosted Manrope, DM
-  Sans, DM Mono and Noto Sans Devanagari, a drawn glyph set, the record spine and the field-mode
-  strip. Every colour pair passes AA in both themes, and the performance budget is measured on
-  every run.
-- the morning briefing: the district benchmark first and largest (sparkline, MSP floor, seven-day
-  movement, seasonal position), the RAKSHA answer with its forecast shown as a band, the
-  farmer's own lot, and "Why this signal?" — a ledger of the nine layers with measured weights.
-- selling by voice or text in Marathi, Hindi or English: the farmer's words are parsed on the
-  phone, shown back in a "here's what we understood" card that asks, with a single tap, about
-  anything unclear (above all: ₹2,500 per quintal, per kilo, or for the whole lot?), and saved
-  as a listing that goes through the outbox, offline or not. Offline, the mic records, and the
-  recording is written down when the network returns.
-- a photograph of the lot: the viewfinder guides in the farmer's words (too dark, move closer,
-  hold steady…), the shutter waits until the frame is right, five views are graded on the phone
-  (ONNX Runtime Web, an INT8 model per crop family) into a grade and a confidence band, and the
-  farmer confirms, changes or skips it. The photo is queued with the listing and uploads in
-  resumable pieces; the server strips it of all metadata and keeps it behind signed links.
-- an explained buyer shortlist, ranked on the phone by what actually reaches the farmer: the
-  offer, less freight, less the cost of waiting for payment and the chance of not being paid.
-  No match percentage anywhere; a buyer offering more that ranks lower says why; buyers left out
-  are counted by reason; and when nothing beats the farmer's own mandi, the list is empty and
-  says what to do instead.
-- offers and the sauda slip: a listed lot draws offers from verified buyers, each shown with its
-  basis (₹ per quintal), what it comes to for the whole lot, how it compares with today's district
-  rate and what the buyer's completed deals say about being paid. The farmer accepts, names their
-  own price instead, or says no. On acceptance the server — not either party — issues the sauda
-  slip, with the benchmark of the day, the grade and its provenance, the freight estimate and the
-  proportional split frozen into it, and prints it at A5. With no network the offers and the slip
-  are all still readable, and agreeing to anything is not: that is Gate G.
-- the rest of the deal: each side confirms delivery for itself, the farmer confirms that the
-  money arrived, and then each side says how the other did — paid on time, fair weighment, picked
-  up as agreed. That mutual rating is the only thing a reputation is ever written by, and it is
-  always shown with the number of people behind it, so one rating cannot look like a hundred
-  closed deals.
-- Judge Mode (`#/_judge`, typed, never linked): the release actually loaded and how old it is,
-  every adapter in the mode it is really running in, all nine RAKSHA layers with their measured
-  weights, the seven conditions with pass or fail, the pipeline's validation table, the ingest
-  report, the grading models with "field-validated: false" on them, this phone's own cache, and
-  the requirements table. Every figure is read at the moment it is shown. It is the one place in
-  the product where model terminology is allowed, and a test enforces that fence both ways.
-- the same answer on a feature phone: one inbound message — "कांदा लासलगाव भाव", or
-  `KANDA LASALGAON` — comes back as a WhatsApp reply, a single-segment SMS
-  (`Kanda Lasalgaon Rs3508/qtl · 7d +4% · vikri karava`) or a spoken IVR script, all quoting the
-  figure the app computes on the device. The channels carry published district information only:
-  a sender id on an SMS gateway is a claim, not an identity, so nothing about anyone's lots or
-  deals ever goes out over one.
-- weather as urgency, not prediction: "Rain expected Thursday in Nashik. Onion is
-  moisture-sensitive — move the lot within 48 hours." One sentence, computed on the phone from a
-  published forecast, and nothing at all once that forecast is more than two days old. The sauda
-  slip suggests the first day in the lot's own window that the weather does not argue against, and
-  when the advice is to wait, the warehouse, its rate and the e-NWR pledge under the CGS-NPF
-  guarantee are named beside it — because advice to wait given to a farmer who cannot wait is not
-  advice.
-- when something goes wrong: from the moment both sides agree the lot changed hands, either of
-  them can say so — one of five plain reasons, their own words, and the photograph already taken
-  of the lot — and it goes to the agriculture officer of their own district, who is the only
-  person who can move it. While a complaint is open, the buyer's rating is not shown at all.
-- group sales: a lot offered for group sale shows the one consignment it can join — who is
-  gathering it, for which buyer, how much is in it against the buyer's minimum, and how much is
-  still needed. Putting the lot in clears the consignment when the volume clears the minimum;
-  taking it out re-opens it. The farmer's own share is shown in quintals of the total, which is
-  how the money will be split. Joining needs a network, and the screen says why.
+Everything a farmer sees is computed **on their own phone**, from sealed, hash-verified data
+bundles. Kill the server mid-session and the prices, the sell-or-wait answer, the evidence behind
+it and the ranked buyers all keep rendering — freshly calculated, not a cached screenshot of
+yesterday.
 
-A farmer can choose a language, sign in, verify a PM-KISAN record and see their district's prices
-and a sell/wait decision computed on the phone, with the reasons laid out, then list a crop by
-speaking or typing, with a graded photograph, and see which buyer leaves them best off. All of it
-keeps working with the API killed or the network gone — the shortlist included, which is the
-second half of Gate A. A small lot that no bulk buyer would look at twice can join six of its
-neighbours and clear that buyer's minimum. A price is agreed only where it can be recorded for
-both sides at once, a buyer's record is what their completed deals say it is, and a complaint has
-somewhere to go, and every recommendation carries the mechanism that makes it possible. The
-narrowest channels carry the same figure as the richest, and a judge can check every claim on
-this page against the running system. The §16 rehearsal is the last phase (P21).
+---
 
-The twenty-three steps of §16.3 are an automated test, run twice on every verify — once in NIGHT
-and once in FIELD — from choosing Marathi before sign-in, through the camera, the shortlist, the
-deal, the sauda slip, the dispute, the network being switched off and the outbox draining when it
-comes back. `apps/web/e2e/rehearsal.spec.ts` is the demonstration.
+## What it looks like
 
-All ten acceptance gates (PROMPT §14.3) now have automated proofs, and `pnpm verify` runs them:
-A offline · B security · C camera · D staleness · E the guardrail · F matching · G deal state ·
-H language · I price units · J requirements.
+<table>
+  <tr>
+    <td width="33%" valign="top"><img src="docs/screens/03-briefing.png" alt="The morning briefing" width="100%"></td>
+    <td width="33%" valign="top"><img src="docs/screens/04-evidence.png" alt="Why this signal" width="100%"></td>
+    <td width="33%" valign="top"><img src="docs/screens/07-buyers.png" alt="The buyer shortlist" width="100%"></td>
+  </tr>
+  <tr>
+    <td valign="top"><b>The morning briefing.</b> The district rate first and largest, with the MSP floor, the seven-day movement drawn by hand, and the season's position. Rain in Nashik on Sunday says so, in words a farmer can act on.</td>
+    <td valign="top"><b>"Why this signal?"</b> Nine layers of evidence with their measured weights, the seven conditions that must hold before waiting is ever suggested, and technical detail underneath for anyone who wants to check the arithmetic.</td>
+    <td valign="top"><b>The buyers.</b> Ranked by what actually reaches the farmer — the offer, less freight, less the cost of waiting for payment and the chance of not being paid. No match percentages anywhere.</td>
+  </tr>
+  <tr>
+    <td valign="top"><img src="docs/screens/05-price-unit.png" alt="The price unit question" width="100%"></td>
+    <td valign="top"><img src="docs/screens/09-sauda-slip.png" alt="The sauda slip" width="100%"></td>
+    <td valign="top"><img src="docs/screens/10-offline.png" alt="Field mode, with no network" width="100%"></td>
+  </tr>
+  <tr>
+    <td valign="top"><b>₹2,500 — for what?</b> Per quintal, per kilo, or for the whole lot differ by two orders of magnitude. The app stops and asks with a single tap rather than guessing and being confidently wrong.</td>
+    <td valign="top"><b>The sauda slip.</b> Issued by the server the moment a price is agreed, with the day's benchmark, the grade and where it came from, the freight estimate and a suggested pickup day frozen into it. Prints at A5.</td>
+    <td valign="top"><b>Field mode.</b> No network, and the product still knows everything it knew: the benchmark, the decision, the evidence, the shortlist — all computed on the phone from verified bundles.</td>
+  </tr>
+</table>
 
-`REQUIREMENTS.csv` is the source of truth for what is real. Run `pnpm requirements` to see it.
-Two rows are deliberately still `planned`: FR-02 and FR-03, the buyer's own desk, which this
-build does not have (CUTS C-11).
+<p align="center"><img src="docs/brand/grain-rule.svg" alt="" width="520"></p>
 
-## Quick start
+## Try it in two minutes
 
-Requires Node ≥ 20.11, pnpm 10 and Python 3.11+.
-
-The fastest way to see it: `pnpm install`, then `pnpm demo`, then open **http://127.0.0.1:4173**.
-That one command starts PostgreSQL with the committed price release, the API, and the production
-PWA with its service worker. Sign in with any mobile number: this is a test build, so the one-time
-code is shown on screen and no SMS is sent. Use a sample PM-KISAN number such as
-`PMK-MH-2003-11562` (Lasalgaon, Nashik) or `PMK-MH-2211-07314` (Ausa, Latur). To see field mode,
-stop the API or switch the network off: the app keeps calculating from the phone.
-
-Or run the pieces separately:
+You need Node 24 and pnpm. Nothing else — PostgreSQL is downloaded and run for you, and every
+external service has a mock, so there is no account to create and no key to paste.
 
 ```bash
 pnpm install
-pnpm db:start          # real PostgreSQL 18 (no Docker needed); writes .env; Ctrl+C stops it
-pnpm dev:api           # in a second terminal — http://127.0.0.1:8787/api/health
-                       # bundles: /api/bundles/manifest · /api/bundles/onion/nashik
-pnpm dev:web           # http://localhost:5173
-pnpm e2e               # Gate A in Microsoft Edge: kills the API mid-session and checks home still computes
+pnpm demo
 ```
 
-With Docker instead: `docker compose -f infra/docker-compose.yml --env-file .env up -d`, then
-`pnpm db:bootstrap` (see `.env.example`).
-
-`pnpm db:start` loads the newest committed bundle release, so prices are served without Python.
-To regenerate from scratch: `pnpm ml:pipeline --as-of 2026-09-18` (synthetic data → cleaned →
-RAKSHA → sealed bundle cores, about three minutes), then `pnpm bundles:publish`.
-
-Python pipeline environment:
+Open **http://127.0.0.1:4173**. Sign in with any phone number — the one-time code appears on
+screen — then pick any farmer from the demonstration registry list on the verification screen.
+Choose a Nashik one for the onion scenario.
 
 ```bash
-python -m venv .venv
-.venv/Scripts/python -m pip install -r ml/requirements.txt    # Windows
-.venv/bin/python -m pip install -r ml/requirements.txt        # Linux / macOS
+pnpm verify      # typecheck, build, unit, database, ML, 24 browser tests, requirements audit
 ```
 
-## Prove it
+## What makes it different
 
-```bash
-pnpm verify            # strict typecheck · build · unit · real-PostgreSQL · ml · Gate A end-to-end · traceability
-pnpm verify --deps     # … plus the dependency audit (fails at high)
+**It refuses.** When the evidence does not support waiting, the product says so and explains which
+condition failed, in a sentence a farmer can act on. Seven guardrails sit in front of every
+"wait", and any one of them failing blocks it. Onion — the demonstration crop — is exactly where
+forecasting is hardest, and a panel is more usefully shown a system that declines to advise than
+one that performs.
+
+**It never scores a farmer against themselves.** Buyers are ranked against the district modal
+price, never against the farmer's own asking price, and never with a percentage. The card shows
+the offer, the distance, the freight, the gross, what lands after freight, and the buyer's
+completed-deal record — every line checkable, nothing asking to be trusted.
+
+**It stops when the data is old.** Past seven days for perishables, fourteen for grains, the
+recommendation disappears on its own and the price stays with its date on it. A stale forecast can
+never reach a farmer wearing a recommendation.
+
+**It works where the network does not.** A service worker, an IndexedDB store and an outbox mean a
+lot can be listed standing in a field with no signal, and it syncs when the connection returns.
+Deal transitions are the one thing that cannot happen offline — they commit two parties at once —
+and the interface says exactly that instead of pretending.
+
+**It reaches beyond the smartphone.** The same engine answers WhatsApp, a 160-character SMS
+(`Kanda Lasalgaon Rs3508/qtl · 7d +4% · vikri karava`) and an IVR script in Marathi. A test asserts
+all four channels quote the identical figure for the same crop, district and date.
+
+**Nothing on a farmer's screen mentions a model.** Not "AI", not "confidence interval", not
+"score" — the words are banned by a test that scans the shipped copy. Security is invisible too:
+no padlocks, no "verified" badges, no "runs locally" reassurance. The product is trustworthy
+because of what it does, not because of what it claims.
+
+## How it is built
+
+```
+packages/shared   one implementation of every domain rule — benchmark, decision, matching,
+                  aggregation, deal state, parser, vision, channels. Zero dependencies, no I/O,
+                  no clock. The phone, the API and the channels all compute from this.
+apps/api          Fastify over PostgreSQL. Ownership lives in row-level security, not in code:
+                  every request asserts a signed actor for one transaction only.
+apps/web          React PWA. Marathi first, Hindi and English. Two themes — NIGHT for the hall,
+                  FIELD for standing in the sun.
+ml                The forecast pipeline: ingest, clean, climatology, features, conformal bands,
+                  validation, and the sealed bundle release the phone verifies.
+infra             Twelve ordered, checksummed migrations. Immutable once applied.
 ```
 
-Individually: `pnpm typecheck` · `pnpm build` · `pnpm test` · `pnpm test:db` · `pnpm e2e` · `pnpm ml:test` ·
-`pnpm requirements`.
+**Ten acceptance gates**, all automated and all run by `pnpm verify`:
 
-## Honesty notes (stated before anyone asks)
+| | Gate | Proven by |
+|---|---|---|
+| A | The backend can be killed mid-session and home still renders | The API process is really killed, then the screen is read |
+| B | Fourteen adversarial database tests fail to bypass | `pnpm test:security` |
+| C | Every one of fourteen camera failure paths is handled | A scripted camera, the real grader, the real upload pipeline |
+| D | An old forecast cannot produce a recommendation | The phone's clock moved past the crop's own limit |
+| E | Any single failed condition blocks WAIT | Seven independent refusals, and the screen obeying them |
+| F | Ranking is explainable, net-realisation ordered, no percentages | The three-buyer scenario, and a search for `%` |
+| G | An offline client cannot finalise a deal | A type-level proof, plus IndexedDB read with the network off |
+| H | Switching language changes the interface, not just speech | All three locales |
+| I | An ambiguous price unit cannot pass silently | The ₹2,500 test |
+| J | Every migrated Phase-1 defect has a passing test | The requirements audit |
 
-- **RAKSHA-QAD does not claim gradient boosting as an invention.** The contribution is the
-  decision architecture around a standard quantile estimator:
-  - skill-weighted fusion of nine signals, with measured weights;
-  - a cost-sensitive asymmetric decision rule on conformalised quantiles;
-  - a seven-condition guardrail that decides when the system refuses to advise.
-- **The market data is synthetic.** No real Agmarknet/MSAMB extract was supplied, so the pipeline
-  generates a structural price process and deliberately injects every defect class the cleaner
-  must repair (PROMPT §4.4). Its metrics prove the pipeline is sound. They prove nothing about
-  real Nashik onion prices.
-- **Volatile crops look worse, and the table shows by how much.** Onion, tomato and chilli are
-  regime-switching, and policy shocks such as export bans or stock limits cannot be forecast.
-  On the synthetic run:
-  - onion and tomato bands are roughly three to four times wider than the grains' (log width
-    0.32–0.46 against 0.09–0.14), and that width is what drives refusals;
-  - their skill against naive is lower (+0.05 to +0.26, grains +0.13 to +0.36);
-  - pomegranate at 14 days does not beat naive at all, so that horizon is withheld;
-  - banana at 14 days reaches only 0.44 held-out wait precision on 16 cases. That is printed as
-    it is, not smoothed over.
+## The demonstration
 
-  None of this has been tuned away, and none of it predicts what real onion data will show. The
-  generator's day-to-day noise is an order-of-magnitude assumption (grains about 1.5 % a day,
-  onion and tomato 6–7 %), not a measurement.
-- **Where the skill comes from.** The shipped layer weights are measured out of fold:
-  - arrival pressure (RK-3) and persistence (RK-1) carry most of it;
-  - the seasonal layer (RK-2) contributes mainly at 14 days for the grains;
-  - the weather layer (RK-4) earns roughly zero weight, because the generator couples rain to price
-    only weakly. RK-8 therefore gives it no vote.
+§16.3's twenty-three steps are an automated test — `apps/web/e2e/rehearsal.spec.ts` — run twice on
+every verify, once in each theme: choosing Marathi before sign-in, the benchmark, the evidence
+panel, a Marathi sentence understood on the phone, the ₹2,500 question, a frame too dark to use, a
+real lot of onions graded on the device, the ranked buyers, an offer taken, the sauda slip,
+delivery, payment, the buyer's record moving, a grade dispute with the photograph — then the
+network switched off, everything still computed on the phone, and the outbox draining when it
+comes back.
 
-  For the perishables, a skill of +0.2 against "no change" is mostly the model seeing through
-  day-to-day noise. For grains at 14 days it is mostly the harvest calendar. In neither case is it
-  the model foreseeing events.
-- **Every validation number is held out.** Folds are forward-chaining and purged. Seasonal
-  profiles, arrival norms and weather climatology use earlier years only, and tests fail if
-  truncating the future moves any past feature. The band widening, layer weights and wait
-  threshold are learned only from earlier folds when scoring a later one. The first run, before
-  these fixes, looked better. It was leaking.
+<p align="center"><img src="docs/screens/12-judge.png" alt="Judge Mode" width="820"></p>
+
+**Judge Mode** (`#/_judge`, typed, never linked from any farmer screen) is the one surface written
+to be disbelieved: the release actually loaded and its age, every external service in the mode it
+is really running in, all nine layers with their measured weights, the seven conditions, the
+pipeline's validation table, the ingest report, the grading models marked `field-validated: false`,
+this phone's own cache, and the requirements count. Every figure is read at the moment it is shown.
+
+## The documents
+
+| | |
+|---|---|
+| [`PROMPT.md`](PROMPT.md) | The master build prompt — the contract this was built against |
+| [`CONSTITUTION.md`](CONSTITUTION.md) | The eighteen rules that cannot be broken |
+| [`SPEC.md`](SPEC.md) | The condensed specification |
+| [`REQUIREMENTS.csv`](REQUIREMENTS.csv) | Every requirement, where it lives, which test proves it |
+| [`CUTS.md`](CUTS.md) | Every scope decision and substitution, with its reason |
+| [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | The map, the decisions taken in each phase, the gaps |
+| [`docs/DEPLOY.md`](docs/DEPLOY.md) | Running it somewhere other than a laptop |
+| [`docs/PHASE1-STUDY.md`](docs/PHASE1-STUDY.md) | What carries forward from Phase 1, and what changes |
+
+## Status, honestly
+
+Twenty-one phases built, ten gates green, **75 of 77 requirement rows done**. Run
+`pnpm requirements` to print the table.
+
+What is deliberately **not** built, and written down rather than implied:
+
+- **The buyer's own desk** (FR-02, FR-03). The demonstration traders act through the same API a
+  real buyer would, but no buyer signs in.
+- **The FPO and district-officer consoles.** Both are first-class accounts in the database with
+  tested endpoints and no screens of their own.
+- **A contact relay.** A masked handle is issued when a farmer acknowledges an offer; nothing yet
+  carries a call through it.
+- **Field-validated grading.** The models are trained on rendered lots, marked
+  `fieldValidated: false` everywhere, and the farmer always confirms the grade.
+
+The market data is a synthetic dataset built to the shape of the real feeds, with every defect of
+the real ones injected — wrong units, duplicate sessions, impossible rows, silent gaps — and the
+cleaner's report is in Judge Mode. Every screen that shows demonstration data says so.
+
+## Licence
+
+[Apache-2.0](LICENSE).
+
+<p align="center"><img src="docs/brand/grain-rule.svg" alt="" width="360"></p>

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 28" width="1200" height="28" role="img" aria-label="A row of maize grains">
+  <title>Maize grains</title>
+  <defs>
+    <path id="g" d="M0 0 C 4.4 0 7.8 3.2 7.8 8 L 7.8 13 C 7.8 17 4.4 19.6 0 19.6 C -4.4 19.6 -7.8 17 -7.8 13 L -7.8 8 C -7.8 3.2 -4.4 0 0 0 Z" />
+  </defs>
+  <g fill="#b9e879">
+    <g opacity="0.5">
+      <use href="#g" x="24" y="4" /><use href="#g" x="46" y="4" /><use href="#g" x="68" y="4" /><use href="#g" x="90" y="4" /><use href="#g" x="112" y="4" />
+      <use href="#g" x="134" y="4" /><use href="#g" x="156" y="4" /><use href="#g" x="178" y="4" /><use href="#g" x="200" y="4" /><use href="#g" x="222" y="4" />
+    </g>
+    <g opacity="0.3">
+      <use href="#g" x="244" y="4" /><use href="#g" x="266" y="4" /><use href="#g" x="288" y="4" /><use href="#g" x="310" y="4" /><use href="#g" x="332" y="4" />
+      <use href="#g" x="354" y="4" /><use href="#g" x="376" y="4" /><use href="#g" x="398" y="4" />
+    </g>
+    <g opacity="0.16">
+      <use href="#g" x="420" y="4" /><use href="#g" x="442" y="4" /><use href="#g" x="464" y="4" /><use href="#g" x="486" y="4" /><use href="#g" x="508" y="4" />
+    </g>
+  </g>
+</svg>
