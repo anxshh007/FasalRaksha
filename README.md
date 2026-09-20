@@ -19,8 +19,8 @@ farmers* · Government of Maharashtra, Maharashtra State Innovation Society · T
 
 ## Status
 
-Built phase by phase, each gate proven and committed (PROMPT PART XV). **Current: P18 — storage, transport
-and weather.** Done so far:
+Built phase by phase, each gate proven and committed (PROMPT PART XV). **Current: P19 — WhatsApp, SMS
+and IVR.** Done so far:
 - the foundation, and the shared domain engine;
 - the schema with row-level security, and authentication;
 - the nine adapters;
@@ -63,6 +63,12 @@ and weather.** Done so far:
   up as agreed. That mutual rating is the only thing a reputation is ever written by, and it is
   always shown with the number of people behind it, so one rating cannot look like a hundred
   closed deals.
+- the same answer on a feature phone: one inbound message — "कांदा लासलगाव भाव", or
+  `KANDA LASALGAON` — comes back as a WhatsApp reply, a single-segment SMS
+  (`Kanda Lasalgaon Rs3508/qtl · 7d +4% · vikri karava`) or a spoken IVR script, all quoting the
+  figure the app computes on the device. The channels carry published district information only:
+  a sender id on an SMS gateway is a claim, not an identity, so nothing about anyone's lots or
+  deals ever goes out over one.
 - weather as urgency, not prediction: "Rain expected Thursday in Nashik. Onion is
   moisture-sensitive — move the lot within 48 hours." One sentence, computed on the phone from a
   published forecast, and nothing at all once that forecast is more than two days old. The sauda
@@ -88,7 +94,8 @@ second half of Gate A. A small lot that no bulk buyer would look at twice can jo
 neighbours and clear that buyer's minimum. A price is agreed only where it can be recorded for
 both sides at once, a buyer's record is what their completed deals say it is, and a complaint has
 somewhere to go, and every recommendation carries the mechanism that makes it possible. The
-channels — WhatsApp, SMS, IVR — come next (P19).
+narrowest channels carry the same figure as the richest. Judge Mode and the full suite come next
+(P20).
 
 `REQUIREMENTS.csv` is the source of truth for what is real. Run `pnpm requirements` to see it.
 

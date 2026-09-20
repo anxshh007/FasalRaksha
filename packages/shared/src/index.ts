@@ -18,6 +18,7 @@ export * from './crops/locate.js';
 export * from './units/units.js';
 export * from './staleness/staleness.js';
 export * from './weather/urgency.js';
+export * from './channels/render.js';
 export * from './bundle/types.js';
 export * from './bundle/integrity.js';
 export * from './bundle/parse.js';

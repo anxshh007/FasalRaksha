@@ -14,21 +14,28 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-import type { CropProfile, OutboxEntry } from '@fasal/shared';
+import type { CropDictionary, OutboxEntry } from '@fasal/shared';
 import type { PoolClient } from 'pg';
 
 import { withActor, type Actor, type Database } from '../../db/actor.js';
 import { DomainError } from '../../http/errors.js';
 
 let knownCrops: Set<string> | null = null;
+let dictionary: CropDictionary | null = null;
 
-/** Crop ids from the shipped dictionary (data/reference/crops.json), read once. */
-export function cropIds(): Set<string> {
-  if (knownCrops === null) {
+/** The shipped crop dictionary (data/reference/crops.json), read once. */
+export function cropDictionary(): CropDictionary {
+  if (dictionary === null) {
     const path = resolve(import.meta.dirname, '../../../../../data/reference/crops.json');
-    const dictionary = JSON.parse(readFileSync(path, 'utf8')) as { crops: CropProfile[] };
-    knownCrops = new Set(dictionary.crops.map((c) => c.id));
+    const raw = JSON.parse(readFileSync(path, 'utf8')) as { dictionary?: CropDictionary } & CropDictionary;
+    dictionary = raw.dictionary ?? raw;
   }
+  return dictionary;
+}
+
+/** Crop ids from that dictionary. */
+export function cropIds(): Set<string> {
+  knownCrops ??= new Set(cropDictionary().crops.map((c) => c.id));
   return knownCrops;
 }
 

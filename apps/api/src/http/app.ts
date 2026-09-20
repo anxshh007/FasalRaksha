@@ -25,6 +25,7 @@ import type { Actor, Database } from '../db/actor.js';
 import type { Logger } from '../log/logger.js';
 import { refreshSession, requestOtp, revokeSession, verifyOtp, type AuthDeps, type SessionTokens } from '../modules/auth/service.js';
 import { cropBundle, currentManifest, sharedBundle, type ServedDocument } from '../modules/bundles/store.js';
+import { answerInbound, InboundBody, secretMatches } from '../modules/channels/service.js';
 import { demandFor } from '../modules/demand/service.js';
 import { weatherFor } from '../modules/weather/service.js';
 import { listMine } from '../modules/listings/service.js';
@@ -229,6 +230,22 @@ export function buildApp(deps: AppDependencies) {
 
   // Demand for the buyer shortlist (FR-09): signed-in only, verified on the phone like a bundle,
   // revalidated by ETag. The phone ranks it against its own lot, which never leaves the phone.
+  /**
+   * The narrow channels (PART XII). Authenticated by the gateway's shared secret, never by the
+   * sender id in the body: a phone number in an inbound webhook is a claim. The reply carries
+   * published district information only — the same figures the app computes, in three widths.
+   */
+  app.post('/api/channels/:channel/webhook', { config: { rateLimit: { max: 120, timeWindow: '1 minute' } } }, async (request, reply) => {
+    const { channel } = z.object({ channel: z.enum(['whatsapp', 'sms', 'ivr']) }).parse(request.params);
+    const presented = request.headers['x-channel-secret'];
+    if (!secretMatches(deps.config.CHANNEL_SECRET, typeof presented === 'string' ? presented : undefined)) {
+      throw new DomainError(401, 'CHANNEL_UNAUTHORISED', 'This webhook is not authorised.');
+    }
+    const answer = await answerInbound({ db: requireDb(), now }, channel, InboundBody.parse(request.body));
+    void reply.header('cache-control', 'no-store');
+    return answer;
+  });
+
   // Weather (§XIII): what a published source says, verifiable like a bundle. The urgency
   // sentence is computed on the phone from it, so it survives this server being killed.
   app.get('/api/weather/:district', { config: { rateLimit: { max: 60, timeWindow: '1 minute' } } }, async (request, reply) => {

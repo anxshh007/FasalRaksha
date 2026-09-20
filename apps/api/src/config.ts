@@ -89,6 +89,11 @@ const BaseSchema = z.object({
    * is the demonstration store; an object store implements the same PhotoStore interface.
    */
   PHOTO_STORE_DIR: z.string().trim().min(1).default('data/uploads'),
+  /**
+   * Shared with the WhatsApp/SMS/IVR gateway; every inbound webhook presents it (PART XII). No
+   * default: unset means those endpoints are closed, which is the safe way for them to fail.
+   */
+  CHANNEL_SECRET: optionalSecret,
   /** Strict CORS allowlist, comma-separated origins. */
   CORS_ORIGINS: z
     .string()

@@ -280,6 +280,17 @@ worth committing.
 | When the answer is to wait, the warehouse, its monthly rate and the e-NWR pledge under CGS-NPF are named beside the advice — and where the warehouse issues no e-NWR, that is said too | §XIII: advice to wait given to a farmer who cannot afford to wait is not advice. The pledge rate is written as "about 9 percent", in words, because the percent sign belongs to nothing on a farmer's screen. |
 | Gates D and E are proven twice: as arithmetic in `packages/shared`, and on the screen in `gates-de.spec.ts` | An engine that refuses correctly behind a screen that hedges is not a product. The browser test moves the phone's clock eight days past the bundle and watches the advice go while the price stays, and drives the lot to two thousand quintals to fail GR-7 live, with no network call. |
 
+### Decisions taken in P19
+
+| Decision | Reason |
+|---|---|
+| The channel renderers take a `Benchmark` and a `WaitEvaluation` and may not recompute either | That is what makes "identical benchmark on all four channels" a property of the code rather than a promise, and it is asserted twice: over the pure renderers, and end to end against a published bundle over HTTP. |
+| The SMS is transliterated Latin — `Kanda Lasalgaon Rs3508/qtl · 7d +4% · vikri karava` | A Devanagari SMS is 70 characters a segment instead of 160, and a farmer on a feature phone pays for every segment. The reply is measured in segments in the test, not just in characters. |
+| WhatsApp answers in Devanagari with the reason; IVR answers in short utterances with the menu last | A voice cannot be re-read, so one idea per utterance and the price before the menu: a farmer who only wanted the price can hang up having heard it. |
+| A refusal keeps its plain-language reason on every channel, and the condition ids never leave Judge Mode | "GR-6" is not a sentence. The channel copy is its own register — spoken and texted — so it lives beside the renderers rather than in the app's string table. |
+| The channels answer **published district information only**: benchmark, movement, verdict, refusal. Never a lot, a deal, an offer or a buyer | A sender id on an SMS gateway is a claim, not an identity, and it is trivially spoofed. Quoting a farmer's deals back to whoever texted their number would be the product's worst possible failure. The app, where the sender holds a session, is where that lives — and a test greps the channel payloads for it. |
+| The webhook is authenticated by a gateway secret (`CHANNEL_SECRET`) compared in constant time, and an unset secret closes the endpoint | An open webhook on a public URL is an open relay. Failing closed is the only safe default, and the 401 path is tested with no secret, a wrong secret and a longer secret. |
+
 ## 4 · Environment (measured 2026-09-19)
 
 Windows 11 · Node 24.19 · pnpm 10.34.5 · Python 3.12.6 (`.venv`, pinned `ml/requirements.txt`) ·
@@ -333,6 +344,6 @@ precisely what v3 PART IX forbids.
 | P16 | Delivery, payment, reputation | **reputation moves only on completed deals** — proven in the browser and against PostgreSQL |
 | P17 | Disputes, grievance routing | **open dispute suppresses clean reputation** — proven on the card and in the demand document |
 | P18 | Transport, storage, e-NWR, weather urgency | **Gates D, E** — proven in the engine and on the screen |
-| P19 | WhatsApp · SMS · IVR | identical benchmark on all four channels |
+| P19 | WhatsApp · SMS · IVR | **identical benchmark on all four channels** — asserted over the renderers and over HTTP |
 | P20 | Full suite, Judge Mode, seeds | **Gate J**; all ten gates green |
 | P21 | 23-step rehearsal, both themes | §16 unbroken twice |
