@@ -21,6 +21,7 @@
     "test:db": "vitest run --project db",
     "test:security": "vitest run test/security",
     "bootstrap": "tsx --conditions=source scripts/bootstrap.ts",
+    "provision": "tsx --conditions=source scripts/provision.ts",
     "seed-demo": "tsx --conditions=source scripts/seed-demo.ts",
     "bundles": "tsx --conditions=source scripts/publish-bundles.ts"
   },

@@ -83,6 +83,52 @@ export async function bootstrapDatabase(superuserUrl: string, options: Bootstrap
 }
 
 /**
+ * The managed-database path: the instance and its database already exist and were handed to you
+ * as one connection string, with no superuser and no second database to create. Everything
+ * `bootstrapDatabase` does except `CREATE DATABASE` — the two roles, the grants they need, and
+ * the extension the migrations expect — applied to the database the admin URL already names.
+ *
+ * The API still refuses to connect as the role the platform gave you (it owns the relations, so
+ * row-level security would not bind it); this is what creates the role it will connect as.
+ */
+export async function provisionDatabase(adminUrl: string, options: Omit<BootstrapOptions, 'database'>): Promise<BootstrapResult> {
+  if (options.ownerPassword.length < 16 || options.appPassword.length < 16) {
+    throw new Error('Database role passwords must be at least 16 characters.');
+  }
+  const base = new URL(adminUrl);
+  const database = decodeURIComponent(base.pathname.replace(/^\//, ''));
+  if (!IDENTIFIER.test(database)) throw new Error(`The admin URL must name a database; "${database}" is not one.`);
+
+  const admin = new pg.Client({ connectionString: adminUrl, application_name: 'fasal-provision' });
+  await admin.connect();
+  try {
+    await ensureRole(admin, OWNER_ROLE, options.ownerPassword);
+    await ensureRole(admin, APP_ROLE, options.appPassword);
+    // The owner creates the schemas; the app only ever connects.
+    await admin.query(`GRANT CONNECT, CREATE ON DATABASE "${database}" TO "${OWNER_ROLE}"`);
+    await admin.query(`GRANT CONNECT ON DATABASE "${database}" TO "${APP_ROLE}"`);
+    await admin.query('CREATE EXTENSION IF NOT EXISTS pgcrypto');
+    await admin.query(`ALTER ROLE "${APP_ROLE}" IN DATABASE "${database}" SET search_path = app, public`);
+    // Tightening, not correctness: a managed platform may not let its user revoke from PUBLIC,
+    // and the policies still bind without it. Report it rather than failing the provision.
+    for (const statement of [`REVOKE ALL ON DATABASE "${database}" FROM PUBLIC`, 'REVOKE CREATE ON SCHEMA public FROM PUBLIC']) {
+      try {
+        await admin.query(statement);
+      } catch (error) {
+        process.stderr.write(`  note: "${statement}" was refused (${(error as Error).message.trim()}). The policies still bind.\n`);
+      }
+    }
+  } finally {
+    await admin.end();
+  }
+
+  return {
+    ownerUrl: urlFor(base, OWNER_ROLE, options.ownerPassword, database),
+    appUrl: urlFor(base, APP_ROLE, options.appPassword, database),
+  };
+}
+
+/**
  * Install (or rotate) the request-context key in the database, as the owner. Run after
  * migrations. The same key must be in the API's DB_CONTEXT_KEY; until it is installed, every
  * signed request fails closed.

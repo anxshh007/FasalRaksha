@@ -17,6 +17,7 @@
     "test:security": "pnpm --filter @fasal/api run test:security",
     "db:start": "pnpm --filter @fasal/api run db:local",
     "db:bootstrap": "pnpm --filter @fasal/api run bootstrap",
+    "db:provision": "pnpm --filter @fasal/api run provision",
     "db:migrate": "pnpm --filter @fasal/api run migrate",
     "db:seed-demo": "pnpm --filter @fasal/api run seed-demo",
     "dev:api": "pnpm --filter @fasal/api run dev",

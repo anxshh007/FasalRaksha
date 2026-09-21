@@ -1,0 +1,83 @@
+# Render runs the API and the database; Netlify serves the PWA and proxies /api here
+# (see netlify.toml). Render can also serve both halves on one service — set WEB_DIST_DIR and
+# build the web workspace too — but with Netlify in front, this service answers only /api.
+#
+# Nothing in this file is a secret. DATABASE_URL, DB_CONTEXT_KEY and AUTH_SECRET are marked
+# `sync: false`, which means Render asks for them in the dashboard and never stores them here.
+# They come from `pnpm db:provision`, which is run once against the database below.
+
+databases:
+  - name: fasal-raksha-db
+    databaseName: fasal
+    plan: free
+    region: singapore
+    postgresMajorVersion: "17"
+
+services:
+  - type: web
+    name: fasal-raksha-api
+    runtime: node
+    plan: free
+    region: singapore
+    branch: main
+    healthCheckPath: /api/health
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm --filter @fasal/shared build && pnpm --filter @fasal/api build
+    startCommand: node apps/api/dist/server.js
+    envVars:
+      - key: NODE_VERSION
+        value: "24"
+
+      # ── the posture of a demonstration, stated rather than hidden ─────────────────────────
+      # `production` stops one-time codes being returned in the sign-in response, so nobody can
+      # sign in until MESSAGING_ADAPTER=live has a real SMS gateway behind it. A public
+      # demonstration has no gateway, so it runs as `development`: the code appears on screen,
+      # and the refresh cookie is not marked `Secure` (both hosts force HTTPS regardless).
+      # Change this to `production` the moment real farmers are involved.
+      - key: NODE_ENV
+        value: development
+
+      - key: API_HOST
+        value: 0.0.0.0
+      - key: LOG_LEVEL
+        value: info
+
+      # Photographs. The free plan has no persistent disk, so these last until the next deploy —
+      # acceptable for a demonstration. For anything longer, attach a disk and point this at it.
+      - key: PHOTO_STORE_DIR
+        value: /opt/render/project/src/data/uploads
+
+      # Every adapter stays on its mock: the demonstration runs entirely without third-party
+      # accounts, and Judge Mode reports the mode each one is really in.
+      - key: MARKET_ADAPTER
+        value: mock
+      - key: WEATHER_ADAPTER
+        value: mock
+      - key: REGISTRY_ADAPTER
+        value: mock
+      - key: MESSAGING_ADAPTER
+        value: mock
+      - key: SPEECH_ADAPTER
+        value: mock
+      - key: MODEL_FALLBACK_ADAPTER
+        value: mock
+      - key: STORAGE_ADAPTER
+        value: mock
+      - key: TRANSPORT_ADAPTER
+        value: mock
+
+      # ── entered in the dashboard, printed by `pnpm db:provision` ──────────────────────────
+      # DATABASE_URL is the least-privilege role (fasal_app), never the one Render hands you:
+      # that role owns the relations, and an owner is not bound by row-level security, so the
+      # API refuses to start as it.
+      - key: DATABASE_URL
+        sync: false
+      - key: DB_CONTEXT_KEY
+        sync: false
+      - key: AUTH_SECRET
+        sync: false
+
+    # A disk, for a deployment that should keep its photographs. Free instances cannot have one.
+    # disk:
+    #   name: photos
+    #   mountPath: /var/lib/fasal/photos
+    #   sizeGB: 1

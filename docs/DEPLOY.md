@@ -42,8 +42,19 @@ pnpm db:bootstrap    # creates the roles and the database, applies every migrati
                      # request-context key, and writes the URLs and secrets into a gitignored .env
 ```
 
-`db:bootstrap` is the whole of step 1 on a database you control. If the roles already exist —
-a managed instance where you were handed a connection string — apply migrations on their own:
+`db:bootstrap` is the whole of step 1 on a database you control. On a **managed** instance — Render, Neon, Supabase, RDS — you are handed one connection string
+for a database that already exists, and there is no superuser and nothing to create. Use
+`db:provision` instead: it makes the same two roles, grants them what they need, installs
+`pgcrypto`, applies every migration as the owner, installs the context key, and prints the
+environment to paste into the platform.
+
+```bash
+DATABASE_ADMIN_URL=postgres://user:pass@host/dbname pnpm db:provision
+```
+
+It is idempotent, but re-running **rotates both role passwords** — so the `DATABASE_URL` it
+prints has to be pasted back. Pass `DB_CONTEXT_KEY` and `AUTH_SECRET` to keep the ones a running
+deployment already uses. If the roles exist and you only want pending migrations:
 
 ```bash
 DATABASE_OWNER_URL=postgres://fasal_owner:…@host:5432/fasal pnpm db:migrate
@@ -183,6 +194,68 @@ the app never needs it.
 adapter's mode. If the release is `null`, `bundles:publish` has not run against that database.
 If sign-in never arrives, `MESSAGING_ADAPTER` is still `mock` in production, where one-time codes
 are deliberately not returned to the caller.
+
+---
+
+## 5b · A worked example: Netlify (the PWA) and Render (the API)
+
+Two hosts, one origin — Netlify proxies `/api/*` to Render, so the browser only ever sees the
+Netlify domain and §3's rule still holds. `netlify.toml` and `render.yaml` in the repository root
+are this arrangement, committed; neither holds a secret.
+
+**1 · The database and the API, on Render.** In the Render dashboard: *New → Blueprint*, point it
+at this repository. `render.yaml` declares a PostgreSQL instance and one web service, and asks
+for three values it deliberately does not store: `DATABASE_URL`, `DB_CONTEXT_KEY`, `AUTH_SECRET`.
+Leave them empty for now; the first deploy will fail its health check, which is correct.
+
+**2 · Provision the database, from your own machine.** Copy the database's *external* connection
+string from Render, then:
+
+```bash
+DATABASE_ADMIN_URL="postgres://…@…render.com/fasal" pnpm db:provision
+```
+
+Paste the three printed values into the Render service's environment and keep
+`DATABASE_OWNER_URL` for yourself. The role Render gives you owns the relations, so row-level
+security would not bind it — which is exactly why the API refuses to start as it, and why this
+step exists.
+
+**3 · Load the data the phone verifies**, against the same database:
+
+```bash
+DATABASE_OWNER_URL="postgres://fasal_owner:…@…render.com/fasal" pnpm bundles:publish
+DATABASE_OWNER_URL="postgres://fasal_owner:…@…render.com/fasal" pnpm db:seed-demo   # demonstration only
+```
+
+Redeploy the service. `GET /api/health` should now answer `{"ok":true,"database":"up"}`.
+
+**4 · The PWA, on Netlify.** *Add new site → Import an existing project*, same repository.
+`netlify.toml` supplies the build command, the publish directory, the headers and the proxy;
+the only thing to change is the proxy's target, which must be the API service's own URL:
+
+```toml
+[[redirects]]
+  from = "/api/*"
+  to = "https://<your-api>.onrender.com/api/:splat"
+  status = 200
+  force = true
+```
+
+**5 · Check it, rather than assume it.** Open `#/_judge` on the Netlify domain. It names the
+release actually loaded, its age, and the mode every adapter is really in. A `null` release means
+`bundles:publish` has not run against that database. If `/api/health` answers but the app does
+not, the proxy target is wrong.
+
+### What this arrangement costs you, stated plainly
+
+| | |
+|---|---|
+| **Sign-in** | `render.yaml` sets `NODE_ENV=development`, because in `production` one-time codes are not returned and there is no SMS gateway behind the mock — nobody could sign in. The code appears on screen, and the refresh cookie is not marked `Secure`. Both hosts force HTTPS regardless. Set `NODE_ENV=production` and `MESSAGING_ADAPTER=live` before anyone real uses it. |
+| **Cold starts** | A free Render service sleeps after 15 minutes idle and takes the better part of a minute to wake. Before a demonstration, open it once and leave a tab on it. |
+| **Photographs** | No persistent disk on the free plan: uploads last until the next deploy. Attach a disk and move `PHOTO_STORE_DIR` to it for anything longer. |
+| **The free database** | Render expires free PostgreSQL instances after 30 days. Steps 2 and 3 are the whole of recreating one. |
+| **Rate limiting** | The API sees Netlify's proxy address, not the visitor's, so its 300 requests/minute limit is shared across everyone arriving through the proxy. Fine for a panel; not for a crowd. |
+| **One region** | `render.yaml` asks for Singapore, the nearest to Maharashtra that Render offers. |
 
 ---
 
