@@ -6,11 +6,12 @@
 # domain to the API keeps the browser on **one** origin, which is what the app was built for.
 
 [build]
-  command = "corepack enable && pnpm install --frozen-lockfile && pnpm --filter @fasal/shared build && pnpm --filter @fasal/web build"
+  command = "corepack pnpm install --frozen-lockfile && corepack pnpm --filter @fasal/shared build && corepack pnpm --filter @fasal/web build"
   publish = "apps/web/dist"
 
 [build.environment]
   NODE_VERSION = "24"
+  COREPACK_ENABLE_DOWNLOAD_PROMPT = "0"
   # Vite's own `build` is what runs; nothing here is baked into the bundle.
   NPM_FLAGS = "--version"
 

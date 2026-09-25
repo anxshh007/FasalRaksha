@@ -37,10 +37,26 @@ function urlFor(base: URL, user: string, password: string, database: string): st
 async function ensureRole(client: pg.Client, role: string, password: string): Promise<void> {
   const { rowCount } = await client.query('SELECT 1 FROM pg_roles WHERE rolname = $1', [role]);
   if (rowCount === 0) await client.query(`CREATE ROLE "${role}"`);
+  const { rows: me } = await client.query<{ rolsuper: boolean }>('SELECT rolsuper FROM pg_roles WHERE rolname = current_user');
   // Utility statements cannot take bind parameters; the literal is escaped by the driver.
-  await client.query(
-    `ALTER ROLE "${role}" WITH LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS PASSWORD ${client.escapeLiteral(password)}`,
+  if (me[0]?.rolsuper === true) {
+    await client.query(
+      `ALTER ROLE "${role}" WITH LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION NOBYPASSRLS PASSWORD ${client.escapeLiteral(password)}`,
+    );
+    return;
+  }
+  // A managed platform's admin is not a superuser, and PostgreSQL refuses to let it name
+  // SUPERUSER, REPLICATION or BYPASSRLS in ALTER ROLE even to switch them off. CREATE ROLE
+  // already defaults every one of them to off, so set only what it may, then prove the rest.
+  await client.query(`ALTER ROLE "${role}" WITH LOGIN PASSWORD ${client.escapeLiteral(password)}`);
+  const { rows } = await client.query<Record<string, boolean>>(
+    'SELECT rolsuper, rolcreatedb, rolcreaterole, rolreplication, rolbypassrls FROM pg_roles WHERE rolname = $1',
+    [role],
   );
+  const excess = Object.entries(rows[0] ?? {}).filter(([, on]) => on).map(([attribute]) => attribute);
+  if (excess.length > 0) {
+    throw new Error(`Role "${role}" has ${excess.join(', ')}, and this admin cannot remove them. Drop the role and provision again.`);
+  }
 }
 
 export async function bootstrapDatabase(superuserUrl: string, options: BootstrapOptions): Promise<BootstrapResult> {

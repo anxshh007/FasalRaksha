@@ -21,11 +21,16 @@ services:
     region: singapore
     branch: main
     healthCheckPath: /api/health
-    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm --filter @fasal/shared build && pnpm --filter @fasal/api build
+    buildCommand: corepack pnpm install --frozen-lockfile && corepack pnpm --filter @fasal/shared build && corepack pnpm --filter @fasal/api build
     startCommand: node apps/api/dist/server.js
     envVars:
       - key: NODE_VERSION
         value: "24"
+      # The build runs pnpm through `corepack pnpm` (Render's /usr/bin is read-only, so
+      # `corepack enable` cannot install its shim); this stops corepack pausing to ask before it
+      # downloads the pnpm version package.json pins.
+      - key: COREPACK_ENABLE_DOWNLOAD_PROMPT
+        value: "0"
 
       # ── the posture of a demonstration, stated rather than hidden ─────────────────────────
       # `production` stops one-time codes being returned in the sign-in response, so nobody can
