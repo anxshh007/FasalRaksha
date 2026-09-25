@@ -115,7 +115,7 @@ pnpm install
 pnpm demo
 ```
 
-Open **(https://fasal-raksha.netlify.app/)**.
+Open **https://fasal-raksha.netlify.app/**.
 
 1. Sign in with **any** phone number — the one-time code appears on screen.
 2. On the verification screen, **tap any farmer** in the demonstration registry.
