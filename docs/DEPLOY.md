@@ -209,23 +209,40 @@ for three values it deliberately does not store: `DATABASE_URL`, `DB_CONTEXT_KEY
 Leave them empty for now; the first deploy will fail its health check, which is correct.
 
 **2 · Provision the database, from your own machine.** Copy the database's *external* connection
-string from Render, then:
+string from Render and append `?sslmode=require`: Render refuses unencrypted connections from
+outside its network, and without it every script fails with an SSL error. Then:
 
 ```bash
-DATABASE_ADMIN_URL="postgres://…@…render.com/fasal" pnpm db:provision
+DATABASE_ADMIN_URL="postgres://…@…render.com/fasal?sslmode=require" pnpm db:provision
+```
+
+```powershell
+$env:DATABASE_ADMIN_URL="postgres://…@…render.com/fasal?sslmode=require"; pnpm db:provision
 ```
 
 Paste the three printed values into the Render service's environment and keep
-`DATABASE_OWNER_URL` for yourself. The role Render gives you owns the relations, so row-level
+`DATABASE_OWNER_URL` for yourself. **Do not** paste your local `.env` into Render: its
+`127.0.0.1` URLs point at the database on your laptop, which Render cannot reach, and its secrets
+belong to that database, not this one. The role Render gives you owns the relations, so row-level
 security would not bind it — which is exactly why the API refuses to start as it, and why this
 step exists.
 
 **3 · Load the data the phone verifies**, against the same database:
 
 ```bash
-DATABASE_OWNER_URL="postgres://fasal_owner:…@…render.com/fasal" pnpm bundles:publish
-DATABASE_OWNER_URL="postgres://fasal_owner:…@…render.com/fasal" pnpm db:seed-demo   # demonstration only
+DATABASE_OWNER_URL="postgres://fasal_owner:…@…render.com/fasal?sslmode=require" pnpm bundles:publish
+DATABASE_OWNER_URL="postgres://fasal_owner:…@…render.com/fasal?sslmode=require" pnpm db:seed-demo   # demonstration only
 ```
+
+```powershell
+$env:DATABASE_OWNER_URL="postgres://fasal_owner:…@…render.com/fasal?sslmode=require"
+pnpm bundles:publish
+pnpm db:seed-demo
+```
+
+Set `DATABASE_OWNER_URL` in the shell every time: these scripts fall back to the repository's
+`.env` for anything the shell leaves unset, and that file's owner URL is your *local* database —
+a forgotten variable publishes to the laptop and leaves Render empty.
 
 Redeploy the service. `GET /api/health` should now answer `{"ok":true,"database":"up"}`.
 

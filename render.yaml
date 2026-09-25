@@ -38,6 +38,12 @@ services:
 
       - key: API_HOST
         value: 0.0.0.0
+      # Render routes traffic to $PORT (10000 unless overridden). The API reads API_PORT and would
+      # otherwise listen on its own default, 8787, which Render does not route to.
+      - key: PORT
+        value: "10000"
+      - key: API_PORT
+        value: "10000"
       - key: LOG_LEVEL
         value: info
 

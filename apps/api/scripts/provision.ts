@@ -9,11 +9,17 @@
  * must never use it: that role owns the relations, and an owner is not bound by row-level
  * security, so the API refuses to start as it (ARCH-03).
  *
- *   DATABASE_ADMIN_URL=postgres://user:pass@host/db pnpm db:provision
+ *   DATABASE_ADMIN_URL=postgres://user:pass@host/db pnpm db:provision          (bash)
+ *   set "DATABASE_ADMIN_URL=postgres://…" && pnpm db:provision                 (cmd.exe)
+ *   $env:DATABASE_ADMIN_URL="postgres://…"; pnpm db:provision                  (PowerShell)
  *
  * Idempotent: running it again re-asserts the roles, rotates their passwords (so it prints a new
  * DATABASE_URL, which must be pasted back) and applies only the migrations that are pending.
- * Pass DB_CONTEXT_KEY and AUTH_SECRET to keep the ones a deployment already uses.
+ *
+ * The secrets are generated fresh unless you put them in the *environment* — a deployment must
+ * not inherit the development ones that happen to be sitting in the repository's `.env`. Set
+ * DB_CONTEXT_KEY and AUTH_SECRET yourself when re-provisioning a deployment that already runs
+ * with them: rotating either one signs every existing session and actor assertion out.
  */
 import { randomBytes } from 'node:crypto';
 
@@ -22,6 +28,9 @@ import { migrate } from '../src/db/migrate.js';
 import { loadEnvIfPresent } from './lib/envfile.js';
 import { ENV_FILE, MIGRATIONS_DIR } from './lib/paths.js';
 
+// What the operator actually typed, before `.env` fills the gaps: `.env` is this machine's
+// development database, and its secrets must not silently become a deployment's.
+const shell = { ...process.env };
 loadEnvIfPresent(ENV_FILE);
 
 const adminUrl = process.env['DATABASE_ADMIN_URL'];
@@ -30,8 +39,8 @@ if (adminUrl === undefined || adminUrl === '') {
   process.exit(1);
 }
 
-const contextKey = process.env['DB_CONTEXT_KEY'] || randomBytes(32).toString('hex');
-const authSecret = process.env['AUTH_SECRET'] || randomBytes(32).toString('hex');
+const contextKey = shell['DB_CONTEXT_KEY'] || randomBytes(32).toString('hex');
+const authSecret = shell['AUTH_SECRET'] || randomBytes(32).toString('hex');
 
 const urls = await provisionDatabase(adminUrl, {
   ownerPassword: randomBytes(24).toString('base64url'),
